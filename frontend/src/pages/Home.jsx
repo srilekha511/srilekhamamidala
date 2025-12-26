@@ -6,6 +6,9 @@ import './Home.css'
 const Home = () => {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [displayedText, setDisplayedText] = useState('')
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [showCursor, setShowCursor] = useState(true)
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -21,6 +24,38 @@ const Home = () => {
     fetchProfile()
   }, [])
 
+  // Reset typewriter when profile loads
+  useEffect(() => {
+    if (profile) {
+      setDisplayedText('')
+      setCurrentIndex(0)
+      setShowCursor(true)
+    }
+  }, [profile])
+
+  // Typewriter effect
+  useEffect(() => {
+    if (!profile) return
+
+    const fullText = `Hi, I'm ${profile.name}`
+    
+    if (currentIndex < fullText.length) {
+      const timeout = setTimeout(() => {
+        setDisplayedText(fullText.substring(0, currentIndex + 1))
+        setCurrentIndex(currentIndex + 1)
+      }, 100) // Typing speed: 100ms per character
+      
+      return () => clearTimeout(timeout)
+    } else {
+      // Blinking cursor effect after typing is complete
+      const cursorInterval = setInterval(() => {
+        setShowCursor(prev => !prev)
+      }, 530)
+      
+      return () => clearInterval(cursorInterval)
+    }
+  }, [currentIndex, profile])
+
   if (loading) {
     return <div className="loading">Loading...</div>
   }
@@ -35,7 +70,8 @@ const Home = () => {
         <div className="container">
           <div className="hero-content">
             <h1 className="hero-title">
-              Hi, I'm <span className="highlight">{profile.name}</span>
+              {displayedText}
+              <span className="typewriter-cursor">{showCursor ? '|' : ''}</span>
             </h1>
             <p className="hero-subtitle">{profile.title}</p>
             <p className="hero-description">{profile.bio}</p>

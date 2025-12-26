@@ -6,15 +6,37 @@
   min-height: calc(100vh - 80px);
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  justify-content: flex-start;
+  background-image: url('/website.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  position: relative;
   color: white;
-  text-align: center;
+  text-align: left;
   padding: 2rem 0;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(112, 120, 153, 0.7) 0%, rgba(118, 75, 162, 0.7) 100%);
+  z-index: 0;
+}
+
+.hero > .container {
+  position: relative;
+  z-index: 1;
 }
 
 .hero-content {
   max-width: 800px;
+  width: 100%;
 }
 
 .hero-title {
@@ -22,6 +44,21 @@
   font-weight: 700;
   margin-bottom: 1rem;
   line-height: 1.2;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.typewriter-cursor {
+  color: #fbbf24;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
 }
 
 .highlight {
@@ -32,6 +69,7 @@
   font-size: 1.5rem;
   margin-bottom: 1rem;
   opacity: 0.9;
+  font-family: 'Courier New', Courier, monospace;
 }
 
 .hero-description {
@@ -39,12 +77,13 @@
   margin-bottom: 2rem;
   opacity: 0.8;
   line-height: 1.8;
+  font-family: 'Courier New', Courier, monospace;
 }
 
 .hero-buttons {
   display: flex;
   gap: 1rem;
-  justify-content: center;
+  justify-content: flex-start;
   margin-bottom: 2rem;
   flex-wrap: wrap;
 }
@@ -82,7 +121,7 @@
 .social-links {
   display: flex;
   gap: 1.5rem;
-  justify-content: center;
+  justify-content: flex-start;
   margin-top: 2rem;
 }
 
@@ -112,6 +151,10 @@
 }
 
 @media (max-width: 768px) {
+  .hero {
+    justify-content: flex-start;
+  }
+  
   .hero-title {
     font-size: 2.5rem;
   }
@@ -126,12 +169,16 @@
   
   .hero-buttons {
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
   }
   
   .btn {
     width: 100%;
     max-width: 300px;
+  }
+  
+  .social-links {
+    justify-content: flex-start;
   }
 }
 

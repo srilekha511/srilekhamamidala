@@ -4,18 +4,13 @@ import './About.css'
 
 const About = () => {
   const [profile, setProfile] = useState(null)
-  const [skills, setSkills] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [profileRes, skillsRes] = await Promise.all([
-          axios.get('/api/profile'),
-          axios.get('/api/skills')
-        ])
-        setProfile(profileRes.data)
-        setSkills(skillsRes.data)
+        const response = await axios.get('/api/profile')
+        setProfile(response.data)
       } catch (error) {
         console.error('Error fetching data:', error)
       } finally {
@@ -53,26 +48,6 @@ const About = () => {
               </div>
             </div>
           )}
-
-          <div className="skills-section">
-            <h3 className="skills-title">Skills</h3>
-            <div className="skills-grid">
-              {skills.map((skill, index) => (
-                <div key={index} className="skill-item">
-                  <div className="skill-header">
-                    <span className="skill-name">{skill.name}</span>
-                    <span className="skill-percentage">{skill.level}%</span>
-                  </div>
-                  <div className="skill-bar">
-                    <div 
-                      className="skill-progress" 
-                      style={{ width: `${skill.level}%` }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
     </div>

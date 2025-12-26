@@ -1,8 +1,7 @@
 .contact-content {
-  display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 3rem;
-  max-width: 1000px;
+  display: flex;
+  justify-content: center;
+  max-width: 600px;
   margin: 0 auto;
 }
 
@@ -10,7 +9,8 @@
   background-color: var(--bg-light);
   padding: 2rem;
   border-radius: 12px;
-  height: fit-content;
+  width: 100%;
+  text-align: center;
 }
 
 .contact-info h3 {
@@ -54,8 +54,10 @@
 
 .social-buttons {
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  flex-direction: row;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .social-button {
@@ -69,79 +71,18 @@
 }
 
 .social-button:hover {
-  transform: translateX(5px);
-  box-shadow: var(--shadow);
-}
-
-.contact-form {
-  background-color: var(--bg-light);
-  padding: 2rem;
-  border-radius: 12px;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: var(--text-color);
-  font-weight: 500;
-}
-
-.form-group input,
-.form-group textarea {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  font-family: inherit;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-  background-color: var(--bg-color);
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: var(--primary-color);
-}
-
-.form-group textarea {
-  resize: vertical;
-  min-height: 120px;
-}
-
-.submit-button {
-  width: 100%;
-  padding: 0.75rem 2rem;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  color: white;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.submit-button:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
 }
 
-.form-status {
-  padding: 1rem;
-  background-color: #10b981;
-  color: white;
-  border-radius: 6px;
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
-@media (max-width: 968px) {
+@media (max-width: 768px) {
   .contact-content {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+  
+  .contact-info {
+    padding: 1.5rem;
   }
 }
 
