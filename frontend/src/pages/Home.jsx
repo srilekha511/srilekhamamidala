@@ -37,7 +37,7 @@ const Home = () => {
   useEffect(() => {
     if (!profile) return
 
-    const fullText = `Hi, I'm ${profile.name}`
+    const fullText = `Hi, I'm ${profile.firstName}`
     
     if (currentIndex < fullText.length) {
       const timeout = setTimeout(() => {
@@ -73,27 +73,27 @@ const Home = () => {
               {displayedText}
               <span className="typewriter-cursor">{showCursor ? '|' : ''}</span>
             </h1>
-            <p className="hero-subtitle">{profile.title}</p>
+            <p className="hero-subtitle">{profile.role}</p>
             <p className="hero-description">{profile.bio}</p>
             <div className="hero-buttons">
               <Link to="/projects" className="btn btn-primary">
                 View My Work
               </Link>
-              <Link to="/contact" className="btn btn-secondary">
-                Get In Touch
-              </Link>
             </div>
-            <div className="social-links">
-              {profile.social.github && (
-                <a href={profile.social.github} target="_blank" rel="noopener noreferrer" className="social-link">
-                  GitHub
-                </a>
-              )}
-              {profile.social.linkedin && (
-                <a href={profile.social.linkedin} target="_blank" rel="noopener noreferrer" className="social-link">
-                  LinkedIn
-                </a>
-              )}
+            <div className="connect-section">
+              <p className="connect-text">Connect with me on:</p>
+              <div className="social-icons">
+                {profile.social.github && (
+                  <a href={profile.social.github} target="_blank" rel="noopener noreferrer" className="social-icon">
+                    <img src="/github.svg" alt="GitHub" />
+                  </a>
+                )}
+                {profile.social.linkedin && (
+                  <a href={profile.social.linkedin} target="_blank" rel="noopener noreferrer" className="social-icon social-icon-linkedin">
+                    <img src="/linkedin.svg" alt="LinkedIn" />
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </div>

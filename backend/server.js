@@ -13,11 +13,13 @@ app.use(express.json());
 
 // Sample data
 const profile = {
-  name: "Your Name",
-  title: "Software Developer",
-  bio: "Welcome to my personal website! I'm passionate about building amazing web experiences.",
+  firstName: "Srilekha",
+  fullName: "Srilekha Mamidala",
+  //role: "Computer Science, Data Science, and Economics",
+  fullRole: "Computer Science, Data Science, and Economics @ MIT",
+  bio: "I'm a student at MIT studying Computer Science, Data Science, and Economics. Check out my projects and experience, and feel free to reach out!",
   email: "your.email@example.com",
-  location: "Your City, Country",
+  headshot: "/headshot.jpg", // Path to headshot image (must be in frontend/public/)
   social: {
     github: "https://github.com/yourusername",
     linkedin: "https://linkedin.com/in/yourusername",

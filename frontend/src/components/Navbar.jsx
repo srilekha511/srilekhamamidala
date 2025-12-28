@@ -13,7 +13,7 @@ const Navbar = () => {
       <div className="container">
         <div className="nav-content">
           <Link to="/" className="logo">
-            <span>Portfolio</span>
+            <span>Srilekha Mamidala</span>
           </Link>
           <ul className="nav-links">
             <li>
@@ -29,11 +29,6 @@ const Navbar = () => {
             <li>
               <Link to="/projects" className={isActive('/projects')}>
                 Projects
-              </Link>
-            </li>
-            <li>
-              <Link to="/contact" className={isActive('/contact')}>
-                Contact
               </Link>
             </li>
           </ul>
