@@ -31,26 +31,47 @@ const projects = [
   {
     id: 1,
     title: "Project One",
-    description: "A brief description of your first project.",
+    category: "Web Development",
+    description: "A brief description of your first project. This project demonstrates various skills and technologies.",
+    whatILearned: "Through this project, I learned about React hooks, state management, and integrating APIs with Node.js and MongoDB.",
     technologies: ["React", "Node.js", "MongoDB"],
     link: "https://github.com/yourusername/project-one",
-    image: "https://via.placeholder.com/400x250"
+    image: "https://via.placeholder.com/400x250",
+    images: [
+      "https://via.placeholder.com/600x400",
+      "https://via.placeholder.com/600x400",
+      "https://via.placeholder.com/600x400"
+    ]
   },
   {
     id: 2,
     title: "Project Two",
-    description: "A brief description of your second project.",
+    category: "Full Stack",
+    description: "A brief description of your second project. This project showcases full-stack development capabilities.",
+    whatILearned: "I gained experience with Vue.js framework, Express.js backend development, and PostgreSQL database design.",
     technologies: ["Vue.js", "Express", "PostgreSQL"],
     link: "https://github.com/yourusername/project-two",
-    image: "https://via.placeholder.com/400x250"
+    image: "https://via.placeholder.com/400x250",
+    images: [
+      "https://via.placeholder.com/600x400",
+      "https://via.placeholder.com/600x400",
+      "https://via.placeholder.com/600x400"
+    ]
   },
   {
     id: 3,
     title: "Project Three",
-    description: "A brief description of your third project.",
+    category: "Frontend",
+    description: "A brief description of your third project. This project focuses on modern frontend technologies.",
+    whatILearned: "This project taught me TypeScript best practices, Next.js server-side rendering, and Tailwind CSS utility-first styling.",
     technologies: ["Next.js", "TypeScript", "Tailwind CSS"],
     link: "https://github.com/yourusername/project-three",
-    image: "https://via.placeholder.com/400x250"
+    image: "https://via.placeholder.com/400x250",
+    images: [
+      "https://via.placeholder.com/600x400",
+      "https://via.placeholder.com/600x400",
+      "https://via.placeholder.com/600x400"
+    ]
   }
 ];
 

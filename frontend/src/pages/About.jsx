@@ -28,8 +28,6 @@ const About = () => {
     <div className="about">
       <section className="section">
         <div className="container">
-          <h2 className="section-title">About Me</h2>
-          <p className="section-subtitle">Get to know me better</p>
           
           {profile && (
             <>
@@ -37,6 +35,8 @@ const About = () => {
                 <div className="about-header-text">
                   <h3 className="about-name">{profile.fullName}</h3>
                   <p className="about-role">{profile.fullRole}</p>
+                  <p className="section-subtitle">I'm interested in AI and fintech, and am passionate aboutfinding ways to integrate AI tools to create more accurate and inclusive financial services. </p>
+                  <p className="section-subtitle">Outside of classes, I help organize logistics for HackMIT, captain MIT's Indian Classical Dance Team, serve on MIT's Society of Women Engineers Board, and am treasurer for MIT's IEEE/ACM Chapter. </p>
                 </div>
                 {profile.headshot && (
                   <div className="about-headshot">
@@ -54,6 +54,8 @@ const About = () => {
 
                     Relevant Coursework:
                     Data Structures and Algorithms, Machine Learning, Econometrics, Game Theory, Linear Algebra, Optimization for Business Analytics, Probability and Statistics
+
+                    Teaching Assistant for Physics: Electricity and Magnetism
                    
                   </p>
                 </div>

@@ -106,7 +106,7 @@
 
 .section-card-content {
   font-size: 1rem;
-  color: var(--text-light);
+  color: var(--text-color);
   line-height: 1.8;
   font-family: 'Courier New', Courier, monospace;
 }

@@ -7,8 +7,8 @@
 :root {
   --primary-color: #6366f1;
   --secondary-color: #8b5cf6;
-  --text-color: #1f2937;
-  --text-light: #6b7280;
+  --text-color: #000000;
+  --text-light: #333333;
   --bg-color: #ffffff;
   --bg-light: #f9fafb;
   --border-color: #e5e7eb;
@@ -64,7 +64,7 @@ button {
 
 .section-subtitle {
   text-align: center;
-  color: var(--text-light);
+  color: var(--text-color);
   font-size: 1.1rem;
   margin-bottom: 3rem;
   max-width: 600px;
