@@ -81,7 +81,7 @@
 
 .about-sections-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
   gap: 2rem;
   margin-top: 3rem;
 }
@@ -109,6 +109,164 @@
   color: var(--text-color);
   line-height: 1.8;
   font-family: 'Courier New', Courier, monospace;
+}
+
+/* Intro text styling */
+.about-intro {
+  font-size: 1rem;
+  color: var(--text-color);
+  line-height: 1.8;
+  font-family: 'Courier New', Courier, monospace;
+  margin-bottom: 1rem;
+}
+
+/* Education section styling */
+.education-content {
+  font-size: 1rem;
+  color: var(--text-color);
+  line-height: 1.8;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.education-institution {
+  font-size: 1.2rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-color);
+}
+
+.education-major {
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.education-section {
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.coursework-list {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.course-item {
+  color: var(--text-color);
+}
+
+.education-teaching {
+  margin-top: 1rem;
+  color: var(--text-color);
+}
+
+/* Expandable items */
+.expandable-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.expandable-item {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.75rem;
+}
+
+.expandable-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.expandable-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0.75rem 0;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.3s ease;
+}
+
+.expandable-header:hover {
+  background-color: rgba(99, 102, 241, 0.05);
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  border-radius: 6px;
+}
+
+.expandable-header-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.expandable-title-section {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.expandable-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text-color);
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.expandable-place-line {
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+.expandable-place {
+  font-size: 1rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.expandable-date {
+  font-size: 0.95rem;
+  color: var(--text-color);
+  font-weight: 500;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.expandable-arrow {
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+  margin-left: 1rem;
+}
+
+.expandable-arrow.expanded {
+  transform: rotate(180deg);
+}
+
+.expandable-content {
+  padding: 1rem 0 0 0;
+  font-size: 0.95rem;
+  color: var(--text-color);
+  line-height: 1.8;
+  font-family: 'Courier New', Courier, monospace;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+  }
 }
 
 /* .skills-section {

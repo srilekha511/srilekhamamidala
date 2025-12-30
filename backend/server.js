@@ -21,9 +21,8 @@ const profile = {
   email: "your.email@example.com",
   headshot: "/headshot.jpg", // Path to headshot image (must be in frontend/public/)
   social: {
-    github: "https://github.com/yourusername",
-    linkedin: "https://linkedin.com/in/yourusername",
-    twitter: "https://twitter.com/yourusername"
+    github: "https://github.com/srilekha511",
+    linkedin: "https://www.linkedin.com/in/srilekha-mamidala/",
   }
 };
 

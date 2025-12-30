@@ -57,7 +57,7 @@ const Projects = () => {
       <section className="section">
         <div className="container">
           <h2 className="section-title">My Projects</h2>
-          <p className="section-subtitle">Here are some of my recent works</p>
+          <p className="section-subtitle">Check out some of my work below!</p>
           
           <div className="projects-grid">
             {projects.map((project) => (
