@@ -77,12 +77,12 @@ const Home = () => {
               <div className="social-icons">
                 {profile.social.github && (
                   <a href={profile.social.github} target="_blank" rel="noopener noreferrer" className="social-icon">
-                    <img src="/github.svg" alt="GitHub" />
+                    <img src={`${import.meta.env.BASE_URL}github.svg`} alt="GitHub" />
                   </a>
                 )}
                 {profile.social.linkedin && (
                   <a href={profile.social.linkedin} target="_blank" rel="noopener noreferrer" className="social-icon social-icon-linkedin">
-                    <img src="/linkedin.svg" alt="LinkedIn" />
+                    <img src={`${import.meta.env.BASE_URL}linkedin.svg`} alt="LinkedIn" />
                   </a>
                 )}
               </div>

@@ -148,7 +148,7 @@ const About = () => {
                 </div>
                 {profile.headshot && (
                   <div className="about-headshot">
-                    <img src={profile.headshot} alt={profile.fullName} />
+                    <img src={`${import.meta.env.BASE_URL}${profile.headshot.replace(/^\//, '')}`} alt={profile.fullName} />
                   </div>
                 )}
               </div>

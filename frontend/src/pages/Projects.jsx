@@ -52,10 +52,14 @@ const Projects = () => {
           <p className="section-subtitle">Check out some of my work below!</p>
           
           <div className="projects-grid">
-            {projects.map((project) => (
+            {projects.map((project) => {
+              const getImagePath = (imgPath) => {
+                return `${import.meta.env.BASE_URL}${imgPath.replace(/^\//, '')}`
+              }
+              return (
               <div key={project.id} className="project-card">
                 <div className="project-image">
-                  <img src={project.image} alt={project.title} />
+                  <img src={getImagePath(project.image)} alt={project.title} />
                 </div>
                 <div className="project-content">
                   <h3 className="project-title">{project.title}</h3>
@@ -75,13 +79,18 @@ const Projects = () => {
                   </button>
                 </div>
               </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
 
       {/* Project Modal */}
-      {selectedProject && (
+      {selectedProject && (() => {
+        const getImagePath = (imgPath) => {
+          return `${import.meta.env.BASE_URL}${imgPath.replace(/^\//, '')}`
+        }
+        return (
         <div className="project-modal-overlay" onClick={closeModal}>
           <div className="project-modal-content" onClick={(e) => e.stopPropagation()}>
             <button className="project-modal-close" onClick={closeModal}>×</button>
@@ -91,7 +100,7 @@ const Projects = () => {
               <div className="project-modal-gallery">
                 <div className="project-modal-main-image">
                   <img 
-                    src={selectedProject.images[selectedImageIndex] || selectedProject.image} 
+                    src={getImagePath(selectedProject.images[selectedImageIndex] || selectedProject.image)} 
                     alt={selectedProject.title} 
                   />
                 </div>
@@ -102,7 +111,7 @@ const Projects = () => {
                       className={`thumbnail ${index === selectedImageIndex ? 'active' : ''}`}
                       onClick={() => handleImageClick(index)}
                     >
-                      <img src={img} alt={`${selectedProject.title} ${index + 1}`} />
+                      <img src={getImagePath(img)} alt={`${selectedProject.title} ${index + 1}`} />
                     </div>
                   ))}
                 </div>
@@ -141,7 +150,8 @@ const Projects = () => {
             </div>
           </div>
         </div>
-      )}
+        )
+      })()}
     </div>
   )
 }

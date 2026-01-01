@@ -4,7 +4,7 @@
   position: relative;
   background-image: 
     linear-gradient(180deg, rgba(208, 215, 250, 0.906) 0%, rgba(167, 232, 232, 0.5) 100%),
-    url('/projectsactual.jpg');
+    url('var(--base-path)/projectsactual.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

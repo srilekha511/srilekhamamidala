@@ -6,9 +6,11 @@ import { join } from 'path'
 // Get the repository name from environment variable or use default
 // For GitHub Pages, the base path should be '/repository-name/'
 // If deploying to root domain (username.github.io), use '/'
+// 
+// IMPORTANT: Make sure this matches your actual GitHub repository name!
+// Repository name: srilekhamamidala
 const repositoryName = process.env.VITE_REPO_NAME || 'srilekhamamidala'
-// Manual override for this repository:
-const base = '/srilekhamamidala/'
+const base = repositoryName ? `/${repositoryName}/` : '/'
 
 export default defineConfig({
   plugins: [
