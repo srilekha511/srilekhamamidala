@@ -3,7 +3,7 @@
   min-height: 100vh;
   position: relative;
   background-image: 
-    linear-gradient(180deg, rgba(208, 215, 250, 0.906) 0%, rgba(199, 167, 232, 0.5) 100%),
+    linear-gradient(180deg, rgba(208, 215, 250, 0.906) 0%, rgba(167, 232, 232, 0.5) 100%),
     url('/projectsactual.jpg');
   background-size: cover;
   background-position: center;
@@ -18,7 +18,7 @@
 
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
   margin-top: 2rem;
 }
@@ -99,7 +99,7 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Raleway', sans-serif;
   font-size: 1rem;
 }
 
@@ -153,7 +153,7 @@
   align-items: center;
   justify-content: center;
   transition: background 0.3s ease;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Raleway', sans-serif;
 }
 
 .project-modal-close:hover {
@@ -234,7 +234,7 @@
   font-size: 2rem;
   font-weight: 700;
   color: var(--text-color);
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Raleway', sans-serif;
   margin: 0;
 }
 
@@ -242,7 +242,7 @@
   font-size: 1rem;
   color: var(--primary-color);
   font-weight: 600;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Raleway', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -251,7 +251,7 @@
   font-size: 1rem;
   color: var(--text-color);
   line-height: 1.8;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Raleway', sans-serif;
 }
 
 .project-modal-technologies {
@@ -272,14 +272,14 @@
   font-weight: 700;
   color: var(--text-color);
   margin-bottom: 0.75rem;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Raleway', sans-serif;
 }
 
 .learned-description {
   font-size: 1rem;
   color: var(--text-color);
   line-height: 1.8;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Raleway', sans-serif;
   margin: 0;
 }
 
@@ -290,7 +290,7 @@
   align-items: center;
   gap: 0.5rem;
   transition: color 0.3s ease;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Raleway', sans-serif;
   text-decoration: none;
   align-self: flex-start;
 }

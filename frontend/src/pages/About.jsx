@@ -1,6 +1,59 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import axios from 'axios'
 import './About.css'
+
+const TypewriterHeading = ({ text, className }) => {
+  const [displayedText, setDisplayedText] = useState('')
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [hasStarted, setHasStarted] = useState(false)
+  const headingRef = useRef(null)
+  const observerRef = useRef(null)
+
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !hasStarted) {
+            setHasStarted(true)
+          }
+        })
+      },
+      { threshold: 0.5 }
+    )
+
+    const currentObserver = observerRef.current
+    const currentElement = headingRef.current
+
+    if (currentElement) {
+      currentObserver.observe(currentElement)
+    }
+
+    return () => {
+      if (currentElement && currentObserver) {
+        currentObserver.unobserve(currentElement)
+      }
+    }
+  }, [hasStarted])
+
+  useEffect(() => {
+    if (!hasStarted) return
+
+    if (currentIndex < text.length) {
+      const timeout = setTimeout(() => {
+        setDisplayedText(text.substring(0, currentIndex + 1))
+        setCurrentIndex(currentIndex + 1)
+      }, 100) // Typing speed: 100ms per character
+
+      return () => clearTimeout(timeout)
+    }
+  }, [currentIndex, text, hasStarted])
+
+  return (
+    <h4 ref={headingRef} className={className}>
+      {displayedText}
+    </h4>
+  )
+}
 
 const ExpandableItem = ({ title, place, date, description }) => {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -56,7 +109,7 @@ const About = () => {
     institution: "Massachusetts Institute of Technology (MIT)",
     major: "Computer Science, Data Science, and Economics",
     coursework: ["Data Structures and Algorithms", "Machine Learning", "Econometrics", "Game Theory", "Linear Algebra", "Optimization for Business Analytics", "Probability and Statistics"],
-    teaching: "Teaching Assistant for Physics: Electricity and Magnetism"
+    teaching: "Teaching Assistant (TA) for Physics: Electricity and Magnetism"
   }
 
   const workExperience = [
@@ -70,20 +123,20 @@ const About = () => {
   ]
 
   const leadershipExperience = [
-    { title: "Logistics Coordinator", place: "HackMIT 2025", date: "September 2024 - Present", description: "Managed logistics for one of the nation's largest undergraduate hackathons, coordinating lodging, sponsor communications, and initiatives to maximize the hacker experience." },
+    { title: "Logistics Coordinator", place: "HackMIT 2025", date: "September 2024 - Present", description: "Managed logistics for one of the nation's largest undergraduate hackathons, coordinating lodging, hacker communications, and initiatives to maximize the hacker experience." },
     { title: "Board Representative, Career Development Committee", place: "MIT Society of Women Engineers (SWE) Chapter", date: "September 2024 - Present", description: "Led the SWE Annual Career Fair, coordinate industry info sessions, and develop workshops on communication, advocacy, and career exploration for club members." },
     { title: "Treasurer", place: "MIT IEEE/ACM Chapter", date: "September 2024 - Present", description: "Managed budget and led coordination with MIT administration to optimally allocate resources engaging 1,000+ MIT EECS students through faculty dinners, social events, and more." },
     { title: "Publicity/Marketing Chair", place: "MIT Undergraduate Research and Technology Conference", date: "September 2024 - Present", description: "Designed the conference logo and sponsorship and promotional materials for the largest-ever iteration of the conference, supporting and elevating student research." }
   ]
 
   const awards = [
-    { title: "Samuel A. Green Scholarship Recipient", place: "", date: "May 2024", description: "Awarded a $20,000 scholarship for demonstrating leadership potential and commitment to making a substantial impact in one's community." },
+    { title: "Samuel A. Green Scholarship Winner", place: "", date: "May 2024", description: "Awarded a $20,000 scholarship for demonstrating leadership potential and commitment to making a substantial impact in one's community." },
     { title: "Math Prize for Girls Invitee", place: "", date: "September 2023", description: "Selected as one of top 250 girls in the US and Canada to participate in the Math Prize for Girls competition at MIT." },
     { title: "3-time International Science and Engineering Fair (ISEF) Finalist", place: "", date: "2021, 2023, 2024", description: "Awarded for excellence in computer science (machine learning) research. 2024 Association for Computing Machinery $2,500 Special Award Winner." },
     { title: "National Junior Humanities and Science Symposium 1st Place Winner", place: "", date: "May 2022", description: "Awarded for excellence for machine learning-powered computational drug repurposing research." },
-    { title: "University of Pennsylvania Pennapps Hackathon", place: "", date: "September 2023", description: "Developed a computer vision application for more accurate screening of dermatological conditions." }
+    { title: "Winner at University of Pennsylvania Pennapps Hackathon", place: "", date: "September 2023", description: "Developed a computer vision application for more accurate screening of dermatological conditions." },
+    { title: "4-time American Invitational Mathematics Examination (AIME) Qualification", place: "", date: "September 2020-2024", description: "Qualified in the top 5% of test takers in the United States. Recognized as one of the top 5 girls in the Delaware Valley region." }
   ]
-
   if (loading) {
     return <div className="loading">Loading...</div>
   }
@@ -98,8 +151,8 @@ const About = () => {
                 <div className="about-header-text">
                   <h3 className="about-name">{profile.fullName}</h3>
                   <p className="about-role">{profile.fullRole}</p>
-                  <p className="about-intro">I'm interested in AI and fintech, and am passionate about finding ways to integrate AI tools to create more accurate and inclusive financial services.</p>
-                  <p className="about-intro">Outside of classes, I help organize logistics for HackMIT, captain MIT's Indian Classical Dance Team (MIT Nritya), serve on MIT's Society of Women Engineers Board, and am treasurer for MIT's IEEE/ACM Chapter.</p>
+                  <p className="about-intro">I'm interested in AI and fintech, and am passionate about finding ways to apply AI and ML to the financial services, operations, and investment industries.</p>
+                  <p className="about-intro">Outside of classes, I help organize logistics for <a href="https://hackmit.org/" target="_blank" rel="noopener noreferrer" style={{color: 'var(--primary-color)', textDecoration: 'underline'}}>HackMIT</a>, captain MIT's Indian Classical Dance Team (<a href="https://www.instagram.com/mitnritya/?hl=en" target="_blank" rel="noopener noreferrer" style={{color: 'var(--primary-color)', textDecoration: 'underline'}}>MIT Nritya</a>), serve on MIT's <a href="https://swe.mit.edu/" target="_blank" rel="noopener noreferrer" style={{color: 'var(--primary-color)', textDecoration: 'underline'}}>Society of Women Engineers (SWE)</a> Board, and am treasurer for MIT's <a href="https://ieeeacm.mit.edu/" target="_blank" rel="noopener noreferrer" style={{color: 'var(--primary-color)', textDecoration: 'underline'}}>IEEE/ACM</a> Chapter.</p>
                 </div>
                 {profile.headshot && (
                   <div className="about-headshot">
@@ -111,7 +164,7 @@ const About = () => {
               <div className="about-sections-grid">
                 {/* Education Section */}
                 <div className="about-section-card">
-                  <h4 className="section-card-title">Education</h4>
+                  <TypewriterHeading text="Education" className="section-card-title" />
                   <div className="education-content">
                     <div className="education-institution"><strong>{educationData.institution}</strong></div>
                     <div className="education-major"><strong>Major:</strong> {educationData.major}</div>
@@ -129,7 +182,7 @@ const About = () => {
 
                 {/* Work and Research Experience */}
                 <div className="about-section-card">
-                  <h4 className="section-card-title">Work and Research Experience</h4>
+                  <TypewriterHeading text="Work and Research Experience" className="section-card-title" />
                   <div className="expandable-list">
                     {workExperience.map((item, index) => (
                       <ExpandableItem
@@ -145,7 +198,7 @@ const About = () => {
 
                 {/* Leadership Experience */}
                 <div className="about-section-card">
-                  <h4 className="section-card-title">Leadership Experience</h4>
+                  <TypewriterHeading text="Leadership Experience" className="section-card-title" />
                   <div className="expandable-list">
                     {leadershipExperience.map((item, index) => (
                       <ExpandableItem
@@ -161,7 +214,7 @@ const About = () => {
 
                 {/* Awards and Achievements */}
                 <div className="about-section-card">
-                  <h4 className="section-card-title">Awards and Achievements</h4>
+                  <TypewriterHeading text="Awards and Achievements" className="section-card-title" />
                   <div className="expandable-list">
                     {awards.map((item, index) => (
                       <ExpandableItem

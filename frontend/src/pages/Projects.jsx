@@ -142,7 +142,7 @@ const Projects = () => {
                     rel="noopener noreferrer"
                     className="project-modal-link"
                   >
-                    View on GitHub →
+                    {selectedProject.linkText || "View on GitHub"} →
                   </a>
                 )}
               </div>
