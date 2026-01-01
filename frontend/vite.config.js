@@ -6,14 +6,9 @@ import { join } from 'path'
 // Get the repository name from environment variable or use default
 // For GitHub Pages, the base path should be '/repository-name/'
 // If deploying to root domain (username.github.io), use '/'
-// 
-// IMPORTANT: If you're still getting 404 errors, manually set the base path below:
-// - For project pages: const base = '/your-repo-name/'
-// - For user pages (username.github.io): const base = '/'
-const repositoryName = process.env.VITE_REPO_NAME || ''
-// Uncomment and set manually if auto-detection doesn't work:
-// const base = '/your-repo-name/'  // Replace 'your-repo-name' with your actual repo name
-const base = repositoryName ? `/${repositoryName}/` : '/'
+const repositoryName = process.env.VITE_REPO_NAME || 'srilekhamamidala'
+// Manual override for this repository:
+const base = '/srilekhamamidala/'
 
 export default defineConfig({
   plugins: [

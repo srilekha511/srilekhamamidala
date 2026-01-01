@@ -65,6 +65,44 @@ This project is configured for automatic deployment to GitHub Pages using GitHub
    - Your site will be available at: `https://[your-username].github.io/[repository-name]/`
    - For example: `https://srilekha511.github.io/PersonalWebsite/`
 
+### Troubleshooting "File Not Found" Error
+
+If you're getting a "404 File Not Found" error:
+
+1. **Check GitHub Actions:**
+   - Go to your repository → **Actions** tab
+   - Verify the workflow ran successfully
+   - Check if there were any build errors
+
+2. **Verify GitHub Pages Settings:**
+   - Go to **Settings** → **Pages**
+   - Ensure **Source** is set to **GitHub Actions** (not "Deploy from a branch")
+   - Wait a few minutes after enabling for the first deployment
+
+3. **Check Repository Name:**
+   - The base path is automatically set from your repository name
+   - If your repo is `username.github.io` (user/organization page), you need to set `base: '/'` in `vite.config.js`
+   - If your repo is a project page (e.g., `PersonalWebsite`), the base path should be `/PersonalWebsite/`
+
+4. **Manual Base Path Fix:**
+   - If the automatic base path detection isn't working, edit `frontend/vite.config.js`:
+   ```javascript
+   // For project pages (username.github.io/repo-name):
+   const base = '/your-repo-name/'
+   
+   // For user pages (username.github.io):
+   const base = '/'
+   ```
+   - Then rebuild and redeploy
+
+5. **Clear Browser Cache:**
+   - Try accessing the site in an incognito/private window
+   - Or clear your browser cache
+
+6. **Check the URL:**
+   - Make sure you're accessing: `https://[username].github.io/[repo-name]/`
+   - Note the trailing slash and the hash routes (e.g., `/#/about`)
+
 ### Manual Deployment
 
 If you prefer to deploy manually:
