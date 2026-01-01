@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
+import { profile as profileData } from '../data'
 import './Home.css'
 
 const Home = () => {
@@ -11,17 +11,9 @@ const Home = () => {
   const [showCursor, setShowCursor] = useState(true)
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await axios.get('/api/profile')
-        setProfile(response.data)
-      } catch (error) {
-        console.error('Error fetching profile:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchProfile()
+    // Use local data instead of API call
+    setProfile(profileData)
+    setLoading(false)
   }, [])
 
   // Reset typewriter when profile loads

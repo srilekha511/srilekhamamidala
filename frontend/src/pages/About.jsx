@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import axios from 'axios'
+import { profile as profileData } from '../data'
 import './About.css'
 
 const TypewriterHeading = ({ text, className }) => {
@@ -91,17 +91,9 @@ const About = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get('/api/profile')
-        setProfile(response.data)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchData()
+    // Use local data instead of API call
+    setProfile(profileData)
+    setLoading(false)
   }, [])
 
   // Data structures for different sections

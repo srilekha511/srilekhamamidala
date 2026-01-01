@@ -1,20 +1,13 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
+import { profile as profileData } from '../data'
 import './Contact.css'
 
 const Contact = () => {
   const [profile, setProfile] = useState(null)
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await axios.get('/api/profile')
-        setProfile(response.data)
-      } catch (error) {
-        console.error('Error fetching profile:', error)
-      }
-    }
-    fetchProfile()
+    // Use local data instead of API call
+    setProfile(profileData)
   }, [])
 
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
+import { projects as projectsData } from '../data'
 import './Projects.css'
 
 const Projects = () => {
@@ -9,17 +9,9 @@ const Projects = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await axios.get('/api/projects')
-        setProjects(response.data)
-      } catch (error) {
-        console.error('Error fetching projects:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchProjects()
+    // Use local data instead of API call
+    setProjects(projectsData)
+    setLoading(false)
   }, [])
 
   const openModal = (project) => {
