@@ -45,7 +45,7 @@ const Projects = () => {
   }
 
   return (
-    <div className="projects">
+    <div className="projects" style={{backgroundImage: `linear-gradient(180deg, rgba(208, 215, 250, 0.906) 0%, rgba(167, 232, 232, 0.5) 100%), url(${import.meta.env.BASE_URL}projectsactual.jpg)`}}>
       <section className="section">
         <div className="container">
           <h2 className="section-title">My Projects</h2>

@@ -58,7 +58,7 @@ const Home = () => {
 
   return (
     <div className="home">
-      <section className="hero">
+      <section className="hero" style={{backgroundImage: `url(${import.meta.env.BASE_URL}website.webp)`}}>
         <div className="container">
           <div className="hero-content">
             <h1 className="hero-title">

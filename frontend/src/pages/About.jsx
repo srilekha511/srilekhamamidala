@@ -134,7 +134,7 @@ const About = () => {
   }
 
   return (
-    <div className="about">
+    <div className="about" style={{backgroundImage: `url(${import.meta.env.BASE_URL}proejcts.jpg)`}}>
       <section className="section">
         <div className="container">
           {profile && (
