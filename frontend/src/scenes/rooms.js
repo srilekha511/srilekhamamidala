@@ -27,7 +27,7 @@ const ITEM_FRAME = { w: 48, h: 38, y: 50 }
 const HALL_GAP = 50
 const ITEM_GAP = 40
 const TILE_W = 24
-const TILE_GAP = 14
+const TILE_GAP = 64
 
 export function buildHall() {
   const frames = []
@@ -156,7 +156,7 @@ function sectionRoom(section, items) {
     theme: THEMES[section.id],
     frames,
     tiles,
-    width: Math.max(VIEW_W, tiles.at(-1).x + TILE_W + 40),
+    width: Math.max(VIEW_W, tiles.at(-1).x + TILE_W + 12),
     spawnX: 24,
   }
 }

@@ -5,7 +5,7 @@ export const AVATAR_H = 24
 export const AVATAR_PALETTE = {
   k: '#1b1b24', // hair
   s: '#c68e5e', // skin
-  g: '#2a2a2a', // glasses frame
+  g: '#6f7488', // glasses frame (light enough to read against dark eyes)
   e: '#1b1b24', // eyes
   p: '#e38a8a', // blush
   r: '#9c4a4a', // mouth

@@ -33,6 +33,17 @@ describe('rooms', () => {
       expect(room.width).toBeGreaterThanOrEqual(room.tiles.at(-1).x + room.tiles.at(-1).w)
     }
   })
+  it('tile labels (8px pixel font) never overlap', () => {
+    for (const id of sectionIds) {
+      const tiles = rooms[id].tiles
+      tiles.forEach((t, i) => {
+        if (i === 0) return
+        const prev = tiles[i - 1]
+        const gap = (t.x + t.w / 2) - (prev.x + prev.w / 2)
+        expect(gap).toBeGreaterThanOrEqual((t.label.length + prev.label.length) * 4 + 8)
+      })
+    }
+  })
   it('frames never overlap and are sorted left to right', () => {
     for (const room of Object.values(rooms)) {
       room.frames.forEach((f, i) => {
