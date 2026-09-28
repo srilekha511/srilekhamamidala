@@ -20,22 +20,33 @@ describe('rooms', () => {
     expect(rooms.about.frames.map((f) => f.id)).toEqual(['about-me', 'about-education', 'about-skills', 'about-interests'])
     expect(rooms.contact.frames.map((f) => f.id)).toEqual(['contact-email', 'contact-github', 'contact-linkedin'])
   })
+  it('every section room starts with a Home portal before the first painting', () => {
+    for (const id of sectionIds) {
+      const room = rooms[id]
+      const [start] = room.tiles
+      expect(start.target).toBe('hall')
+      expect(start.x + start.w).toBeLessThan(room.frames[0].x)
+      expect(room.spawnX).toBeGreaterThan(start.x + start.w + 14) // arrive clear of the tile
+      expect(room.spawnX).toBeLessThan(room.frames[0].x)
+    }
+  })
   it('every section room ends with Home + the other three sections', () => {
     for (const id of sectionIds) {
       const room = rooms[id]
-      const targets = room.tiles.map((t) => t.target)
+      const end = room.tiles.slice(1)
+      const targets = end.map((t) => t.target)
       expect(targets[0]).toBe('hall')
       expect(targets).toHaveLength(4)
       expect(targets).not.toContain(id)
       expect(new Set(targets)).toEqual(new Set(['hall', ...sectionIds.filter((s) => s !== id)]))
       const lastFrame = room.frames.at(-1)
-      expect(room.tiles[0].x).toBeGreaterThan(lastFrame.x + lastFrame.w)
-      expect(room.width).toBeGreaterThanOrEqual(room.tiles.at(-1).x + room.tiles.at(-1).w)
+      expect(end[0].x).toBeGreaterThan(lastFrame.x + lastFrame.w)
+      expect(room.width).toBeGreaterThanOrEqual(end.at(-1).x + end.at(-1).w)
     }
   })
   it('tile labels (8px pixel font) never overlap', () => {
     for (const id of sectionIds) {
-      const tiles = rooms[id].tiles
+      const tiles = rooms[id].tiles.slice(1)
       tiles.forEach((t, i) => {
         if (i === 0) return
         const prev = tiles[i - 1]

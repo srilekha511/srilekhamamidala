@@ -29,6 +29,9 @@ const HALL_GAP = 50
 const ITEM_GAP = 40
 const TILE_W = 24
 const TILE_GAP = 64
+const START_TILE_X = 16 // Home portal just inside the entrance
+const SECTION_SPAWN_X = 64 // arrive clear of that portal
+const FIRST_ITEM_X = 100
 
 export function buildHall() {
   const frames = []
@@ -136,14 +139,15 @@ function sectionRoom(section, items) {
     id: item.id,
     kind: 'item',
     label: item.card.title,
-    x: 70 + i * (ITEM_FRAME.w + ITEM_GAP),
+    x: FIRST_ITEM_X + i * (ITEM_FRAME.w + ITEM_GAP),
     ...ITEM_FRAME,
     thumb: item.thumb,
     card: item.card,
   }))
   const lastEnd = frames.length ? frames.at(-1).x + ITEM_FRAME.w : 40
   const destinations = [{ id: 'hall', label: 'Home', icon: 'house' }, ...SECTIONS.filter((s) => s.id !== section.id)]
-  const tiles = destinations.map((d, i) => ({
+  const startTile = { id: 'tile-hall-start', target: 'hall', label: 'Home', icon: 'house', x: START_TILE_X, w: TILE_W }
+  const endTiles = destinations.map((d, i) => ({
     id: `tile-${d.id}`,
     target: d.id,
     label: d.label,
@@ -156,9 +160,9 @@ function sectionRoom(section, items) {
     label: section.label,
     theme: THEMES[section.id],
     frames,
-    tiles,
-    width: Math.max(VIEW_W, tiles.at(-1).x + TILE_W + 12),
-    spawnX: 24,
+    tiles: [startTile, ...endTiles],
+    width: Math.max(VIEW_W, endTiles.at(-1).x + TILE_W + 12),
+    spawnX: SECTION_SPAWN_X,
   }
 }
 
