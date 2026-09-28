@@ -3,6 +3,7 @@ import { drawFrame, drawNameplate } from '../sprites/frame.js'
 import { drawTile } from '../sprites/tiles.js'
 import { drawIcon } from '../sprites/icons.js'
 import { drawCover } from '../paintings/covers.js'
+import { drawProjectArt } from '../paintings/projectArt.js'
 import { WAINSCOT_Y, FLOOR_Y, TILE_Y, TILE_H } from '../../scenes/rooms.js'
 
 export const frameInnerScreenRect = (f, camX) => ({ x: f.x - camX + 3, y: f.y + 3, w: f.w - 6, h: f.h - 6 })
@@ -35,10 +36,14 @@ function drawBackground(ctx, theme, camX, t) {
   }
 }
 
-function drawThumb(ctx, frame, r, assets, theme) {
+function drawThumb(ctx, frame, r, assets, theme, t) {
   const thumb = frame.thumb
   if (thumb?.type === 'image' && assets.thumbs.get(frame.id)) {
     ctx.drawImage(assets.thumbs.get(frame.id), r.x, r.y, r.w, r.h)
+    return
+  }
+  if (thumb?.type === 'art') {
+    drawProjectArt(ctx, thumb.art, r.x, r.y, r.w, r.h, t)
     return
   }
   if (thumb?.type === 'monogram') {
@@ -68,7 +73,7 @@ export function drawRoom(ctx, room, camX, t, assets, activeTileId) {
     const inner = frameInnerScreenRect(f, cam)
     if (f.kind === 'starry') ctx.drawImage(assets.starry, inner.x, inner.y, inner.w, inner.h)
     else if (f.kind === 'section') drawCover(ctx, f.cover, inner.x, inner.y, inner.w, inner.h, t)
-    else drawThumb(ctx, f, inner, assets, room.theme)
+    else drawThumb(ctx, f, inner, assets, room.theme, t)
     if (f.kind === 'section') drawNameplate(ctx, sx + f.w / 2, f.y + f.h + 5, f.label.toUpperCase())
   }
   for (const tile of room.tiles) {

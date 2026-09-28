@@ -3,7 +3,7 @@ export const profile = {
   fullName: "Srilekha Mamidala",
   fullRole: "Computer Science, Data Science, and Economics @ MIT",
   bio: "I'm a student at MIT studying Computer Science, Data Science, and Economics. Check out my projects and experience, and feel free to reach out!",
-  email: "your.email@example.com",
+  email: "mamidala@mit.edu",
   headshot: "/headshot.jpg",
   social: {
     github: "https://github.com/srilekha511",
@@ -110,6 +110,7 @@ export const experience = [
 export const projects = [
   {
     id: 2,
+    art: "chatbot",
     title: "AI-Powered Insurance Chatbot",
     category: "NLP, Full Stack",
     description: "An AI-powered SME insurance agent chatbot prototype that answers broker questions, makes coverage decisions, refers complex cases to human brokers, and uses rule-based logic combined with OpenAI's GPT model for conversational interactions.",
@@ -122,6 +123,7 @@ export const projects = [
   },
   {
     id: 3,
+    art: "formality",
     title: "An Empirical Evaluation of LLMs for the Assessment of Subjective Qualities",
     category: "ML/NLP Research",
     description: "Research done at the Decentralized Information Group, part of MIT's Computer Science and Artificial Intelligence Lab. Designed a framework involving human and LLM evaluation to assess subjective qualities, with this paper's specific focus being formality in professional communication.",
@@ -134,6 +136,7 @@ export const projects = [
   },
   {
     id: 4,
+    art: "election",
     title: "Web Scraping of Legislative Election Data for Knowledge Graph Analysis",
     category: "ML/NLP Research",
     description: "Research done at the MIT Election Data Science Lab. Built a data pipeline to transform unstructured election legislation into knowledge graphs and classified bills to study how lawmakers and interest groups influence election policy outcomes.",
@@ -147,6 +150,7 @@ export const projects = [
   },
   {
     id: 5,
+    art: "dermalab",
     title: "dermalab: AI and LLM-Powered Skin Disease Diagnosis",
     category: "ML/CV/NLP Hackathon Project",
     description: "Winner at PennApps XXIV, Best Use of MATLAB. Built dermalab, an end-to-end web platform that uses ML, deep learning, and LLMs to diagnose skin conditions, assess severity, predict disease spread, and explain results clearly to patients and doctors.",
@@ -163,6 +167,7 @@ export const projects = [
   },
   {
     id: 9,
+    art: "legal",
     title: "WhartonMunicode: LLMs for Legal Code Analysis",
     category: "ML, NLP Research",
     description: "Built a nanoGPT-based language model trained on thousands of municipal codes to explore how LLMs can support legal research and analysis in the public law domain.",
@@ -177,6 +182,7 @@ export const projects = [
   },
   {
     id: 6,
+    art: "brainNetwork",
     title: "A Holistic, Personalized Dementia Risk Prediction Framework",
     category: "ML Research",
     description: "Developed a personalized dementia risk prediction model by integrating ML awith network theory to capture complex lifestyle, environmental, and genetic interactions. Awarded a $2500 prize from the Association for Computing Machinery.",
@@ -192,6 +198,7 @@ export const projects = [
   },
   {
     id: 7,
+    art: "drugRepurposing",
     title: "NeuroCADR: Computational Drug Repurposing for Epilepsy",
     category: "Computational Biology Research",
     description: "Built an integrated computational pipeline to identify and prioritize novel anti-epileptic drug candidates through data-driven drug repurposing. Awarded 1st Place in the Mathematics and Computer Science Category at the National Junior Science and Humanities Symposium in Albuquerque, New Mexico.",
@@ -207,6 +214,7 @@ export const projects = [
   },
   {
     id: 8,
+    art: "foodShelfLife",
     title: "ML-Based Food Shelf Life Tracking",
     category: "ML, CV Research",
     description: "Designed a ML-based iOS app to predict food expiration dates, reducing food waste and minimizing the risk of foodborne illnesses. Recognized as a Congressional App Challenge Winner, American Statistical Association Award Winner, and MIT Solv[ED] Social Entrepreneurship Semifinalist.",
@@ -223,6 +231,7 @@ export const projects = [
   },
   {
     id: 1,
+    art: "campaign",
     title: "AI-Powered Performance Campaign Manager",
     category: "AI, Web Dev",
     description: "A web application that enables users to upload advertising campaign data from multiple platforms, analyze performance metrics, perform audience segmentation using ML, generate AI-powered optimization recommendations, and create PDF reports with cross-platform aggregations.",

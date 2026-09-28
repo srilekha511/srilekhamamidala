@@ -98,4 +98,10 @@ describe('rooms', () => {
       expect(contrast(t.ink, '#f4e6c8'), `${id} icon`).toBeGreaterThanOrEqual(4.5)
     }
   })
+  it('project frames show their pixel scene instead of a screenshot', () => {
+    rooms.projects.frames.forEach((f, i) => {
+      expect(f.thumb).toEqual({ type: 'art', art: data.projects[i].art })
+      expect(f.card.image).toBe(data.projects[i].image) // screenshot still in the card
+    })
+  })
 })

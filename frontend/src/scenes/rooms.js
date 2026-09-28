@@ -58,7 +58,7 @@ const card = (c) => ({ subtitle: '', meta: '', body: [], bullets: [], tags: [], 
 export function projectItems(projects) {
   return projects.map((p) => ({
     id: `project-${p.id}`,
-    thumb: { type: 'image', src: p.image },
+    thumb: { type: 'art', art: p.art ?? 'idea' },
     card: card({
       title: p.title,
       subtitle: p.category,
