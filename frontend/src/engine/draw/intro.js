@@ -1,4 +1,7 @@
-export const PAINT_FULL = { x: 16, y: 0, w: 288, h: 180 }
+import { VIEW_W } from '../renderer.js'
+
+// Full-screen painting rect (exact 2x of the 144x90 painting), centred in the current view.
+export const paintFull = () => ({ x: Math.round((VIEW_W - 288) / 2), y: 0, w: 288, h: 180 })
 
 // Pixel-by-pixel reveal into an offscreen canvas. Newly revealed pixels flash white for one frame.
 export function createIntroReveal(painting, order) {
@@ -55,7 +58,7 @@ export function drawWelcome(ctx, alpha, t) {
   ctx.textBaseline = 'top'
   const text = 'Welcome!'
   const w = ctx.measureText(text).width
-  const x = Math.round(160 - w / 2)
+  const x = Math.round(VIEW_W / 2 - w / 2)
   const y = 34
   ctx.fillStyle = '#0b1e4a'
   for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1], [2, 2]]) ctx.fillText(text, x + dx, y + dy)

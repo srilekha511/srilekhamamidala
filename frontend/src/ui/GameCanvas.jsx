@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { createEmitter } from '../engine/events.js'
 import { createGame } from '../engine/game.js'
-import { fitScale, VIEW_W, VIEW_H } from '../engine/renderer.js'
+import { fitView, setViewSize, VIEW_H } from '../engine/renderer.js'
 
 export default function GameCanvas({ options, handlers, onReady, children }) {
   const canvasRef = useRef(null)
@@ -9,6 +9,20 @@ export default function GameCanvas({ options, handlers, onReady, children }) {
   const handlersRef = useRef(handlers)
   const gameRef = useRef(null)
   handlersRef.current = handlers
+
+  // Declared first so the world width is set before the game is created.
+  useEffect(() => {
+    const fit = () => {
+      const { viewW, scale } = fitView(window.innerWidth, window.innerHeight)
+      setViewSize(viewW)
+      boxRef.current.style.width = `${viewW * scale}px`
+      boxRef.current.style.height = `${VIEW_H * scale}px`
+      gameRef.current?.resize(viewW)
+    }
+    fit()
+    window.addEventListener('resize', fit)
+    return () => window.removeEventListener('resize', fit)
+  }, [])
 
   useEffect(() => {
     const emitter = createEmitter()
@@ -23,17 +37,6 @@ export default function GameCanvas({ options, handlers, onReady, children }) {
     }
     // options are read once at mount by design
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  useEffect(() => {
-    const fit = () => {
-      const s = fitScale(window.innerWidth, window.innerHeight)
-      boxRef.current.style.width = `${VIEW_W * s}px`
-      boxRef.current.style.height = `${VIEW_H * s}px`
-    }
-    fit()
-    window.addEventListener('resize', fit)
-    return () => window.removeEventListener('resize', fit)
   }, [])
 
   const onPointerDown = (e) => {

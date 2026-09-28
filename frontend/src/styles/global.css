@@ -1,6 +1,6 @@
 :root {
-  --bg: #120e18;
-  --panel: #f4e6c8;
+  --bg: #f3ead9;
+  --panel: #fbf3e0;
   --ink: #2a1f14;
   --maroon: #8a1f2b;
   --gold: #d4a93a;
@@ -10,14 +10,16 @@
   --body: 'Pixelify Sans', system-ui, sans-serif;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; background: var(--bg); color: var(--panel); font-family: var(--body); overflow-x: hidden; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); overflow-x: hidden; }
 body { min-height: 100vh; }
-.app { display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 0 16px; }
-.top-bar { width: 100%; max-width: 1280px; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; }
-.site-title { font-family: var(--pixel); font-size: 14px; margin: 0; color: var(--gold); }
+.app { position: relative; min-height: 100vh; }
+/* Menu and title float over the full-window game. */
+.top-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 6; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; pointer-events: none; }
+.top-bar > * { pointer-events: auto; }
+.site-title { font-family: var(--pixel); font-size: 12px; margin: 0; color: var(--maroon); background: rgba(251, 243, 224, 0.9); border: 3px solid var(--ink); padding: 8px 10px; }
 .corner-menu { display: flex; gap: 8px; }
-.stage { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; }
-.canvas-box { position: relative; max-width: 100%; }
+.stage { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.canvas-box { position: relative; flex: none; }
 .game-canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; image-rendering: crisp-edges; touch-action: manipulation; }
 .pixel-border { border: 4px solid var(--ink); box-shadow: 0 0 0 4px var(--gold), 6px 6px 0 4px rgba(0, 0, 0, 0.5); }
 .pixel-button {
@@ -31,8 +33,10 @@ body { min-height: 100vh; }
   font-family: var(--pixel); font-size: 10px; line-height: 1.6; padding: 10px 12px; pointer-events: none; animation: pop 0.15s steps(3);
 }
 .skip-button { position: absolute; right: 12px; bottom: 12px; }
-.card-slot { width: 100%; max-width: 720px; min-height: 40px; }
-.info-card { position: relative; background: var(--panel); color: var(--ink); padding: 16px; max-height: 45vh; overflow-y: auto; animation: slide-up 0.2s steps(4); font-size: 16px; line-height: 1.45; }
+/* Info cards float as a panel on the right of the game. */
+.card-slot { position: fixed; top: 72px; right: 16px; bottom: 16px; width: min(380px, 40vw); z-index: 4; pointer-events: none; display: flex; align-items: flex-start; }
+.card-slot > * { pointer-events: auto; }
+.info-card { position: relative; background: var(--panel); color: var(--ink); padding: 16px; max-height: 100%; overflow-y: auto; animation: slide-up 0.2s steps(4); font-size: 16px; line-height: 1.45; }
 .info-card__close { position: absolute; top: 8px; right: 8px; font-family: var(--pixel); background: none; border: 0; cursor: pointer; color: var(--ink); }
 .info-card__title { font-family: var(--pixel); font-size: 13px; line-height: 1.5; margin: 0 24px 6px 0; color: var(--maroon); }
 .info-card__subtitle { font-weight: 600; margin: 0 0 4px; }
@@ -60,11 +64,15 @@ body { min-height: 100vh; }
 @media (prefers-reduced-motion: reduce) {
   .speech-bubble, .info-card { animation: none; }
 }
+/* Portrait phones: game across the top, cards underneath. */
+@media (max-aspect-ratio: 1/1) {
+  .stage { height: auto; flex-direction: column; justify-content: flex-start; }
+  .card-slot { position: static; width: 100%; padding: 12px 16px; }
+}
 @media (max-width: 600px) {
-  .site-title { font-size: 10px; }
+  .site-title { font-size: 9px; padding: 6px 8px; }
   .corner-menu .pixel-button { padding: 6px; font-size: 9px; }
   .speech-bubble { font-size: 8px; padding: 8px; }
-  .info-card { max-height: none; }
 }
 .touch-controls {
   position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; align-items: center;
@@ -73,6 +81,6 @@ body { min-height: 100vh; }
 .touch-controls__dpad { display: flex; gap: 12px; }
 .touch-button { pointer-events: auto; width: 64px; height: 64px; font-size: 18px; user-select: none; -webkit-user-select: none; touch-action: none; }
 .touch-button--a { border-radius: 50%; background: var(--maroon); color: #fff; }
-@media (pointer: coarse) {
+@media (pointer: coarse) and (max-aspect-ratio: 1/1) {
   .app { padding-bottom: 104px; }
 }

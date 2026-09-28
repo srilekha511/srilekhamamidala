@@ -13,12 +13,13 @@ export const SECTIONS = [
   { id: 'contact', label: 'Contact', icon: 'envelope' },
 ]
 
+// Light pastel galleries. accent = tile glow + labels, ink = icons on cream thumbnails.
 export const THEMES = {
-  hall: { wall: '#3b2f4a', wallDark: '#33283f', trim: '#6b4a32', floor: '#5a3d2b', floorLine: '#4a3122', accent: '#e0b44c' },
-  about: { wall: '#2f4a5a', wallDark: '#28404e', trim: '#4a3a2a', floor: '#6b4a32', floorLine: '#573b27', accent: '#f2c94c' },
-  projects: { wall: '#2f5a45', wallDark: '#284e3c', trim: '#3a2f25', floor: '#5a4632', floorLine: '#4a3927', accent: '#9ee6c1' },
-  experience: { wall: '#5a3a2f', wallDark: '#4e3228', trim: '#2f2a3a', floor: '#4a4058', floorLine: '#3c3448', accent: '#f2a93b' },
-  contact: { wall: '#4a2f5a', wallDark: '#40284e', trim: '#2f3a4a', floor: '#5a3d4a', floorLine: '#4a313c', accent: '#f4a6c8' },
+  hall: { wall: '#efe4d2', wallDark: '#e3d5bf', trim: '#9a7650', floor: '#c49a6c', floorLine: '#ad8457', accent: '#6a3f8a', ink: '#4a3a2a' },
+  about: { wall: '#d6e9f2', wallDark: '#c5dde9', trim: '#7896ab', floor: '#c9a276', floorLine: '#b08b60', accent: '#1f4e6e', ink: '#1f4e6e' },
+  projects: { wall: '#d9eedf', wallDark: '#c7e2cf', trim: '#6f9a7b', floor: '#c49a6c', floorLine: '#ad8457', accent: '#1e5a3e', ink: '#1e5a3e' },
+  experience: { wall: '#f7e2cf', wallDark: '#ecd2bb', trim: '#a87a62', floor: '#b3a6c2', floorLine: '#9c8eae', accent: '#8a3a12', ink: '#6a3a22' },
+  contact: { wall: '#eee0f2', wallDark: '#e1cfe7', trim: '#9278a8', floor: '#c9a3b1', floorLine: '#b28a99', accent: '#7a2560', ink: '#5a2a6a' },
 }
 
 const HALL_FRAME = { w: 56, h: 44, y: 44 }

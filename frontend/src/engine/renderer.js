@@ -1,4 +1,6 @@
-export const VIEW_W = 320
+// World width follows the window's shape (height stays 180), so the game can fill the screen.
+// `let` exports are live bindings: every module reading VIEW_W sees updates from setViewSize.
+export let VIEW_W = 320
 export const VIEW_H = 180
 
 // Integer scale when >= 2x fits (crisp pixels); otherwise fill the space fractionally.
@@ -16,15 +18,23 @@ export function setupCanvas(canvas) {
   return ctx
 }
 
-const GUTTER = 16
-const CARD_RESERVE = 220
+export const MIN_VIEW_W = 240
+export const MAX_VIEW_W = 560
 
-// Scale for the whole viewport: side gutters, plus room below the canvas for info cards
-// (at most 30% of the height, so short/landscape screens keep a usable canvas).
-export function fitScale(viewportW, viewportH) {
-  const availW = viewportW - GUTTER * 2
-  const reserve = Math.min(CARD_RESERVE, viewportH * 0.3)
-  const s = computeScale(availW, viewportH - reserve)
-  const floor = Math.min(availW / VIEW_W, 0.5)
-  return Math.max(s, Math.floor(floor * 100) / 100)
+export function setViewSize(w) {
+  VIEW_W = w
+}
+
+// World width and CSS scale that fill the window. Portrait screens fill the width
+// (with a minimum world width); ultra-wide screens are capped and centred.
+export function fitView(windowW, windowH) {
+  let scale = windowH / VIEW_H
+  let viewW = Math.floor(windowW / scale)
+  if (viewW < MIN_VIEW_W) {
+    viewW = MIN_VIEW_W
+    scale = windowW / MIN_VIEW_W
+  } else if (viewW > MAX_VIEW_W) {
+    viewW = MAX_VIEW_W
+  }
+  return { viewW, scale }
 }

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import * as data from '../data.js'
-import { buildRooms, SECTIONS } from './rooms.js'
+import { buildRooms, SECTIONS, THEMES } from './rooms.js'
 
 const rooms = buildRooms(data)
 const sectionIds = SECTIONS.map((s) => s.id)
@@ -73,5 +73,18 @@ describe('rooms', () => {
     expect(email).toBe(`mailto:${data.profile.email}`)
     expect(gh).toBe(data.profile.social.github)
     expect(li).toBe(data.profile.social.linkedin)
+  })
+  it('uses light walls, with readable tile labels and icons', () => {
+    const lum = (hex) => {
+      const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+        .map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b
+    }
+    const contrast = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05) }
+    for (const [id, t] of Object.entries(THEMES)) {
+      expect(lum(t.wall), `${id} wall`).toBeGreaterThan(0.55)
+      expect(contrast(t.accent, t.wall), `${id} tile label`).toBeGreaterThanOrEqual(4.5)
+      expect(contrast(t.ink, '#f4e6c8'), `${id} icon`).toBeGreaterThanOrEqual(4.5)
+    }
   })
 })

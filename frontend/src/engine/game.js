@@ -1,6 +1,6 @@
 import { createInput } from './input.js'
 import { createLoop } from './loop.js'
-import { setupCanvas, VIEW_W, VIEW_H } from './renderer.js'
+import { setupCanvas, setViewSize, VIEW_W, VIEW_H } from './renderer.js'
 import { clampCamera, followCamera } from './camera.js'
 import { createDirector, introPhase } from './director.js'
 import { welcomeText, enterFrameText, tileText, STARRY_TEXT } from './copy.js'
@@ -16,14 +16,14 @@ import { createAudio } from './audio.js'
 import { drawFrame } from './sprites/frame.js'
 import { drawRoom, frameInnerScreenRect } from './draw/room.js'
 import { drawAvatar, drawSparkle } from './draw/avatar.js'
-import { createIntroReveal, drawWelcome, PAINT_FULL } from './draw/intro.js'
+import { createIntroReveal, drawWelcome, paintFull } from './draw/intro.js'
 import { buildRooms, AVATAR_FEET_Y, TILE_Y } from '../scenes/rooms.js'
 import { createHallScene } from '../scenes/hallScene.js'
 import { spawnFor } from '../scenes/spawn.js'
 import { asset } from '../asset.js'
 
-const SCREEN = { x: 0, y: 0, w: VIEW_W, h: VIEW_H }
-const FOLD_TARGET = { x: 132, y: 66, w: 56, h: 44 }
+const screenRect = () => ({ x: 0, y: 0, w: VIEW_W, h: VIEW_H })
+const foldTarget = () => ({ x: Math.round(VIEW_W / 2 - 28), y: 66, w: 56, h: 44 })
 const BG = '#120e18'
 
 function makeCanvas(w, h) {
@@ -49,7 +49,7 @@ export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIn
   paintingCanvas.ctx.putImageData(new ImageData(painting.pixels, painting.width, painting.height), 0, 0)
   const reveal = createIntroReveal(painting, revealOrder(painting.regions, mulberry32(7)))
   const assets = { starry: paintingCanvas.canvas, thumbs: new Map() }
-  const snap = makeCanvas(VIEW_W, VIEW_H)
+  let snap = makeCanvas(VIEW_W, VIEW_H)
   const dust = makeDust(48, mulberry32(11))
 
   for (const room of Object.values(rooms)) {
@@ -167,6 +167,7 @@ export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIn
 
   function renderIntro() {
     const { phase, p } = introPhase(director.state.t, reducedMotion)
+    const PAINT_FULL = paintFull()
     ctx.fillStyle = BG
     ctx.fillRect(0, 0, VIEW_W, VIEW_H)
     if (phase === 'fade') {
@@ -246,7 +247,7 @@ export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIn
       drawWorld(snap.ctx)
       ctx.fillStyle = BG
       ctx.fillRect(0, 0, VIEW_W, VIEW_H)
-      const r = foldRect(p, SCREEN, FOLD_TARGET)
+      const r = foldRect(p, screenRect(), foldTarget())
       drawFrame(ctx, r.x - 3, r.y - 3, r.w + 6, r.h + 6, p)
       ctx.drawImage(snap.canvas, r.x, r.y, r.w, r.h)
       for (const d of dust) {
@@ -307,6 +308,15 @@ export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIn
     setPaused(v) {
       paused = !!v
       input.setEnabled(!paused)
+    },
+    resize(viewW) {
+      if (viewW === VIEW_W && canvas.width === viewW) return
+      setViewSize(viewW)
+      canvas.width = viewW
+      ctx.imageSmoothingEnabled = false // resizing a canvas resets its context state
+      snap = makeCanvas(VIEW_W, VIEW_H)
+      camX = clampCamera(scene.avatar.x - VIEW_W / 2, scene.room.width)
+      lastAvatar = null
     },
     setSoundOn(v) {
       audio.setEnabled(v)

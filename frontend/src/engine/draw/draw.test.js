@@ -36,3 +36,18 @@ describe('drawAvatar', () => {
     expect(Math.max(...xs)).toBeLessThanOrEqual(100 - 40 + 8 + 1)
   })
 })
+
+describe('intro layout follows the view width', () => {
+  it('centres the painting and the Welcome text', async () => {
+    const { setViewSize } = await import('../renderer.js')
+    const { paintFull, drawWelcome } = await import('./intro.js')
+    setViewSize(400)
+    const r = paintFull()
+    expect(r.x + r.w / 2).toBe(200)
+    const ctx = stubCtx()
+    drawWelcome(ctx, 1, 0)
+    const [, text, x] = ctx.calls.filter((c) => c[0] === 'fillText').at(-1)
+    expect(x + String(text).length * 8 / 2).toBeCloseTo(200, 0)
+    setViewSize(320)
+  })
+})
