@@ -54,6 +54,7 @@ export function createAudio({ AudioCtx = globalThis.AudioContext || globalThis.w
     pop: () => blip(880 + Math.random() * 400, 0.05, 'square', 0.25),
     card: () => { blip(660, 0.06); blip(990, 0.08, 'square', 0.5, 0.06) },
     whoosh: () => { for (let i = 0; i < 8; i++) blip(300 + i * 120, 0.08, 'sawtooth', 0.3, i * 0.04) },
+    jump: () => { blip(320, 0.06, 'square', 0.3); blip(520, 0.08, 'square', 0.25, 0.05) },
     sparkle: () => { for (let i = 0; i < 4; i++) blip(1200 + i * 300, 0.06, 'triangle', 0.3, i * 0.05) },
   }
 

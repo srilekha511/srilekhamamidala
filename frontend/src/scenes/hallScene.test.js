@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createHallScene, WALK_SPEED, AVATAR_MARGIN } from './hallScene.js'
+import { createHallScene, WALK_SPEED, AVATAR_MARGIN, JUMP_VELOCITY, GRAVITY } from './hallScene.js'
 
 const fakeInput = ({ dir = 0, presses = [] } = {}) => {
   const p = new Set(presses)
@@ -81,5 +81,41 @@ describe('hallScene', () => {
     s.update(0.1, fakeInput({ dir: -1 }))
     for (let i = 0; i < 10; i++) s.update(0.1, fakeInput())
     expect(s.avatar.x).toBeLessThan(50)
+  })
+  it('jumps about 1.5 avatar heights and lands exactly on the floor', () => {
+    const s = createHallScene(room)
+    const evs = s.update(1 / 60, fakeInput({ presses: ['jump'] }))
+    expect(evs).toContainEqual({ type: 'jump' })
+    let peak = 0, landed = null
+    for (let i = 1; i < 120 && landed === null; i++) {
+      const e = s.update(1 / 60, fakeInput())
+      peak = Math.max(peak, s.avatar.y)
+      if (e.some((x) => x.type === 'land')) landed = i / 60
+    }
+    expect(peak).toBeGreaterThan(30)
+    expect(peak).toBeLessThan(42)
+    expect(landed).toBeCloseTo((2 * JUMP_VELOCITY) / GRAVITY, 1)
+    expect(s.avatar.y).toBe(0)
+    expect(s.avatar.airborne).toBe(false)
+  })
+  it('cannot double-jump in mid-air', () => {
+    const s = createHallScene(room)
+    s.update(1 / 60, fakeInput({ presses: ['jump'] }))
+    s.update(0.1, fakeInput())
+    expect(s.update(1 / 60, fakeInput({ presses: ['jump'] })).some((e) => e.type === 'jump')).toBe(false)
+  })
+  it('can steer left and right in mid-air', () => {
+    const s = createHallScene(room)
+    s.update(1 / 60, fakeInput({ presses: ['jump'] }))
+    s.update(0.2, fakeInput({ dir: 1 }))
+    expect(s.avatar.x).toBeGreaterThan(50)
+    expect(s.avatar.y).toBeGreaterThan(0)
+  })
+  it('portals only respond once the avatar has landed', () => {
+    const s = createHallScene(sectionRoom, { spawnX: 312 })
+    s.update(1 / 60, fakeInput({ presses: ['jump'] }))
+    expect(s.update(1 / 60, fakeInput({ presses: ['interact'] })).some((e) => e.type === 'go')).toBe(false)
+    for (let i = 0; i < 60; i++) s.update(1 / 60, fakeInput())
+    expect(s.update(1 / 60, fakeInput({ presses: ['interact'] })).some((e) => e.type === 'go')).toBe(true)
   })
 })

@@ -15,7 +15,7 @@ import { loadPixelated } from './pixelate.js'
 import { createAudio } from './audio.js'
 import { drawFrame } from './sprites/frame.js'
 import { drawRoom, frameInnerScreenRect } from './draw/room.js'
-import { drawAvatar, drawSparkle } from './draw/avatar.js'
+import { drawAvatar, drawDust, drawSparkle } from './draw/avatar.js'
 import { createIntroReveal, drawWelcome, paintFull } from './draw/intro.js'
 import { buildRooms, AVATAR_FEET_Y, TILE_Y } from '../scenes/rooms.js'
 import { createHallScene } from '../scenes/hallScene.js'
@@ -65,6 +65,7 @@ export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIn
   let t = 0
   let paused = false
   let sparkleUntil = 0
+  let landedAt = -1
   let stepTimer = 0
   let lastAvatar = null
   let welcomed = false
@@ -102,6 +103,8 @@ export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIn
           if (ev.frame) audio.sfx('card')
         }
       }
+      if (ev.type === 'jump') audio.sfx('jump')
+      if (ev.type === 'land') landedAt = t
       if (ev.type === 'tile') emitter.emit('bubble', ev.tile ? { text: tileText(ev.tile.label, isTouch) } : null)
       if (ev.type === 'go' && director.request(ev.target, { origin: originOf(ev.origin) })) {
         emitter.emit('bubble', null)
@@ -163,6 +166,7 @@ export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIn
     drawRoom(target, scene.room, camX, t, assets, scene.activeTile?.id ?? null)
     if (!hideAvatar) drawAvatar(target, scene.avatar, camX)
     if (t < sparkleUntil) drawSparkle(target, scene.avatar.x - camX, AVATAR_FEET_Y - 12, t)
+    if (landedAt >= 0 && t - landedAt < 0.25) drawDust(target, scene.avatar.x - camX, AVATAR_FEET_Y - 1, (t - landedAt) / 0.25)
   }
 
   function renderIntro() {

@@ -26,7 +26,10 @@ export default function TouchControls({ onPress, onRelease }) {
         <HoldButton action="left" label="Walk left" className="touch-button--dir" {...common}>◀</HoldButton>
         <HoldButton action="right" label="Walk right" className="touch-button--dir" {...common}>▶</HoldButton>
       </div>
-      <HoldButton action="interact" label="Interact (A)" className="touch-button--a" {...common}>A</HoldButton>
+      <div className="touch-controls__actions">
+        <HoldButton action="jump" label="Jump (B)" className="touch-button--b" {...common}>B</HoldButton>
+        <HoldButton action="interact" label="Interact (A)" className="touch-button--a" {...common}>A</HoldButton>
+      </div>
     </div>
   )
 }

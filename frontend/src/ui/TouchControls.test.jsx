@@ -23,4 +23,12 @@ describe('TouchControls', () => {
     expect(onPress).toHaveBeenCalledWith('interact')
     expect(onRelease).toHaveBeenCalledWith('interact')
   })
+  it('B button jumps', () => {
+    const onPress = vi.fn(), onRelease = vi.fn()
+    render(<TouchControls onPress={onPress} onRelease={onRelease} />)
+    const b = screen.getByRole('button', { name: /jump/i })
+    fireEvent.pointerDown(b); fireEvent.pointerUp(b)
+    expect(onPress).toHaveBeenCalledWith('jump')
+    expect(onRelease).toHaveBeenCalledWith('jump')
+  })
 })

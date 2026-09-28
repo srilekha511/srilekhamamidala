@@ -59,4 +59,8 @@ describe('icons', () => {
     expect(() => drawIcon(ctx, 'nope', 0, 0, '#fff')).not.toThrow()
     expect(fillRects(ctx)).toHaveLength(0)
   })
+  it('tucks legs in the air and squashes on landing', () => {
+    expect(avatarFrame({ walking: false, animT: 0, airborne: true }).rows).toBe(AVATAR_FRAMES.walkB)
+    expect(avatarFrame({ walking: true, animT: 0, landing: 0.1 }).yOffset).toBe(1)
+  })
 })

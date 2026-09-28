@@ -80,7 +80,9 @@ body { min-height: 100vh; }
 }
 .touch-controls__dpad { display: flex; gap: 12px; }
 .touch-button { pointer-events: auto; width: 64px; height: 64px; font-size: 18px; user-select: none; -webkit-user-select: none; touch-action: none; }
+.touch-controls__actions { display: flex; gap: 12px; align-items: flex-end; }
 .touch-button--a { border-radius: 50%; background: var(--maroon); color: #fff; }
+.touch-button--b { border-radius: 50%; background: #1f4e6e; color: #fff; margin-bottom: 20px; }
 @media (pointer: coarse) and (max-aspect-ratio: 1/1) {
   .app { padding-bottom: 104px; }
 }

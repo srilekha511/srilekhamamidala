@@ -55,7 +55,9 @@ export const AVATAR_FRAMES = {
 const WALK_CYCLE = ['walkA', 'walkB', 'walkA', 'walkB']
 const WALK_FPS = 8
 
-export function avatarFrame({ walking, animT }) {
+export function avatarFrame({ walking, animT, airborne = false, landing = 0 }) {
+  if (airborne) return { rows: AVATAR_FRAMES.walkB, yOffset: 0 } // legs tucked
+  if (landing > 0) return { rows: walking ? AVATAR_FRAMES.walkA : AVATAR_FRAMES.idle, yOffset: 1 } // squash
   if (walking) {
     const i = Math.floor(animT * WALK_FPS) % WALK_CYCLE.length
     return { rows: AVATAR_FRAMES[WALK_CYCLE[i]], yOffset: i % 2 ? -1 : 0 }
