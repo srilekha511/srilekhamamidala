@@ -1,10 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { createEmitter } from '../engine/events.js'
 import { createGame } from '../engine/game.js'
-import { computeScale, VIEW_W, VIEW_H } from '../engine/renderer.js'
-
-export const CARD_RESERVE = 220
-const GUTTER = 16
+import { fitScale, VIEW_W, VIEW_H } from '../engine/renderer.js'
 
 export default function GameCanvas({ options, handlers, onReady, children }) {
   const canvasRef = useRef(null)
@@ -15,7 +12,7 @@ export default function GameCanvas({ options, handlers, onReady, children }) {
 
   useEffect(() => {
     const emitter = createEmitter()
-    const names = ['bubble', 'card', 'avatar', 'room', 'introDone', 'back']
+    const names = ['bubble', 'card', 'avatar', 'room', 'introDone', 'back', 'settled']
     const offs = names.map((n) => emitter.on(n, (p) => handlersRef.current[n]?.(p)))
     const game = createGame({ canvas: canvasRef.current, emitter, ...options })
     gameRef.current = game
@@ -30,7 +27,7 @@ export default function GameCanvas({ options, handlers, onReady, children }) {
 
   useEffect(() => {
     const fit = () => {
-      const s = computeScale(window.innerWidth - GUTTER * 2, window.innerHeight - CARD_RESERVE)
+      const s = fitScale(window.innerWidth, window.innerHeight)
       boxRef.current.style.width = `${VIEW_W * s}px`
       boxRef.current.style.height = `${VIEW_H * s}px`
     }

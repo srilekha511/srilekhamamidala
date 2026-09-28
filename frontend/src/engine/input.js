@@ -5,12 +5,16 @@ export const KEYMAP = {
   Escape: 'back',
 }
 
-const INTERACTIVE_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A'])
-const isInteractive = (t) => !!t && (INTERACTIVE_TAGS.has(t.tagName) || t.isContentEditable)
+const TEXT_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT'])
+const CLICKABLE_TAGS = new Set(['BUTTON', 'A'])
+const isTextEntry = (t) => !!t && (TEXT_TAGS.has(t.tagName) || t.isContentEditable)
+// Buttons and links keep Enter/Space for themselves; walking keys still reach the game.
+const ownsKey = (t, action) => isTextEntry(t) || (!!t && CLICKABLE_TAGS.has(t.tagName) && action === 'interact')
 
 export function createInput() {
   const held = { left: false, right: false, interact: false, back: false }
   const presses = new Set()
+  let enabled = true
 
   function press(action) {
     if (!held[action]) presses.add(action)
@@ -25,7 +29,7 @@ export function createInput() {
   }
   function onKeyDown(e) {
     const action = KEYMAP[e.key]
-    if (!action || isInteractive(e.target)) return
+    if (!enabled || !action || ownsKey(e.target, action)) return
     e.preventDefault()
     press(action)
   }
@@ -46,6 +50,10 @@ export function createInput() {
     },
     direction() {
       return (held.right ? 1 : 0) - (held.left ? 1 : 0)
+    },
+    setEnabled(v) {
+      enabled = !!v
+      if (!enabled) reset()
     },
     endFrame() {
       presses.clear()

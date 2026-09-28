@@ -15,3 +15,16 @@ export function setupCanvas(canvas) {
   ctx.imageSmoothingEnabled = false
   return ctx
 }
+
+const GUTTER = 16
+const CARD_RESERVE = 220
+
+// Scale for the whole viewport: side gutters, plus room below the canvas for info cards
+// (at most 30% of the height, so short/landscape screens keep a usable canvas).
+export function fitScale(viewportW, viewportH) {
+  const availW = viewportW - GUTTER * 2
+  const reserve = Math.min(CARD_RESERVE, viewportH * 0.3)
+  const s = computeScale(availW, viewportH - reserve)
+  const floor = Math.min(availW / VIEW_W, 0.5)
+  return Math.max(s, Math.floor(floor * 100) / 100)
+}

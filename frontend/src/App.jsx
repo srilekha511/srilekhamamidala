@@ -27,6 +27,8 @@ export default function App() {
 
   const gameRef = useRef(null)
   const roomRef = useRef(initial.room)
+  const pendingRoomRef = useRef(null) // Back/Forward that arrived while the game was busy
+  const quickPushedRef = useRef(false) // brochure opened by us, so closing can step back
 
   const options = useMemo(
     () => ({ data, initialRoom: initial.room, playIntro: introPlaying, reducedMotion, isTouch, soundOn }),
@@ -41,8 +43,17 @@ export default function App() {
     avatar: setAvatarPos,
     room: (room) => {
       roomRef.current = room
+      const current = parseHash(window.location.hash)
       const target = hashFor(room)
-      if (!parseHash(window.location.hash).quick && window.location.hash !== target) window.location.hash = target
+      if (current.quick || window.location.hash === target) return
+      // Same room, different spelling (startup '', '#/Projects', '#/foo'): tidy the URL without a history entry.
+      if (current.room === room) window.history.replaceState(null, '', target)
+      else window.location.hash = target
+    },
+    settled: () => {
+      const pending = pendingRoomRef.current
+      pendingRoomRef.current = null
+      if (pending && pending !== roomRef.current) gameRef.current?.goTo(pending, { kind: 'crossfade' })
     },
     introDone: () => {
       storage.set(KEYS.introSeen, true)
@@ -63,7 +74,12 @@ export default function App() {
         return
       }
       setQuickOpen(false)
-      if (room !== roomRef.current) gameRef.current?.goTo(room, { kind: 'crossfade' })
+      quickPushedRef.current = false
+      if (room === roomRef.current) {
+        pendingRoomRef.current = null
+      } else if (!gameRef.current?.goTo(room, { kind: 'crossfade' })) {
+        pendingRoomRef.current = room // last one wins once the current transition/intro finishes
+      }
     }
     window.addEventListener('hashchange', onHash)
     return () => window.removeEventListener('hashchange', onHash)
@@ -75,11 +91,17 @@ export default function App() {
 
   const openQuick = () => {
     setQuickOpen(true)
+    quickPushedRef.current = true
     window.location.hash = hashFor(roomRef.current, true)
   }
   const closeQuick = useCallback(() => {
     setQuickOpen(false)
-    window.location.hash = hashFor(roomRef.current)
+    if (quickPushedRef.current) {
+      quickPushedRef.current = false
+      window.history.back()
+    } else {
+      window.history.replaceState(null, '', hashFor(roomRef.current))
+    }
   }, [])
   const toggleSound = () => {
     const next = !soundOn

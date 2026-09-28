@@ -20,7 +20,23 @@ export function createAudio({ AudioCtx = globalThis.AudioContext || globalThis.w
     return true
   }
 
+  // Browsers start audio suspended until a user gesture; queueing notes then would burst on resume.
+  const running = () => ctx && (ctx.state === undefined || ctx.state === 'running')
+
+  function unlockOnGesture() {
+    const unlock = () => {
+      ctx?.resume?.()
+      if (running()) {
+        window.removeEventListener('pointerdown', unlock)
+        window.removeEventListener('keydown', unlock)
+      }
+    }
+    window.addEventListener('pointerdown', unlock)
+    window.addEventListener('keydown', unlock)
+  }
+
   function blip(freq, dur, type = 'square', vol = 1, delay = 0) {
+    if (!running()) return
     const osc = ctx.createOscillator()
     const gain = ctx.createGain()
     const t0 = ctx.currentTime + delay
@@ -67,6 +83,7 @@ export function createAudio({ AudioCtx = globalThis.AudioContext || globalThis.w
       }
       if (!ensure()) return
       ctx.resume?.()
+      if (!running()) unlockOnGesture()
       startMusic()
     },
     sfx(name) {

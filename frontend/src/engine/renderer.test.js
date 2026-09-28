@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { computeScale, VIEW_W, VIEW_H } from './renderer.js'
+import { computeScale, fitScale, VIEW_W, VIEW_H } from './renderer.js'
 
 describe('computeScale', () => {
   it('uses an integer scale when at least 2x fits', () => {
@@ -16,6 +16,23 @@ describe('computeScale', () => {
       expect(VIEW_W * s).toBeLessThanOrEqual(w + 0.001)
       expect(VIEW_H * s).toBeLessThanOrEqual(h + 0.001)
       expect(s).toBeGreaterThan(0)
+    }
+  })
+})
+
+describe('fitScale (whole viewport, reserving room for cards)', () => {
+  it('keeps the desktop layout at an integer 3x', () => {
+    expect(fitScale(1440, 900)).toBe(3)
+  })
+  it('stays usable on a landscape phone', () => {
+    expect(VIEW_W * fitScale(844, 340)).toBeGreaterThanOrEqual(400)
+  })
+  it('never collapses on very short windows', () => {
+    expect(fitScale(1000, 200)).toBeGreaterThanOrEqual(0.5)
+  })
+  it('never overflows the width (16px gutters)', () => {
+    for (const [w, h] of [[390, 844], [844, 340], [300, 150], [1000, 200], [2560, 1400]]) {
+      expect(VIEW_W * fitScale(w, h)).toBeLessThanOrEqual(w - 32 + 0.001)
     }
   })
 })

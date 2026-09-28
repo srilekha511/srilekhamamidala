@@ -119,7 +119,9 @@ export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIn
         audio.sfx('sparkle')
         emitter.emit('introDone')
         showWelcome()
+        emitter.emit('settled')
       }
+      if (ev.type === 'transitionDone') emitter.emit('settled')
       if (ev.type === 'roomChanged') {
         enterScene(ev.room, ev.from)
         if (ev.room === 'hall') showWelcome()
@@ -304,7 +306,7 @@ export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIn
     },
     setPaused(v) {
       paused = !!v
-      input.reset()
+      input.setEnabled(!paused)
     },
     setSoundOn(v) {
       audio.setEnabled(v)
