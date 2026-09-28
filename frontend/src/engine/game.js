@@ -11,7 +11,6 @@ import { applyRipple, rippleFlash, zoomScale } from './effects/ripple.js'
 import { foldRect, settleScale, makeDust, dustAt } from './effects/fold.js'
 import { fadeAlpha } from './effects/fade.js'
 import { generateStarryNight } from './paintings/starryNight.js'
-import { loadPixelated } from './pixelate.js'
 import { createAudio } from './audio.js'
 import { drawFrame } from './sprites/frame.js'
 import { drawRoom, frameInnerScreenRect } from './draw/room.js'
@@ -20,7 +19,6 @@ import { createIntroReveal, drawWelcome, paintFull } from './draw/intro.js'
 import { buildRooms, AVATAR_FEET_Y, TILE_Y } from '../scenes/rooms.js'
 import { createHallScene } from '../scenes/hallScene.js'
 import { spawnFor } from '../scenes/spawn.js'
-import { asset } from '../asset.js'
 
 const screenRect = () => ({ x: 0, y: 0, w: VIEW_W, h: VIEW_H })
 const foldTarget = () => ({ x: Math.round(VIEW_W / 2 - 28), y: 66, w: 56, h: 44 })
@@ -48,16 +46,10 @@ export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIn
   const paintingCanvas = makeCanvas(painting.width, painting.height)
   paintingCanvas.ctx.putImageData(new ImageData(painting.pixels, painting.width, painting.height), 0, 0)
   const reveal = createIntroReveal(painting, revealOrder(painting.regions, mulberry32(7)))
-  const assets = { starry: paintingCanvas.canvas, thumbs: new Map() }
+  const assets = { starry: paintingCanvas.canvas }
   let snap = makeCanvas(VIEW_W, VIEW_H)
   const dust = makeDust(48, mulberry32(11))
 
-  for (const room of Object.values(rooms)) {
-    for (const f of room.frames) {
-      if (f.thumb?.type !== 'image') continue
-      loadPixelated(asset(f.thumb.src), f.w - 6, f.h - 6).then((c) => assets.thumbs.set(f.id, c))
-    }
-  }
   document.fonts?.load('8px "Press Start 2P"').catch(() => {})
 
   let scene = createHallScene(rooms[initialRoom])

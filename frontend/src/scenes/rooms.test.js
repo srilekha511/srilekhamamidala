@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import * as data from '../data.js'
 import { buildRooms, SECTIONS, THEMES } from './rooms.js'
+import { plaqueWidth } from '../engine/sprites/tinyFont.js'
 
 const rooms = buildRooms(data)
 const sectionIds = SECTIONS.map((s) => s.id)
@@ -103,5 +104,31 @@ describe('rooms', () => {
       expect(f.thumb).toEqual({ type: 'art', art: data.projects[i].art })
       expect(f.card.image).toBe(data.projects[i].image) // screenshot still in the card
     })
+  })
+  it('every section frame has a short plaque title, and neighbouring plaques never touch', () => {
+    const expected = {
+      about: ['Srilekha', 'Education', 'Skills', 'Interests'],
+      contact: ['Email', 'GitHub', 'LinkedIn'],
+      projects: data.projects.map((p) => p.plaque),
+      experience: data.experience.map((e) => e.plaque),
+    }
+    for (const id of sectionIds) {
+      const frames = rooms[id].frames
+      expect(frames.map((f) => f.plaque)).toEqual(expected[id])
+      frames.forEach((f, i) => {
+        expect(f.plaque.length, f.plaque).toBeLessThanOrEqual(20)
+        if (i === 0) return
+        const prev = frames[i - 1]
+        const gap = (f.x + f.w / 2) - (prev.x + prev.w / 2)
+        expect(gap).toBeGreaterThanOrEqual((plaqueWidth(f.plaque) + plaqueWidth(prev.plaque)) / 2 + 2)
+      })
+    }
+  })
+  it('experience frames show their pixel scene', () => {
+    rooms.experience.frames.forEach((f, i) => expect(f.thumb).toEqual({ type: 'art', art: data.experience[i].art }))
+  })
+  it('about and contact frames use drawn scenes, not photos', () => {
+    expect(rooms.about.frames.map((f) => f.thumb.art)).toEqual(['avatar', 'mit', 'inventory', 'interests'])
+    expect(rooms.contact.frames.map((f) => f.thumb.art)).toEqual(['email', 'github', 'linkedin'])
   })
 })

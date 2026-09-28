@@ -42,16 +42,16 @@ export const interests = [
 
 export const experience = [
   {
-    id: "disney", company: "Disney Streaming", role: "Software Engineering Intern",
-    location: "Santa Monica, CA", dates: "June 2026 – August 2026", monogram: "DS", color: "#1f3b8a",
+    id: "disney", plaque: "Disney Streaming", art: "castleStream", company: "Disney Streaming", role: "Software Engineering Intern",
+    location: "Santa Monica, CA", dates: "June 2026 – August 2026",
     bullets: [
       "Developed internal developer tooling for Disney Streaming using Databricks, Apache Spark, AWS, Linux, and Terraform, improving platform scalability and engineering productivity across distributed data pipelines, reducing latency by over 400%",
       "Architected AI-assisted knowledge retrieval system leveraging Model Context Protocols (MCPs) to automate access to technical documentation and domain expertise, reducing engineering search time by 150% and automating developer workflows",
     ],
   },
   {
-    id: "acronym", company: "Acronym", role: "Machine Learning Intern",
-    location: "New York, NY", dates: "September 2026 – Present", monogram: "AC", color: "#2d6a4f",
+    id: "acronym", plaque: "Acronym", art: "clusterJudge", company: "Acronym", role: "Machine Learning Intern",
+    location: "New York, NY", dates: "September 2026 – Present",
     bullets: [
       "Building an LLM evaluation pipeline that scores signal extractions against source artifacts using LLM-as-a-Judge, surfacing model and prompt failure modes across unstructured data",
       "Analyzing HDBSCAN embedding-based clustering of extracted signals to analyze cluster quality and reduce redundant themes and improve group-level synthesis, enabling more accurate classification of new signals and emerging trends",
@@ -59,48 +59,48 @@ export const experience = [
     ],
   },
   {
-    id: "hof", company: "HOF Capital", role: "Investment Intern",
-    location: "", dates: "September 2026 – Present", monogram: "HOF", color: "#7a2e2e",
+    id: "hof", plaque: "HOF Capital", art: "rocketDiligence", company: "HOF Capital", role: "Investment Intern",
+    location: "", dates: "September 2026 – Present",
     bullets: [
       "Source and conduct market and company diligence on AI, software, and frontier technology startups, assessing founders, products, markets, competitive landscapes, and technical differentiation to identify high-potential investment opportunities",
       "Develop investment theses through market research, founder conversations, and analysis of emerging technologies and products",
     ],
   },
   {
-    id: "medialab", company: "MIT Media Lab", role: "Research Intern",
-    location: "", dates: "September 2026 – Present", monogram: "ML", color: "#5b2a86",
+    id: "medialab", plaque: "MIT Media Lab", art: "memoryLoop", company: "MIT Media Lab", role: "Research Intern",
+    location: "", dates: "September 2026 – Present",
     bullets: [
       "Investigating self-confirming inference in persistent LLM memory by instrumenting an open-source memory system to trace preference updates to interaction evidence and distinguish user beliefs from preferences reinforced by agent interactions",
       "Measuring inference provenance with multi-turn interactions and validating automated classifications vs. hand-labeled traces",
     ],
   },
   {
-    id: "mitecon", company: "MIT Department of Economics", role: "Research Intern",
-    location: "Cambridge, MA", dates: "June 2026 – Present", monogram: "EC", color: "#8a1f2b",
+    id: "mitecon", plaque: "MIT Economics", art: "phoneWellbeing", company: "MIT Department of Economics", role: "Research Intern",
+    location: "Cambridge, MA", dates: "June 2026 – Present",
     bullets: [
       "Developed and evaluated technical infrastructure for a large-scale RCT studying smartphone use and adolescent well-being",
       "Analyzed Android application and Django backend logs to diagnose missing/incomplete smartphone usage records",
     ],
   },
   {
-    id: "csail", company: "MIT CSAIL, Decentralized Information Group", role: "Research Intern",
-    location: "Cambridge, MA", dates: "August 2024 – Present", monogram: "DIG", color: "#1d5c7a",
+    id: "csail", plaque: "MIT CSAIL", art: "ratingRobot", company: "MIT CSAIL, Decentralized Information Group", role: "Research Intern",
+    location: "Cambridge, MA", dates: "August 2024 – Present",
     bullets: [
       "Accelerated insurance communication services by >60% by researching development of mathematical metrics for subjective quality evaluation across 10+ large language models (LLMs) in coordination with industry partner Liberty Mutual",
       "Designed parallel human/LLM judge studies via 300+ human ratings to create auto-evaluation metrics for Agentic AI models",
     ],
   },
   {
-    id: "525vc", company: "525 Venture Capital Firm", role: "Venture Associate Intern",
-    location: "New York, NY", dates: "December 2025 – February 2026", monogram: "525", color: "#b5651d",
+    id: "525vc", plaque: "525 VC", art: "voiceMemo", company: "525 Venture Capital Firm", role: "Venture Associate Intern",
+    location: "New York, NY", dates: "December 2025 – February 2026",
     bullets: [
       "Built AI-driven investment portfolio management system using voice and text agentic AI models to ingest founder calls, inbound applications, pitch decks, and market research for deal sourcing, generating first-pass deal memos and SWOT analyses",
       "Training on historical decisions, diligence frameworks to flag risks, rank diligence questions, support investment decisions",
     ],
   },
   {
-    id: "earthian", company: "Earthian AI — Dutch Commercial Property Insurance Optimization Startup", role: "Software Engineering Intern",
-    location: "Enschede, Netherlands", dates: "June 2025 – August 2025", monogram: "EA", color: "#2e7d32",
+    id: "earthian", plaque: "Earthian AI", art: "climateGlobe", company: "Earthian AI — Dutch Commercial Property Insurance Optimization Startup", role: "Software Engineering Intern",
+    location: "Enschede, Netherlands", dates: "June 2025 – August 2025",
     bullets: [
       "Improved climate risk analysis and expedited claim processing and underwriting by 200+% and delivered 2x more accurate insights for insurers in energy markets via PyTorch, FastAPI, AWS, React, leading development of full-stack AI chatbot",
     ],
@@ -110,6 +110,7 @@ export const experience = [
 export const projects = [
   {
     id: 2,
+    plaque: "Insurance Chatbot",
     art: "chatbot",
     title: "AI-Powered Insurance Chatbot",
     category: "NLP, Full Stack",
@@ -123,6 +124,7 @@ export const projects = [
   },
   {
     id: 3,
+    plaque: "LLM Formality Study",
     art: "formality",
     title: "An Empirical Evaluation of LLMs for the Assessment of Subjective Qualities",
     category: "ML/NLP Research",
@@ -136,6 +138,7 @@ export const projects = [
   },
   {
     id: 4,
+    plaque: "Election Law Graphs",
     art: "election",
     title: "Web Scraping of Legislative Election Data for Knowledge Graph Analysis",
     category: "ML/NLP Research",
@@ -150,6 +153,7 @@ export const projects = [
   },
   {
     id: 5,
+    plaque: "dermalab",
     art: "dermalab",
     title: "dermalab: AI and LLM-Powered Skin Disease Diagnosis",
     category: "ML/CV/NLP Hackathon Project",
@@ -167,6 +171,7 @@ export const projects = [
   },
   {
     id: 9,
+    plaque: "WhartonMunicode",
     art: "legal",
     title: "WhartonMunicode: LLMs for Legal Code Analysis",
     category: "ML, NLP Research",
@@ -182,6 +187,7 @@ export const projects = [
   },
   {
     id: 6,
+    plaque: "Dementia Risk ML",
     art: "brainNetwork",
     title: "A Holistic, Personalized Dementia Risk Prediction Framework",
     category: "ML Research",
@@ -198,6 +204,7 @@ export const projects = [
   },
   {
     id: 7,
+    plaque: "NeuroCADR",
     art: "drugRepurposing",
     title: "NeuroCADR: Computational Drug Repurposing for Epilepsy",
     category: "Computational Biology Research",
@@ -214,6 +221,7 @@ export const projects = [
   },
   {
     id: 8,
+    plaque: "Food Shelf Life",
     art: "foodShelfLife",
     title: "ML-Based Food Shelf Life Tracking",
     category: "ML, CV Research",
@@ -231,6 +239,7 @@ export const projects = [
   },
   {
     id: 1,
+    plaque: "Campaign AI",
     art: "campaign",
     title: "AI-Powered Performance Campaign Manager",
     category: "AI, Web Dev",

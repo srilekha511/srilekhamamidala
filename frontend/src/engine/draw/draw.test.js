@@ -6,7 +6,7 @@ import { drawRoom, frameInnerScreenRect } from './room.js'
 import { drawAvatar } from './avatar.js'
 
 const rooms = buildRooms(data)
-const assets = { starry: {}, thumbs: new Map() }
+const assets = { starry: {} }
 
 describe('drawRoom', () => {
   it('draws every room without throwing, including missing thumbnails', () => {

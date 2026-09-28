@@ -58,6 +58,7 @@ const card = (c) => ({ subtitle: '', meta: '', body: [], bullets: [], tags: [], 
 export function projectItems(projects) {
   return projects.map((p) => ({
     id: `project-${p.id}`,
+    plaque: p.plaque ?? p.title,
     thumb: { type: 'art', art: p.art ?? 'idea' },
     card: card({
       title: p.title,
@@ -73,7 +74,8 @@ export function projectItems(projects) {
 export function experienceItems(experience) {
   return experience.map((e) => ({
     id: `exp-${e.id}`,
-    thumb: { type: 'monogram', text: e.monogram, color: e.color },
+    plaque: e.plaque ?? e.company,
+    thumb: { type: 'art', art: e.art ?? 'idea' },
     card: card({
       title: e.company,
       subtitle: e.role,
@@ -87,12 +89,14 @@ export function aboutItems({ profile, education, skills, interests }) {
   return [
     {
       id: 'about-me',
-      thumb: { type: 'image', src: profile.headshot },
+      plaque: profile.firstName,
+      thumb: { type: 'art', art: 'avatar' },
       card: card({ title: profile.fullName, subtitle: profile.fullRole, body: [profile.bio], image: profile.headshot }),
     },
     {
       id: 'about-education',
-      thumb: { type: 'icon', icon: 'book' },
+      plaque: 'Education',
+      thumb: { type: 'art', art: 'mit' },
       card: card({
         title: education.school,
         subtitle: education.degree,
@@ -103,12 +107,14 @@ export function aboutItems({ profile, education, skills, interests }) {
     },
     {
       id: 'about-skills',
-      thumb: { type: 'icon', icon: 'star' },
+      plaque: 'Skills',
+      thumb: { type: 'art', art: 'inventory' },
       card: card({ title: 'Skills', bullets: skills.map((g) => `${g.group}: ${g.items.join(', ')}`) }),
     },
     {
       id: 'about-interests',
-      thumb: { type: 'icon', icon: 'heart' },
+      plaque: 'Interests',
+      thumb: { type: 'art', art: 'interests' },
       card: card({ title: 'Interests', bullets: interests }),
     },
   ]
@@ -118,17 +124,20 @@ export function contactItems(profile) {
   return [
     {
       id: 'contact-email',
-      thumb: { type: 'icon', icon: 'envelope' },
+      plaque: 'Email',
+      thumb: { type: 'art', art: 'email' },
       card: card({ title: 'Email', body: ['Say hi!'], links: [{ href: `mailto:${profile.email}`, label: profile.email }] }),
     },
     {
       id: 'contact-github',
-      thumb: { type: 'icon', icon: 'code' },
+      plaque: 'GitHub',
+      thumb: { type: 'art', art: 'github' },
       card: card({ title: 'GitHub', body: ['Code for my projects.'], links: [{ href: profile.social.github, label: 'github.com/srilekha511' }] }),
     },
     {
       id: 'contact-linkedin',
-      thumb: { type: 'icon', icon: 'link' },
+      plaque: 'LinkedIn',
+      thumb: { type: 'art', art: 'linkedin' },
       card: card({ title: 'LinkedIn', body: ["Let's connect."], links: [{ href: profile.social.linkedin, label: 'linkedin.com/in/srilekha-mamidala' }] }),
     },
   ]
@@ -139,6 +148,7 @@ function sectionRoom(section, items) {
     id: item.id,
     kind: 'item',
     label: item.card.title,
+    plaque: item.plaque,
     x: FIRST_ITEM_X + i * (ITEM_FRAME.w + ITEM_GAP),
     ...ITEM_FRAME,
     thumb: item.thumb,

@@ -20,10 +20,9 @@ describe('content', () => {
     expect(data.experience).toHaveLength(8)
     const ids = new Set()
     for (const e of data.experience) {
-      for (const f of ['id', 'company', 'role', 'dates', 'monogram', 'color']) expect(typeof e[f]).toBe('string')
+      for (const f of ['id', 'company', 'role', 'dates', 'plaque', 'art']) expect(typeof e[f]).toBe('string')
       expect(typeof e.location).toBe('string')
       expect(e.bullets.length).toBeGreaterThan(0)
-      expect(e.monogram.length).toBeLessThanOrEqual(3)
       ids.add(e.id)
     }
     expect(ids.size).toBe(8)
