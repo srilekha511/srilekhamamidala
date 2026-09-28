@@ -3,7 +3,7 @@ import { createLoop } from './loop.js'
 import { setupCanvas, setViewSize, VIEW_W, VIEW_H } from './renderer.js'
 import { clampCamera, followCamera } from './camera.js'
 import { createDirector, introPhase } from './director.js'
-import { welcomeText, enterFrameText, tileText, STARRY_TEXT } from './copy.js'
+import { welcomeText, enterFrameText, tileText, openLinkText, STARRY_TEXT } from './copy.js'
 import { mulberry32 } from './rng.js'
 import { revealOrder, revealCount } from './effects/reveal.js'
 import { easeInOut, lerpRect } from './effects/tween.js'
@@ -93,8 +93,10 @@ export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIn
         } else {
           emitter.emit('card', ev.frame?.card ?? null)
           if (ev.frame) audio.sfx('card')
+          if (ev.frame?.href || !ev.frame) emitter.emit('bubble', ev.frame ? { text: openLinkText(ev.frame.plaque, isTouch) } : null)
         }
       }
+      if (ev.type === 'open') emitter.emit('open', ev.href)
       if (ev.type === 'jump') audio.sfx('jump')
       if (ev.type === 'land') landedAt = t
       if (ev.type === 'tile') emitter.emit('bubble', ev.tile ? { text: tileText(ev.tile.label, isTouch) } : null)

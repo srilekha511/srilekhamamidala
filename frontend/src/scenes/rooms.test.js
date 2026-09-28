@@ -131,4 +131,10 @@ describe('rooms', () => {
     expect(rooms.about.frames.map((f) => f.thumb.art)).toEqual(['avatar', 'mit', 'inventory', 'interests'])
     expect(rooms.contact.frames.map((f) => f.thumb.art)).toEqual(['email', 'github', 'linkedin'])
   })
+  it('contact frames link straight to email, GitHub and LinkedIn; other frames do not', () => {
+    expect(rooms.contact.frames.map((f) => f.href)).toEqual([
+      `mailto:${data.profile.email}`, data.profile.social.github, data.profile.social.linkedin,
+    ])
+    for (const id of ['about', 'projects', 'experience']) for (const f of rooms[id].frames) expect(f.href).toBeUndefined()
+  })
 })

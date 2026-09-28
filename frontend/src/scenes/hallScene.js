@@ -69,6 +69,8 @@ export function createHallScene(room, { spawnX = room.spawnX, facing = 1 } = {})
         events.push({ type: 'go', target: tileTracker.active.target, origin: tileTracker.active })
       } else if (frameTracker.active?.target) {
         events.push({ type: 'go', target: frameTracker.active.target, origin: frameTracker.active })
+      } else if (frameTracker.active?.href) {
+        events.push({ type: 'open', href: frameTracker.active.href })
       }
     }
     return events

@@ -118,4 +118,10 @@ describe('hallScene', () => {
     for (let i = 0; i < 60; i++) s.update(1 / 60, fakeInput())
     expect(s.update(1 / 60, fakeInput({ presses: ['interact'] })).some((e) => e.type === 'go')).toBe(true)
   })
+  it('Enter near a linked frame opens its link', () => {
+    const linkRoom = { ...sectionRoom, frames: [{ id: 'gh', kind: 'item', x: 70, w: 48, href: 'https://github.com/x' }] }
+    const s = createHallScene(linkRoom, { spawnX: 94 })
+    s.update(0.016, fakeInput())
+    expect(s.update(0.016, fakeInput({ presses: ['interact'] }))).toContainEqual({ type: 'open', href: 'https://github.com/x' })
+  })
 })

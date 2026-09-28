@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { welcomeText, enterFrameText, tileText } from './copy.js'
+import { welcomeText, enterFrameText, tileText, openLinkText } from './copy.js'
 
 describe('speech copy', () => {
   it('matches the spec wording on keyboard devices', () => {
@@ -11,5 +11,9 @@ describe('speech copy', () => {
     expect(welcomeText(true)).toContain('Use ◀ ▶ to walk, B to jump')
     expect(enterFrameText('About', true)).toBe('Tap A to step into About!')
     expect(tileText('Home', true)).toBe('Tap A to go to Home!')
+  })
+  it('invites opening a linked frame', () => {
+    expect(openLinkText('GitHub', false)).toBe('Press Enter to open GitHub!')
+    expect(openLinkText('Email', true)).toBe('Tap A to open Email!')
   })
 })

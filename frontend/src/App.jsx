@@ -10,6 +10,7 @@ import CornerMenu from './ui/CornerMenu.jsx'
 import SkipButton from './ui/SkipButton.jsx'
 import TouchControls from './ui/TouchControls.jsx'
 import useMediaQuery from './ui/useMediaQuery.js'
+import { openLink } from './ui/openLink.js'
 
 export default function App() {
   const storage = useMemo(() => createStorage(), [])
@@ -60,6 +61,7 @@ export default function App() {
       setIntroPlaying(false)
     },
     back: () => setCard(null),
+    open: (href) => openLink(href),
   }
 
   const onReady = useCallback((game) => {

@@ -125,20 +125,23 @@ export function contactItems(profile) {
     {
       id: 'contact-email',
       plaque: 'Email',
+      href: `mailto:${profile.email}`,
       thumb: { type: 'art', art: 'email' },
       card: card({ title: 'Email', body: ['Say hi!'], links: [{ href: `mailto:${profile.email}`, label: profile.email }] }),
     },
     {
       id: 'contact-github',
       plaque: 'GitHub',
+      href: profile.social.github,
       thumb: { type: 'art', art: 'github' },
       card: card({ title: 'GitHub', body: ['Code for my projects.'], links: [{ href: profile.social.github, label: 'github.com/srilekha511' }] }),
     },
     {
       id: 'contact-linkedin',
       plaque: 'LinkedIn',
+      href: profile.social.linkedin,
       thumb: { type: 'art', art: 'linkedin' },
-      card: card({ title: 'LinkedIn', body: ["Let's connect."], links: [{ href: profile.social.linkedin, label: 'linkedin.com/in/srilekha-mamidala' }] }),
+      card: card({ title: 'LinkedIn', body: ["Let's connect!"], links: [{ href: profile.social.linkedin, label: 'linkedin.com/in/srilekha-mamidala' }] }),
     },
   ]
 }
@@ -149,6 +152,7 @@ function sectionRoom(section, items) {
     kind: 'item',
     label: item.card.title,
     plaque: item.plaque,
+    ...(item.href ? { href: item.href } : {}),
     x: FIRST_ITEM_X + i * (ITEM_FRAME.w + ITEM_GAP),
     ...ITEM_FRAME,
     thumb: item.thumb,
