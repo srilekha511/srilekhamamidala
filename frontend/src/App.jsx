@@ -9,6 +9,7 @@ import QuickView from './ui/QuickView.jsx'
 import CornerMenu from './ui/CornerMenu.jsx'
 import SkipButton from './ui/SkipButton.jsx'
 import TouchControls from './ui/TouchControls.jsx'
+import DirectoryMenu from './ui/DirectoryMenu.jsx'
 import useMediaQuery from './ui/useMediaQuery.js'
 import { openLink } from './ui/openLink.js'
 
@@ -25,6 +26,7 @@ export default function App() {
   const [bubble, setBubble] = useState(null)
   const [card, setCard] = useState(null)
   const [avatarPos, setAvatarPos] = useState(null)
+  const [room, setRoom] = useState(initial.room)
 
   const gameRef = useRef(null)
   const roomRef = useRef(initial.room)
@@ -44,6 +46,7 @@ export default function App() {
     avatar: setAvatarPos,
     room: (room) => {
       roomRef.current = room
+      setRoom(room)
       const current = parseHash(window.location.hash)
       const target = hashFor(room)
       if (current.quick || urlMatchesHash(target)) return
@@ -116,6 +119,10 @@ export default function App() {
     storage.set(KEYS.soundOn, next)
     gameRef.current?.setSoundOn(next)
   }
+  const travel = (target) => {
+    if (target === roomRef.current) return
+    if (!gameRef.current?.goTo(target)) pendingRoomRef.current = target // busy: go once it settles
+  }
   const replayIntro = () => {
     if (gameRef.current?.replayIntro()) setIntroPlaying(true)
   }
@@ -127,6 +134,8 @@ export default function App() {
         <h1 className="site-title">Srilekha's Gallery</h1>
         <CornerMenu soundOn={soundOn} onToggleSound={toggleSound} onReplayIntro={replayIntro} onQuickView={openQuick} />
       </header>
+
+      {!introPlaying && <DirectoryMenu room={room} onGo={travel} />}
 
       <main className="stage">
         <GameCanvas options={options} handlers={handlers} onReady={onReady}>

@@ -86,3 +86,24 @@ body { min-height: 100vh; }
 @media (pointer: coarse) and (max-aspect-ratio: 1/1) {
   .app { padding-bottom: 104px; }
 }
+
+/* Gallery directory: wooden sign on the left with brass plaques. */
+.directory { position: fixed; left: 16px; top: 50%; transform: translateY(-50%); z-index: 5; }
+.directory__toggle { display: none; }
+.directory__sign { background: #7a4f2e; border: 4px solid #4a2f1a; box-shadow: inset 0 0 0 2px #9a6a42, 4px 4px 0 rgba(0, 0, 0, 0.35); padding: 8px 8px 10px; }
+.directory__title { font-family: var(--pixel); font-size: 9px; color: #f2d27a; text-align: center; margin: 2px 0 8px; letter-spacing: 1px; }
+.directory ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.directory__plaque {
+  display: flex; align-items: center; gap: 8px; width: 100%; font-family: var(--pixel); font-size: 9px; color: #3a2a10;
+  background: #d4a93a; border: 2px solid #8a6420; box-shadow: inset 0 2px 0 #f2d27a; padding: 6px 8px; cursor: pointer; text-align: left;
+}
+.directory__plaque:hover { background: #e2bb52; }
+.directory__plaque[aria-current='page'] { background: #fbf3e0; border-color: var(--maroon); color: var(--maroon); }
+.directory__plaque:focus-visible { outline: 3px dashed var(--accent); outline-offset: 2px; }
+.pixel-icon { width: 16px; height: 16px; fill: currentColor; flex: none; }
+@media (max-aspect-ratio: 1/1), (max-width: 700px) {
+  .directory { top: 64px; transform: none; }
+  .directory__toggle { display: inline-block; }
+  .directory__sign { display: none; margin-top: 8px; }
+  .directory--open .directory__sign { display: block; }
+}

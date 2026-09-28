@@ -124,4 +124,17 @@ describe('App', () => {
     expect(window.location.href).not.toContain('#')
     expect(window.history.length).toBe(before + 1)
   })
+  it('the directory travels to a room and is hidden during the intro', () => {
+    render(<App />)
+    expect(screen.queryByRole('navigation', { name: /gallery directory/i })).toBe(null)
+    act(() => handlers.introDone())
+    fireEvent.click(screen.getByRole('button', { name: 'Projects' }))
+    expect(fakeGame.goTo).toHaveBeenLastCalledWith('projects')
+  })
+  it('the directory highlights the room the game reports', () => {
+    window.localStorage.setItem('rg.introSeen', 'true')
+    render(<App />)
+    act(() => handlers.room('about'))
+    expect(screen.getByRole('button', { name: 'About' }).getAttribute('aria-current')).toBe('page')
+  })
 })
