@@ -72,13 +72,15 @@ describe('input', () => {
     expect(key('keydown', ' ').defaultPrevented).toBe(true)
     off()
   })
-  it('Space and W jump; Enter and Up still interact', () => {
+  it('Space, W and Up jump; only Enter interacts', () => {
     const i = createInput(); const off = i.attach(window)
-    key('keydown', ' '); expect(i.consume('jump')).toBe(true); expect(i.consume('interact')).toBe(false)
-    key('keyup', ' ')
-    key('keydown', 'w'); expect(i.consume('jump')).toBe(true)
-    key('keydown', 'Enter'); expect(i.consume('interact')).toBe(true); key('keyup', 'Enter')
-    key('keydown', 'ArrowUp'); expect(i.consume('interact')).toBe(true)
+    for (const k of [' ', 'w', 'ArrowUp']) {
+      key('keydown', k)
+      expect(i.consume('jump'), k).toBe(true)
+      expect(i.consume('interact'), k).toBe(false)
+      key('keyup', k)
+    }
+    key('keydown', 'Enter'); expect(i.consume('interact')).toBe(true)
     off()
   })
   it('Space on a focused button presses the button, not a jump', () => {

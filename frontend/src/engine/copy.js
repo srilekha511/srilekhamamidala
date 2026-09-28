@@ -1,5 +1,5 @@
 const walkKeys = (touch) => (touch ? '◀ ▶' : '← →')
-const jumpKey = (touch) => (touch ? 'B' : 'Space')
+const jumpKey = (touch) => (touch ? 'B' : '↑ or Space')
 const action = (touch) => (touch ? 'Tap A' : 'Press Enter')
 
 export const welcomeText = (touch) =>

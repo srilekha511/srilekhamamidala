@@ -1,8 +1,8 @@
 export const KEYMAP = {
   ArrowLeft: 'left', a: 'left', A: 'left',
   ArrowRight: 'right', d: 'right', D: 'right',
-  Enter: 'interact', ArrowUp: 'interact',
-  ' ': 'jump', w: 'jump', W: 'jump',
+  Enter: 'interact',
+  ArrowUp: 'jump', ' ': 'jump', w: 'jump', W: 'jump',
   Escape: 'back',
 }
 
