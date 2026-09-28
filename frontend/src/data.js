@@ -1,6 +1,3 @@
-// Data file for the website
-// This replaces the backend API calls for static hosting
-
 export const profile = {
   firstName: "Srilekha",
   fullName: "Srilekha Mamidala",
@@ -13,6 +10,102 @@ export const profile = {
     linkedin: "https://www.linkedin.com/in/srilekha-mamidala/",
   }
 };
+
+export const education = {
+  school: "Massachusetts Institute of Technology (MIT)",
+  location: "Cambridge, MA",
+  degree: "Candidate for Bachelor of Science in Computer Science, Data Science, and Economics",
+  graduation: "June 2028",
+  coursework: ["Algorithms", "Machine Learning", "Econometrics", "Game Theory", "Optimization for Business Analytics"],
+  honors: [
+    "Jane Street Math Prize for Girls Invitee (top 250 girls, USA/Canada)",
+    "3-time International Science and Engineering Fair Finalist",
+    "PennApps Hackathon Winner",
+    "Bridgewater Associates AI Immersion Hackathon Invitee",
+  ],
+};
+
+export const skills = [
+  { group: "Programming", items: ["Python", "Java", "Linux", "C/C++", "R", "SQL", "TypeScript", "JavaScript", "Swift", "C#", "React", "Git", "Shell Scripting", "Kubernetes"] },
+  { group: "Systems & Infrastructure", items: ["Object-Oriented Programming", "Distributed Systems", "Docker", "CI/CD", "Databricks", "AWS", "Terraform"] },
+  { group: "Quantitative & ML", items: ["Machine Learning", "Statistical Analysis", "Econometrics", "Optimization", "PyTorch", "Data Analytics"] },
+  { group: "Financial", items: ["LBO Modeling", "Financial Modeling", "Financial Statement Analysis", "Equity Valuation", "Market Research", "Portfolio Analysis", "Bloomberg API"] },
+  { group: "Tools & Platforms", items: ["Bloomberg Terminal", "PowerPoint", "Word", "Excel", "Tableau", "Power BI", "Databricks", "AWS"] },
+];
+
+export const interests = [
+  "AI & machine learning",
+  "NLP & LLM evaluation research",
+  "Venture capital & startups",
+  "Quantitative finance & economics",
+];
+
+export const experience = [
+  {
+    id: "disney", company: "Disney Streaming", role: "Software Engineering Intern",
+    location: "Santa Monica, CA", dates: "June 2026 – August 2026", monogram: "DS", color: "#1f3b8a",
+    bullets: [
+      "Developed internal developer tooling for Disney Streaming using Databricks, Apache Spark, AWS, Linux, and Terraform, improving platform scalability and engineering productivity across distributed data pipelines, reducing latency by over 400%",
+      "Architected AI-assisted knowledge retrieval system leveraging Model Context Protocols (MCPs) to automate access to technical documentation and domain expertise, reducing engineering search time by 150% and automating developer workflows",
+    ],
+  },
+  {
+    id: "acronym", company: "Acronym", role: "Machine Learning Intern",
+    location: "New York, NY", dates: "September 2026 – Present", monogram: "AC", color: "#2d6a4f",
+    bullets: [
+      "Building an LLM evaluation pipeline that scores signal extractions against source artifacts using LLM-as-a-Judge, surfacing model and prompt failure modes across unstructured data",
+      "Analyzing HDBSCAN embedding-based clustering of extracted signals to analyze cluster quality and reduce redundant themes and improve group-level synthesis, enabling more accurate classification of new signals and emerging trends",
+      "Designing evaluation infrastructure to benchmark LLM models and extraction strategies across quality, cost, and latency",
+    ],
+  },
+  {
+    id: "hof", company: "HOF Capital", role: "Investment Intern",
+    location: "", dates: "September 2026 – Present", monogram: "HOF", color: "#7a2e2e",
+    bullets: [
+      "Source and conduct market and company diligence on AI, software, and frontier technology startups, assessing founders, products, markets, competitive landscapes, and technical differentiation to identify high-potential investment opportunities",
+      "Develop investment theses through market research, founder conversations, and analysis of emerging technologies and products",
+    ],
+  },
+  {
+    id: "medialab", company: "MIT Media Lab", role: "Research Intern",
+    location: "", dates: "September 2026 – Present", monogram: "ML", color: "#5b2a86",
+    bullets: [
+      "Investigating self-confirming inference in persistent LLM memory by instrumenting an open-source memory system to trace preference updates to interaction evidence and distinguish user beliefs from preferences reinforced by agent interactions",
+      "Measuring inference provenance with multi-turn interactions and validating automated classifications vs. hand-labeled traces",
+    ],
+  },
+  {
+    id: "mitecon", company: "MIT Department of Economics", role: "Research Intern",
+    location: "Cambridge, MA", dates: "June 2026 – Present", monogram: "EC", color: "#8a1f2b",
+    bullets: [
+      "Developed and evaluated technical infrastructure for a large-scale RCT studying smartphone use and adolescent well-being",
+      "Analyzed Android application and Django backend logs to diagnose missing/incomplete smartphone usage records",
+    ],
+  },
+  {
+    id: "csail", company: "MIT CSAIL, Decentralized Information Group", role: "Research Intern",
+    location: "Cambridge, MA", dates: "August 2024 – Present", monogram: "DIG", color: "#1d5c7a",
+    bullets: [
+      "Accelerated insurance communication services by >60% by researching development of mathematical metrics for subjective quality evaluation across 10+ large language models (LLMs) in coordination with industry partner Liberty Mutual",
+      "Designed parallel human/LLM judge studies via 300+ human ratings to create auto-evaluation metrics for Agentic AI models",
+    ],
+  },
+  {
+    id: "525vc", company: "525 Venture Capital Firm", role: "Venture Associate Intern",
+    location: "New York, NY", dates: "December 2025 – February 2026", monogram: "525", color: "#b5651d",
+    bullets: [
+      "Built AI-driven investment portfolio management system using voice and text agentic AI models to ingest founder calls, inbound applications, pitch decks, and market research for deal sourcing, generating first-pass deal memos and SWOT analyses",
+      "Training on historical decisions, diligence frameworks to flag risks, rank diligence questions, support investment decisions",
+    ],
+  },
+  {
+    id: "earthian", company: "Earthian AI — Dutch Commercial Property Insurance Optimization Startup", role: "Software Engineering Intern",
+    location: "Enschede, Netherlands", dates: "June 2025 – August 2025", monogram: "EA", color: "#2e7d32",
+    bullets: [
+      "Improved climate risk analysis and expedited claim processing and underwriting by 200+% and delivered 2x more accurate insights for insurers in energy markets via PyTorch, FastAPI, AWS, React, leading development of full-stack AI chatbot",
+    ],
+  },
+];
 
 export const projects = [
   {

@@ -18,6 +18,7 @@ export default defineConfig({
     // Plugin to copy index.html to 404.html for GitHub Pages
     {
       name: 'copy-404',
+      apply: 'build',
       closeBundle() {
         const distPath = join(__dirname, 'dist')
         try {
@@ -35,16 +36,14 @@ export default defineConfig({
   base: base,
   server: {
     port: 3000,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5001',
-        changeOrigin: true
-      }
-    }
   },
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
-  }
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+  },
 })
 
