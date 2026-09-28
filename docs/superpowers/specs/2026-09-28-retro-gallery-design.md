@@ -1,7 +1,7 @@
 # Retro Pixel Art Gallery — Personal Website Redesign
 
 **Date:** 2026-09-28
-**Status:** Awaiting review
+**Status:** Approved
 **Branch:** `retro-gallery`
 **Live site:** https://srilekha511.github.io/srilekhamamidala/
 
@@ -113,7 +113,7 @@ frontend/src/
 | About | Me, Education, Skills, Interests | Me: headshot + bio. Education: MIT, degree, expected June 2028, coursework, honors. Skills: grouped skills. Interests: short list (from bio/résumé themes: AI/ML, NLP research, venture/finance) |
 | Projects | One per project in `data.js` (9) | Title, category, description, what I learned, tech tags, image(s), link |
 | Experience | One per role (8, below) | Company, role, location, dates, bullets |
-| Contact | Email, GitHub, LinkedIn, Résumé | Large clickable link. Résumé frame appears only if `public/resume.pdf` exists (flag in data.js) |
+| Contact | Email, GitHub, LinkedIn | Large clickable link (no Résumé frame) |
 
 Frame thumbnails: projects use their real images pixelated via `pixelate.js`; experience frames use a pixel monogram of the company initials on a themed color; About/Contact frames use code-drawn icons (About "Me" uses the pixelated headshot).
 
@@ -133,7 +133,7 @@ Hash mirrors room: `#/about` etc. Loading a deep link skips the intro and spawns
 
 Content is sourced from the existing `data.js` (profile, 9 projects) plus the résumé provided on 2026-09-28:
 
-**Education:** Massachusetts Institute of Technology, Cambridge, MA — Candidate for Bachelor of Science in Computer Science, Data Science, and Economics, June 2028. GPA 4.7/5.0. Coursework: Algorithms, Machine Learning, Econometrics, Game Theory, Optimization for Business Analytics. Honors: MIT; Jane Street Math Prize for Girls Invitee (top 250 girls, USA/Canada); 3-time Intl. Science and Engineering Fair Finalist; PennApps Hackathon Winner; Bridgewater Associates AI Immersion Hackathon Invitee.
+**Education:** Massachusetts Institute of Technology, Cambridge, MA — Candidate for Bachelor of Science in Computer Science, Data Science, and Economics, June 2028. Coursework: Algorithms, Machine Learning, Econometrics, Game Theory, Optimization for Business Analytics. Honors: MIT; Jane Street Math Prize for Girls Invitee (top 250 girls, USA/Canada); 3-time Intl. Science and Engineering Fair Finalist; PennApps Hackathon Winner; Bridgewater Associates AI Immersion Hackathon Invitee.
 
 **Skills:**
 - Programming: Python, Java, Linux, C/C++, R, SQL, TypeScript, JavaScript, Swift, C#, React, Git, Shell Scripting, Kubernetes
@@ -168,7 +168,7 @@ Content is sourced from the existing `data.js` (profile, 9 projects) plus the r�
 8. **Earthian AI — Dutch Commercial Property Insurance Optimization Startup** — Software Engineering Intern — Enschede, Netherlands — June 2025 – August 2025
    - Improved climate risk analysis and expedited claim processing and underwriting by 200+% and delivered 2x more accurate insights for insurers in energy markets via PyTorch, FastAPI, AWS, React, leading development of full-stack AI chatbot
 
-**Contact:** GitHub https://github.com/srilekha511, LinkedIn https://www.linkedin.com/in/srilekha-mamidala/, email (the current `data.js` value is a placeholder `your.email@example.com`; the real public address is supplied by Srilekha before the Contact room is built).
+**Contact:** GitHub https://github.com/srilekha511, LinkedIn https://www.linkedin.com/in/srilekha-mamidala/, email read from `profile.email` in `data.js` (Srilekha updates the placeholder value directly). GPA is intentionally not shown anywhere.
 
 ## 7. Testing
 
@@ -184,7 +184,7 @@ Content is sourced from the existing `data.js` (profile, 9 projects) plus the r�
 ## 8. Deployment & cleanup
 
 - Keep `.github/workflows/deploy.yml` (builds `frontend/` and deploys `dist/`). All asset URLs go through `import.meta.env.BASE_URL`.
-- **Remove `.github/workflows/static.yml`**: it deploys the unbuilt repo root to Pages on every push to `main`, competing with `deploy.yml` (same concurrency group; last one wins). Removal to be confirmed by Srilekha.
+- **Remove `.github/workflows/static.yml`**: it deploys the unbuilt repo root to Pages on every push to `main`, competing with `deploy.yml` (same concurrency group; last one wins). Removal confirmed by Srilekha.
 - Remove `backend/`, old `pages/`, `components/Navbar*`, `App.css`, and dependencies `axios`, `react-router-dom`. Unused public images (`proejcts.jpg`, `projectsactual.*`, `website.webp`) removed if unreferenced.
 - All work on branch `retro-gallery`; merge to `main` (which triggers deploy) only after Srilekha reviews the running site.
 
