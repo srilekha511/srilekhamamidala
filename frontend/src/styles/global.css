@@ -66,3 +66,13 @@ body { min-height: 100vh; }
   .speech-bubble { font-size: 8px; padding: 8px; }
   .info-card { max-height: none; }
 }
+.touch-controls {
+  position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); pointer-events: none; z-index: 5;
+}
+.touch-controls__dpad { display: flex; gap: 12px; }
+.touch-button { pointer-events: auto; width: 64px; height: 64px; font-size: 18px; user-select: none; -webkit-user-select: none; touch-action: none; }
+.touch-button--a { border-radius: 50%; background: var(--maroon); color: #fff; }
+@media (pointer: coarse) {
+  .app { padding-bottom: 104px; }
+}
