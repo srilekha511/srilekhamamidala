@@ -8,7 +8,13 @@ export function parseHash(hash) {
   return { room: 'hall', quick: false }
 }
 
+// The main hall has a clean URL (no #); other rooms get #/room.
 export function hashFor(room, quick = false) {
   if (quick) return '#/quick'
-  return room === 'hall' ? '#/' : `#/${room}`
+  return room === 'hall' ? '' : `#/${room}`
 }
+
+// Full same-page URL for a hash from hashFor ('' drops the # entirely).
+export const urlWithHash = (hash) => window.location.pathname + window.location.search + hash
+
+export const urlMatchesHash = (hash) => (hash === '' ? !window.location.href.includes('#') : window.location.hash === hash)

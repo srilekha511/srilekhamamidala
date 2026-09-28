@@ -107,4 +107,21 @@ describe('App', () => {
     expect(screen.queryByRole('dialog')).toBe(null)
     back.mockRestore()
   })
+  it('the main hall has a clean URL with no #', () => {
+    window.localStorage.setItem('rg.introSeen', 'true')
+    window.history.replaceState(null, '', '#/')
+    render(<App />)
+    act(() => handlers.room('hall'))
+    expect(window.location.href).not.toContain('#')
+  })
+  it('walking back into the hall adds a clean history entry', () => {
+    window.localStorage.setItem('rg.introSeen', 'true')
+    window.history.replaceState(null, '', '#/about')
+    render(<App />)
+    act(() => handlers.room('about'))
+    const before = window.history.length
+    act(() => handlers.room('hall'))
+    expect(window.location.href).not.toContain('#')
+    expect(window.history.length).toBe(before + 1)
+  })
 })

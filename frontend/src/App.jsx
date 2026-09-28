@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import * as data from './data.js'
 import { createStorage, KEYS } from './storage.js'
-import { parseHash, hashFor } from './routing.js'
+import { parseHash, hashFor, urlWithHash, urlMatchesHash } from './routing.js'
 import GameCanvas from './ui/GameCanvas.jsx'
 import SpeechBubble from './ui/SpeechBubble.jsx'
 import InfoCard from './ui/InfoCard.jsx'
@@ -45,10 +45,10 @@ export default function App() {
       roomRef.current = room
       const current = parseHash(window.location.hash)
       const target = hashFor(room)
-      if (current.quick || window.location.hash === target) return
-      // Same room, different spelling (startup '', '#/Projects', '#/foo'): tidy the URL without a history entry.
-      if (current.room === room) window.history.replaceState(null, '', target)
-      else window.location.hash = target
+      if (current.quick || urlMatchesHash(target)) return
+      // Same room, different spelling ('#/', '#/Projects', '#/foo'): tidy the URL without a history entry.
+      if (current.room === room) window.history.replaceState(null, '', urlWithHash(target))
+      else window.history.pushState(null, '', urlWithHash(target))
     },
     settled: () => {
       const pending = pendingRoomRef.current
@@ -81,8 +81,13 @@ export default function App() {
         pendingRoomRef.current = room // last one wins once the current transition/intro finishes
       }
     }
+    // Back/Forward between pushState entries fires popstate (and hashchange when the # changes); onHash is idempotent.
     window.addEventListener('hashchange', onHash)
-    return () => window.removeEventListener('hashchange', onHash)
+    window.addEventListener('popstate', onHash)
+    return () => {
+      window.removeEventListener('hashchange', onHash)
+      window.removeEventListener('popstate', onHash)
+    }
   }, [])
 
   useEffect(() => {
@@ -100,7 +105,7 @@ export default function App() {
       quickPushedRef.current = false
       window.history.back()
     } else {
-      window.history.replaceState(null, '', hashFor(roomRef.current))
+      window.history.replaceState(null, '', urlWithHash(hashFor(roomRef.current)))
     }
   }, [])
   const toggleSound = () => {

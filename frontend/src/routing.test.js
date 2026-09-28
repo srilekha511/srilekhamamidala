@@ -16,7 +16,7 @@ describe('routing', () => {
     expect(parseHash('#/quick')).toEqual({ room: 'hall', quick: true })
   })
   it('builds hashes', () => {
-    expect(hashFor('hall')).toBe('#/')
+    expect(hashFor('hall')).toBe('') // main hall keeps a clean URL
     expect(hashFor('contact')).toBe('#/contact')
     expect(hashFor('projects', true)).toBe('#/quick')
   })
