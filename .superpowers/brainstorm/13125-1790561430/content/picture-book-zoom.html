@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Picture Book Zoom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --paper: #efe7d8; --muted: #7a6f63; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #1a1816; color: #eee6da; font-family: 'Inter Tight', system-ui, sans-serif; padding: 40px 28px 90px; -webkit-font-smoothing: antialiased; }
+  .mono { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+  .wrap { max-width: 1200px; margin: 0 auto; }
+  h1 { font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 42px; }
+  .lede { color: #a39c91; margin-top: 10px; font-size: 15px; line-height: 1.65; max-width: 840px; }
+  .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 24px 0 14px; color: #a39c91; }
+  .controls button { background: none; color: #eee6da; border: 1px solid rgba(238,230,218,.3); border-radius: 99px; padding: 9px 16px; cursor: pointer; }
+  .controls button:hover { background: #eee6da; color: #1a1816; }
+  .controls button.on { background: #eee6da; color: #1a1816; }
+  #in { background: #d23a1f; border-color: #d23a1f; color: #fff; }
+  .pv { position: relative; width: 100%; overflow: hidden; border-radius: 4px; background: var(--paper); cursor: zoom-in; }
+  .scaler { position: absolute; left: 0; top: 0; width: 1440px; height: 900px; transform-origin: 0 0; }
+  #view { position: absolute; inset: 0; width: 1440px; height: 900px; }
+  .hud { position: absolute; font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; pointer-events: none;
+    color: #3b342c; background: rgba(239,231,216,.78); padding: 7px 12px; border-radius: 99px; }
+  #crumbs { left: 26px; bottom: 24px; }
+  #depth { right: 26px; bottom: 24px; font-variant-numeric: tabular-nums; }
+  #hint { right: 26px; top: 22px; }
+  .loading { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-family: 'IBM Plex Mono', monospace; letter-spacing: .2em; text-transform: uppercase; font-size: 14px; }
+  .note { color: #8f887d; font-size: 13px; line-height: 1.6; margin-top: 14px; max-width: 920px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>A picture book that never ends</h1>
+  <p class="lede">A landscape with a cottage. Zoom into its window, then the room, then the desk, where the open notebook is your About page. The sketch on the facing page turns out to be a whole new landscape: Selected Works. It keeps going, with the light getting later on each loop and each new desk holding one of your projects. Every scene is painted in watercolor by code.</p>
+  <div class="controls">
+    <button id="tour" class="mono on">Auto tour</button>
+    <button id="back" class="mono">← Back</button>
+    <button id="in" class="mono">Zoom in →</button>
+    <span class="mono" style="margin-left:auto">Click the scene to zoom in · Scroll to scrub · Arrow keys work too</span>
+  </div>
+  <div class="pv" id="pv"><div class="scaler">
+    <canvas id="view" width="1440" height="900"></canvas>
+    <div class="hud" id="crumbs"></div><div class="hud" id="depth"></div><div class="hud" id="hint">Zoom in</div>
+    <div class="loading" id="loading">Painting…</div>
+  </div></div>
+  <p class="note">This is a prototype. The scenes are generated in code, so they're charming but simple. For the real site, hand-painted or illustrated scenes would make it look far better, and the zoom engine stays the same.</p>
+</div>
+
+<script>
+const W = 1440, H = 900;
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const easeInOut = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const rnd = (a, b) => a + Math.random() * (b - a);
+
+/* ======================= watercolor toolkit ======================= */
+const mkc = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; return c; };
+const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+function deform(poly, depth, variance) {
+  for (let d = 0; d < depth; d++) {
+    const o = [];
+    for (let k = 0; k < poly.length; k++) {
+      const a = poly[k], b = poly[(k + 1) % poly.length], len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      o.push(a, [(a[0] + b[0]) / 2 + gauss() * len * variance, (a[1] + b[1]) / 2 + gauss() * len * variance]);
+    }
+    poly = o; variance *= .55;
+  }
+  return poly;
+}
+function densify(poly, step) {
+  const o = [];
+  for (let k = 0; k < poly.length; k++) {
+    const a = poly[k], b = poly[(k + 1) % poly.length], n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / step));
+    for (let i = 0; i < n; i++) o.push([lerp(a[0], b[0], i / n), lerp(a[1], b[1], i / n)]);
+  }
+  return o;
+}
+function fillPoly(g, p) { g.beginPath(); g.moveTo(p[0][0], p[0][1]); for (let i = 1; i < p.length; i++) g.lineTo(p[i][0], p[i][1]); g.closePath(); g.fill(); }
+function wash(g, poly, cols, a = .08, layers = 9, v = .1, blur = 0) {
+  const base = deform(densify(poly, 22), 2, v * .5);
+  if (blur) g.filter = `blur(${blur}px)`;
+  for (let k = 0; k < layers; k++) { g.globalAlpha = a; g.fillStyle = cols[k % cols.length]; fillPoly(g, deform(base, 3, v)); }
+  g.filter = 'none'; g.globalAlpha = 1;
+}
+const rectP = (x, y, w, h) => [[x, y], [x + w, y], [x + w, y + h], [x, y + h]];
+const circleP = (cx, cy, r, n = 30) => Array.from({ length: n }, (_, i) => [cx + Math.cos(i / n * 6.283) * r, cy + Math.sin(i / n * 6.283) * r]);
+const ellipseP = (cx, cy, rx, ry, n = 32) => Array.from({ length: n }, (_, i) => [cx + Math.cos(i / n * 6.283) * rx, cy + Math.sin(i / n * 6.283) * ry]);
+function ridgeP(y0, amp, k, peakX = null, peakAmp = 0) {
+  const pts = [];
+  for (let x = -80; x <= W + 80; x += 30) {
+    let y = y0 - amp * (.55 * Math.sin(x * .004 + k) + .3 * Math.sin(x * .011 + k * 2) + .15 * Math.sin(x * .027 + k * 3));
+    if (peakX !== null) y -= peakAmp * Math.exp(-Math.pow((x - peakX) / 260, 2));
+    pts.push([x, y]);
+  }
+  return pts.concat([[W + 80, H + 80], [-80, H + 80]]);
+}
+function brush(g, path, width, cols, a = .12, layers = 5) {       // a painted line along a path
+  const L = [], R = [];
+  for (let i = 0; i < path.length; i++) {
+    const p = path[i], q = path[Math.min(i + 1, path.length - 1)], r = path[Math.max(i - 1, 0)];
+    const dx = q[0] - r[0], dy = q[1] - r[1], d = Math.hypot(dx, dy) || 1, t = Math.min(1, i / 3, (path.length - 1 - i) / 3 + .3);
+    const hw = width / 2 * (.5 + .5 * t);
+    L.push([p[0] - dy / d * hw, p[1] + dx / d * hw]); R.push([p[0] + dy / d * hw, p[1] - dx / d * hw]);
+  }
+  const poly = L.concat(R.reverse());
+  for (let k = 0; k < layers; k++) { g.globalAlpha = a; g.fillStyle = cols[k % cols.length]; fillPoly(g, deform(poly, 2, .05)); }
+  g.globalAlpha = 1;
+}
+const seg = (a, b, n = 12) => Array.from({ length: n + 1 }, (_, i) => [lerp(a[0], b[0], i / n), lerp(a[1], b[1], i / n)]);
+const TEX = (() => {
+  const c = mkc(), t = c.getContext('2d'), s = document.createElement('canvas'); s.width = 40; s.height = 26;
+  const sc = s.getContext('2d'), img = sc.createImageData(40, 26);
+  for (let k = 0; k < img.data.length; k += 4) img.data[k + 3] = Math.random() * 70;
+  sc.putImageData(img, 0, 0); t.filter = 'blur(14px)'; t.drawImage(s, -40, -40, W + 80, H + 80); t.filter = 'none';
+  const fine = t.createImageData(W, H);
+  for (let k = 0; k < fine.data.length; k += 4) fine.data[k + 3] = Math.random() < .4 ? Math.random() * 55 : 0;
+  const f = mkc(); f.getContext('2d').putImageData(fine, 0, 0); t.drawImage(f, 0, 0);
+  return c;
+})();
+function paperBase(g, col = '#efe7d8') { g.fillStyle = col; g.fillRect(0, 0, W, H); }
+function grain(g) { g.globalCompositeOperation = 'destination-out'; g.globalAlpha = .55; g.drawImage(TEX, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; }
+function wrapText(g, text, x, y, maxW, lh) {
+  const words = text.split(' '); let line = '';
+  for (const w of words) { const test = line ? line + ' ' + w : w; if (g.measureText(test).width > maxW && line) { g.fillText(line, x, y); line = w; y += lh; } else line = test; }
+  if (line) g.fillText(line, x, y);
+  return y + lh;
+}
+
+/* ======================= palettes: the light gets later every loop ======================= */
+const PAL = [
+  { name: 'Morning', sky: ['#a9c9e0', '#c3dae9'], glow: ['#f6d2b0'], sun: ['#f3c19b', '#e8a070'], far: ['#9fb4cf', '#a9bdd6'], mid: ['#8fb07a', '#9dbf86'], near: ['#6f9a5f', '#86ad6f'],
+    wall: ['#f1dcc0', '#ead0ae'], roof: ['#c9644a', '#d9795a'], door: ['#3f6fbf', '#5b82c0'], glass: ['#f6d9a0', '#f3c98a'], room: ['#f0dcc0', '#ead3b4'], wood: ['#b98a5e', '#c79a6c'], ink: '#231d17', inkSoft: '#5a4f44', light: 0 },
+  { name: 'Golden hour', sky: ['#f3c9a0', '#f6d8b8'], glow: ['#f7c08c'], sun: ['#e8703f', '#d9532e'], far: ['#b89ab8', '#c6a9c2'], mid: ['#9aa86a', '#a8b477'], near: ['#7f8f52', '#8f9d5e'],
+    wall: ['#f2d2a8', '#ecc592'], roof: ['#b85640', '#c9644a'], door: ['#2f4f8e', '#3f6fbf'], glass: ['#f9d98c', '#f6c86e'], room: ['#f2d4ac', '#ebc594'], wood: ['#a87a50', '#b98a5e'], ink: '#2a2018', inkSoft: '#5f4e3e', light: .2 },
+  { name: 'Dusk', sky: ['#7a86b8', '#9aa2cc'], glow: ['#e9a9a0'], sun: ['#f0b0a0', '#e89a8a'], far: ['#5d6a9a', '#6c79a8'], mid: ['#5f7a6a', '#6c8876'], near: ['#4c6656', '#58735f'],
+    wall: ['#d8c0b4', '#ccb0a4'], roof: ['#8a4a48', '#9a5652'], door: ['#26396a', '#2f4a82'], glass: ['#fbd98a', '#f7cb6a'], room: ['#e8ccb0', '#dcbc9c'], wood: ['#8e6644', '#9c7250'], ink: '#1d1a24', inkSoft: '#4a4556', light: .45 },
+  { name: 'Night', sky: ['#2d3a66', '#3b4a7a'], glow: ['#5a6a9a'], sun: ['#f1ead0', '#e6dcb8'], far: ['#34406a', '#3c4a78'], mid: ['#3c5250', '#46605c'], near: ['#2f423f', '#384e4a'],
+    wall: ['#9aa0b8', '#8a90aa'], roof: ['#4a3a4e', '#56445a'], door: ['#1c2a4e', '#22325c'], glass: ['#fbdc8a', '#f8cf66'], room: ['#e2c49c', '#d6b488'], wood: ['#7a5638', '#8a6242'], ink: '#15131c', inkSoft: '#403a4c', light: .8 },
+];
+
+/* ======================= what each loop says ======================= */
+const PROJECTS = [
+  { t: 'dermalab', s: 'ML/CV/NLP Hackathon · PennApps XXIV winner', d: 'An end-to-end platform that uses deep learning and LLMs to diagnose skin conditions, assess severity, predict spread, and explain results to patients and doctors.' },
+  { t: 'LLMs & Subjective Qualities', s: 'MIT CSAIL · NLP & HCI research', d: 'A framework pairing human and LLM evaluation to assess subjective qualities, focused on formality in professional communication.' },
+  { t: 'NeuroCADR', s: 'Computational biology · NJSHS 1st place', d: 'A pipeline that identifies and prioritises anti-epileptic drug candidates through data-driven drug repurposing.' },
+  { t: 'Dementia Risk Framework', s: 'ML research · ACM $2,500 award', d: 'A personalised dementia risk model combining machine learning with network theory across lifestyle, environmental and genetic factors.' },
+];
+function contentFor(cycle) {
+  if (cycle === 0) return {
+    title: ['Srilekha', 'Mamidala'], sub: 'Engineer & researcher · CS, Data Science & Economics · MIT',
+    left: { head: 'About', body: ["I'm interested in AI and fintech, and passionate about applying AI and ML to financial services, operations, and investing.", "Outside of classes I organise HackMIT logistics, captain MIT Nritya, serve on the SWE board, and am treasurer of IEEE/ACM.", "Currently: Venture Associate Intern at 525 VC and research at MIT CSAIL."] },
+  };
+  const p = PROJECTS[(cycle - 1) % PROJECTS.length];
+  const titles = [['Selected', 'Works'], ['More', 'Works'], ['Further', 'Works']];
+  return {
+    title: titles[Math.min(cycle - 1, 2)], sub: cycle === 1 ? 'Nine pieces · research, engineering, hackathons' : `Work no. ${String(cycle).padStart(2, '0')}`,
+    left: { head: p.t, sub: p.s, body: [p.d, 'Zoom into the sketch to keep going.'] },
+  };
+}
+
+/* ======================= the four scenes ======================= */
+// each returns { c: painting, frame: overlay that stays outside the window, glass: overlay that fades as we pass through, R: where the next scene sits }
+function landscape(P, C) {
+  const c = mkc(), g = c.getContext('2d');
+  paperBase(g);
+  wash(g, rectP(-80, -80, W + 160, H * .66 + 80), P.sky, .065, 12, .04);
+  wash(g, circleP(W * .28, H * .5, 300), P.glow, .045, 8, .3);
+  wash(g, circleP(W * .28, H * .38, 52), P.sun, .085, 10, .35);
+  if (P.light > .6) { g.fillStyle = '#f7f1dc'; for (let i = 0; i < 70; i++) { g.globalAlpha = rnd(.25, .8); g.beginPath(); g.arc(rnd(0, W), rnd(0, H * .5), rnd(.8, 2), 0, 7); g.fill(); } g.globalAlpha = 1; }
+  wash(g, ridgeP(H * .56, 36, rnd(0, 9)), P.far, .07, 9, .1);
+  wash(g, ridgeP(H * .64, 40, rnd(0, 9), 960, 110), P.mid, .075, 10, .09);
+  wash(g, ridgeP(H * .8, 22, rnd(0, 9)), P.near, .08, 10, .08);
+  // a winding path up to the cottage
+  const path = [[700, H + 20], [760, 820], [880, 760], [930, 700], [960, 610]];
+  brush(g, path, 26, ['#efe1c6', '#e8d6b6'], .3, 4);
+  // trees and meadow flowers
+  for (const [tx, ty, s] of [[210, 610, 1.1], [300, 640, .8], [1260, 620, 1], [1340, 650, .75], [560, 690, .7]]) {
+    brush(g, seg([tx, ty], [tx, ty + 60 * s], 6), 9 * s, ['#6b4a2e'], .25, 3);
+    wash(g, circleP(tx, ty - 10 * s, 52 * s), P.near, .08, 8, .25);
+    wash(g, circleP(tx + 18 * s, ty - 28 * s, 36 * s), P.mid, .07, 6, .25);
+  }
+  for (let i = 0; i < 60; i++) { const x = rnd(0, W), y = rnd(H * .82, H); g.globalAlpha = .5; g.fillStyle = ['#d9532e', '#e3b448', '#f7f1e6', '#3f6fbf'][i % 4]; g.beginPath(); g.arc(x, y, rnd(2, 4.5), 0, 7); g.fill(); }
+  g.globalAlpha = 1;
+  grain(g);
+  // lettering painted into the sky
+  g.fillStyle = P.light > .6 ? '#f3ecdc' : P.ink;
+  g.font = 'italic 400 118px "Instrument Serif"'; g.fillText(C.title[0], 110, 190); g.fillText(C.title[1], 110, 300);
+  g.font = '500 17px "IBM Plex Mono"'; g.globalAlpha = .8; g.fillText(C.sub.toUpperCase(), 116, 350); g.globalAlpha = 1;
+  return { c, R: { x: 800, y: 380, w: 320, h: 200 } };
+}
+function cottage(P) {
+  const c = mkc(), g = c.getContext('2d'), frame = mkc(), f = frame.getContext('2d'), glass = mkc(), gl = glass.getContext('2d');
+  const R = { x: 540, y: 330, w: 320, h: 200 };
+  paperBase(g);
+  wash(g, rectP(-80, -80, W + 160, H * .72 + 80), P.sky, .065, 10, .04);
+  wash(g, ridgeP(H * .74, 16, rnd(0, 9)), P.mid, .08, 10, .07);
+  wash(g, ridgeP(H * .9, 10, rnd(0, 9)), P.near, .08, 8, .07);
+  // chimney, roof, walls
+  wash(g, rectP(930, 60, 70, 150), P.roof, .08, 7, .06);
+  wash(g, [[330, 280], [720, 70], [1130, 280]], P.roof, .085, 10, .05);
+  wash(g, rectP(390, 262, 690, 470), P.wall, .09, 10, .03);
+  wash(g, rectP(940, 470, 100, 262), P.door, .09, 9, .04);
+  g.fillStyle = '#e3b448'; g.globalAlpha = .8; g.beginPath(); g.arc(1024, 610, 6, 0, 7); g.fill(); g.globalAlpha = 1;
+  // a second little window, and climbing roses
+  wash(g, rectP(955, 318, 110, 80), P.glass, .1, 7, .05);
+  brush(g, [[400, 730], [420, 600], [400, 480], [440, 380], [420, 300]], 7, ['#6f9a5f'], .25, 3);
+  for (let i = 0; i < 16; i++) { const y = lerp(720, 300, i / 15), x = 410 + Math.sin(i * 1.7) * 30; wash(g, circleP(x, y, rnd(7, 12), 12), [i % 3 ? '#d9532e' : '#e89aa0'], .18, 3, .3); }
+  wash(g, ellipseP(W / 2, 760, 520, 40), P.near, .07, 6, .2);
+  // the window glass (the next scene is painted over it)
+  wash(g, rectP(R.x, R.y, R.w, R.h), P.glass, .1, 8, .03);
+  grain(g);
+  // frame + sill + flower box, just outside the window
+  const fr = 20;
+  wash(f, rectP(R.x - fr, R.y - fr, R.w + 2 * fr, fr), ['#f7f1e6', '#efe4d0'], .35, 5, .02);
+  wash(f, rectP(R.x - fr, R.y + R.h, R.w + 2 * fr, fr + 6), ['#f7f1e6', '#efe4d0'], .35, 5, .02);
+  wash(f, rectP(R.x - fr, R.y, fr, R.h), ['#f7f1e6', '#efe4d0'], .35, 5, .02);
+  wash(f, rectP(R.x + R.w, R.y, fr, R.h), ['#f7f1e6', '#efe4d0'], .35, 5, .02);
+  wash(f, rectP(R.x - 30, R.y + R.h + 26, R.w + 60, 44), P.wood, .12, 6, .04);
+  for (let i = 0; i < 9; i++) wash(f, circleP(R.x - 10 + i * 42, R.y + R.h + 22 + Math.sin(i) * 6, 13, 12), [['#d9532e', '#e3b448', '#e89aa0'][i % 3]], .2, 3, .3);
+  // mullions and a sheen: things we pass through
+  wash(gl, rectP(R.x + R.w / 2 - 6, R.y, 12, R.h), ['#f7f1e6'], .45, 3, .02);
+  wash(gl, rectP(R.x, R.y + R.h / 2 - 6, R.w, 12), ['#f7f1e6'], .45, 3, .02);
+  wash(gl, [[R.x + 30, R.y + R.h], [R.x + 120, R.y], [R.x + 160, R.y], [R.x + 70, R.y + R.h]], ['#ffffff'], .12, 3, .05);
+  return { c, frame, glass, R };
+}
+function room(P) {
+  const c = mkc(), g = c.getContext('2d');
+  const R = { x: 560, y: 520, w: 336, h: 210 };
+  paperBase(g);
+  wash(g, rectP(-80, -80, W + 160, H * .72 + 80), P.room, .085, 10, .03);
+  wash(g, rectP(-80, H * .72, W + 160, H * .3 + 80), P.wood, .06, 8, .03);
+  // a little window on the wall (the landscape outside), a shelf with books, a painting
+  wash(g, rectP(110, 150, 250, 180), P.sky, .12, 7, .03); wash(g, ridgeP(290, 20, 2).map(([x, y]) => [clamp(x, 110, 360), clamp(y, 150, 330)]), P.mid, .1, 5, .04);
+  wash(g, rectP(1030, 190, 300, 16), P.wood, .15, 5, .03);
+  const books = ['#3f6fbf', '#d9532e', '#e3b448', '#6f9a5f', '#2b4a9e', '#c9644a', '#8fb07a'];
+  let bx = 1040; books.forEach((b, i) => { const w = rnd(22, 34), h = rnd(70, 100); wash(g, rectP(bx, 190 - h, w, h), [b], .13, 5, .03); bx += w + 3; });
+  wash(g, rectP(1070, 290, 190, 130), ['#c79a6c'], .14, 5, .02); wash(g, rectP(1085, 305, 160, 100), P.sky, .12, 5, .03);
+  // the desk, a lamp, a chair, and its warm pool of light
+  wash(g, [[420, 520], [1030, 520], [1110, 700], [340, 700]], P.wood, .13, 10, .02);
+  wash(g, rectP(370, 700, 26, 170), P.wood, .15, 6, .03); wash(g, rectP(1060, 700, 26, 170), P.wood, .15, 6, .03);
+  wash(g, circleP(980, 470, 190), ['#f8e1a8'], .05, 6, .3, 6);
+  brush(g, [[1000, 520], [990, 420], [930, 380]], 8, ['#2f2a24'], .3, 4);
+  wash(g, [[880, 330], [990, 330], [960, 400], [905, 400]], ['#3f6fbf', '#2b4a9e'], .14, 6, .03);
+  wash(g, rectP(130, 560, 180, 260), P.wood, .1, 7, .03);
+  // the open notebook on the desk (the next scene is painted over it)
+  grain(g);
+  return { c, R };
+}
+function desk(P, C) {
+  const c = mkc(), g = c.getContext('2d');
+  const R = { x: 790, y: 330, w: 400, h: 250 };
+  paperBase(g);
+  wash(g, rectP(-80, -80, W + 160, H + 160), P.wood, .09, 10, .02);
+  for (let i = 0; i < 22; i++) { const y = rnd(0, H); brush(g, seg([-20, y], [W + 20, y + rnd(-20, 20)], 20), rnd(2, 6), [P.wood[1]], .06, 2); }
+  wash(g, circleP(1240, 150, 330), ['#f8e1a8'], .05, 6, .3, 8);
+  // the notebook: shadow, two pages, spine
+  wash(g, rectP(170, 125, 1100, 690), ['#3a2a1c'], .05, 4, .02, 10);
+  wash(g, rectP(160, 110, 550, 680), ['#f7f1e6', '#f3ebdc'], .5, 5, .01);
+  wash(g, rectP(730, 110, 550, 680), ['#f7f1e6', '#f3ebdc'], .5, 5, .01);
+  wash(g, rectP(706, 110, 28, 680), ['#dccfb8'], .3, 4, .01, 3);
+  // things on the desk
+  wash(g, circleP(1360, 760, 62), ['#f7f1e6'], .4, 5, .02); wash(g, circleP(1360, 760, 48), ['#8a5a36'], .18, 5, .05);
+  brush(g, seg([90, 820], [520, 865], 20), 12, ['#e3b448'], .35, 4); brush(g, seg([510, 864], [538, 868], 3), 12, ['#2f2a24'], .4, 3);
+  for (let i = 0; i < 7; i++) wash(g, ellipseP(1330 + Math.cos(i) * 60, 90 + Math.sin(i * 1.3) * 40, 26, 12, 16), ['#6f9a5f', '#86ad6f'], .12, 4, .1);
+  // the sketch area on the right page (the next scene is painted over it)
+  wash(g, rectP(R.x, R.y, R.w, R.h), P.sky, .1, 5, .03);
+  grain(g);
+  // the left page: About, or a project write-up
+  g.fillStyle = '#231d17';
+  g.font = 'italic 400 62px "Instrument Serif"'; g.fillText(C.left.head, 220, 215);
+  let y = 250;
+  if (C.left.sub) { g.font = '500 14px "IBM Plex Mono"'; g.fillStyle = '#b8452a'; g.fillText(C.left.sub.toUpperCase(), 224, y); y += 36; g.fillStyle = '#231d17'; }
+  g.font = '400 25px "Instrument Serif"';
+  for (const para of C.left.body) y = wrapText(g, para, 222, y + 14, 440, 33) + 6;
+  // the right page: a caption under the sketch
+  g.font = 'italic 400 24px "Instrument Serif"'; g.fillStyle = '#4a4036'; g.fillText('a sketch for the next page —', R.x, R.y + R.h + 50);
+  g.font = '500 13px "IBM Plex Mono"'; g.fillText('ZOOM IN TO STEP INSIDE', R.x, R.y + R.h + 80);
+  return { c, R };
+}
+
+/* ======================= scenes on demand ======================= */
+const KINDS = ['Landscape', 'Cottage', 'Room', 'Desk'];
+const WINDOW_W = [320, 320, 336, 400];                  // each scene's window width, for the zoom readout
+const cache = new Map();
+const MASK = (() => { const m = mkc(), x = m.getContext('2d'); x.filter = 'blur(70px)'; x.fillStyle = '#fff'; x.fillRect(W * .13, H * .13, W * .74, H * .74); return m; })();
+function scene(k) {
+  if (cache.has(k)) return cache.get(k);
+  const cycle = Math.floor(k / 4), kind = k % 4, P = PAL[cycle % PAL.length], C = contentFor(cycle);
+  const s = [landscape, cottage, room, desk][kind](P, C);
+  // a soft-edged copy, used while this scene is still small inside its parent
+  const soft = mkc(), sx = soft.getContext('2d'); sx.drawImage(s.c, 0, 0); sx.globalCompositeOperation = 'destination-in'; sx.drawImage(MASK, 0, 0);
+  Object.assign(s, { soft, name: KINDS[kind], cycle, pal: P.name });
+  cache.set(k, s);
+  for (const old of cache.keys()) if (old < k - 3) cache.delete(old);
+  return s;
+}
+
+/* ======================= the zoom =======================
+   z is a continuous level: the integer part is the scene filling the screen, the fraction is how far
+   we are into its window. The camera zooms exponentially about the fixed point that makes the window
+   exactly fill the screen at f = 1, so the hand-off between scenes is seamless. */
+const view = document.getElementById('view'), v = view.getContext('2d');
+let z = 0, zTarget = 0;
+function draw() {
+  const k = Math.floor(z + 1e-6), f = z - k, A = scene(k), B = scene(k + 1), Cc = scene(k + 2);
+  const r = A.R, s = W / r.w, S = Math.pow(s, f), px = r.x * s / (s - 1), py = r.y * s / (s - 1);
+  const ox = px * (1 - S), oy = py * (1 - S);
+  v.clearRect(0, 0, W, H);
+  v.drawImage(A.c, ox, oy, W * S, H * S);
+  // the next scene inside the window: soft-edged while small, crisp as it fills the screen
+  const bx = ox + r.x * S, by = oy + r.y * S, bw = r.w * S, bh = r.h * S;
+  v.drawImage(B.soft, bx, by, bw, bh);
+  v.globalAlpha = easeInOut(f); v.drawImage(B.c, bx, by, bw, bh); v.globalAlpha = 1;
+  // and the one after that, tiny inside it
+  const cr = B.R, cs = bw / W;
+  v.drawImage(Cc.soft, bx + cr.x * cs, by + cr.y * cs, cr.w * cs, cr.h * cs);
+  if (B.frame) { v.drawImage(B.frame, bx, by, bw, bh); if (B.glass) v.drawImage(B.glass, bx, by, bw, bh); }
+  if (A.frame) v.drawImage(A.frame, ox, oy, W * S, H * S);
+  if (A.glass) { v.globalAlpha = 1 - clamp(f * 2.2, 0, 1); v.drawImage(A.glass, ox, oy, W * S, H * S); v.globalAlpha = 1; }
+  // HUD
+  let depth = S; for (let i = 0; i < k; i++) depth *= W / WINDOW_W[i % 4];
+  document.getElementById('depth').textContent = `Zoom ×${depth < 100 ? depth.toFixed(1) : Math.round(depth).toLocaleString()}`;
+  document.getElementById('crumbs').textContent = `${A.pal} · ${A.name}${f > .5 ? ' → ' + B.name : ''}`;
+}
+
+/* ======================= controls ======================= */
+let touring = true, lastStep = 0, anim = null;
+function goTo(target, dur = 1900) { target = Math.max(0, target); anim = { from: z, to: target, t0: performance.now(), dur }; zTarget = target; }
+function stopTour() { touring = false; document.getElementById('tour').classList.remove('on'); }
+function tick(now) {
+  if (anim) {
+    const u = clamp((now - anim.t0) / anim.dur, 0, 1);
+    z = lerp(anim.from, anim.to, easeInOut(u));
+    if (u >= 1) { z = anim.to; anim = null; lastStep = now; setTimeout(() => { scene(Math.floor(z) + 3); }, 50); }
+  } else if (Math.abs(zTarget - z) > .0005) z += (zTarget - z) * .15;
+  else if (touring && now - lastStep > 1700) goTo(Math.round(z) + 1);
+  draw();
+  requestAnimationFrame(tick);
+}
+const pv = document.getElementById('pv'), scaler = pv.querySelector('.scaler');
+const fit = () => { const kk = pv.clientWidth / W; scaler.style.transform = `scale(${kk})`; pv.style.height = H * kk + 'px'; };
+fit(); addEventListener('resize', fit);
+let settleT;
+pv.addEventListener('click', () => { stopTour(); goTo(Math.round(zTarget) + 1); });
+pv.addEventListener('wheel', e => {
+  e.preventDefault(); stopTour(); anim = null;
+  zTarget = Math.max(0, zTarget + e.deltaY * .0022);
+  clearTimeout(settleT); settleT = setTimeout(() => goTo(Math.round(zTarget), 700), 220);
+}, { passive: false });
+document.getElementById('in').addEventListener('click', () => { stopTour(); goTo(Math.round(zTarget) + 1); });
+document.getElementById('back').addEventListener('click', () => { stopTour(); goTo(Math.round(zTarget) - 1); });
+document.getElementById('tour').addEventListener('click', e => { touring = !touring; e.target.classList.toggle('on', touring); lastStep = 0; });
+addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { stopTour(); goTo(Math.round(zTarget) + 1); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { stopTour(); goTo(Math.round(zTarget) - 1); }
+});
+
+Promise.all(['italic 400 60px "Instrument Serif"', '400 24px "Instrument Serif"', '500 14px "IBM Plex Mono"'].map(f => document.fonts.load(f))).then(() => {
+  scene(0); scene(1); scene(2);
+  document.getElementById('loading').remove();
+  lastStep = performance.now();
+  requestAnimationFrame(tick);
+});
+</script>
+</body>
+</html>

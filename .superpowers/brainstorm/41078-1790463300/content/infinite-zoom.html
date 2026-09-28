@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Infinite Zoom Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #ece6dc;
+    --muted: #8f877c;
+    --line: rgba(236, 230, 220, .16);
+    --accent: #d8bb8c;
+    --ease: cubic-bezier(.2, .7, .2, 1);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%; overflow: hidden;
+    background: #0e0d0c; color: var(--ink);
+    font-family: 'Inter Tight', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    touch-action: none; user-select: none;
+  }
+  @media (pointer: fine) { html, body, a, button { cursor: none; } }
+
+  .serif { font-family: 'Instrument Serif', serif; font-weight: 400; }
+  .mono {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 400;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+  }
+
+  /* ---------- stage & rooms ---------- */
+  #stage { position: fixed; inset: 0; transform-origin: 0 0; will-change: transform; }
+  .room { position: absolute; inset: 0; overflow: hidden; background: var(--room-bg, #0e0d0c); }
+
+  .backdrop {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+    filter: saturate(.9) contrast(1.04);
+    transition: opacity 1.6s ease, transform 2.4s var(--ease), filter 1.6s ease;
+  }
+  .room.entered > .backdrop { opacity: .14; transform: scale(1.08); filter: saturate(.4) contrast(1.04) blur(6px); }
+  .veil {
+    position: absolute; inset: 0; opacity: 0; transition: opacity 1.4s ease;
+    background: radial-gradient(120% 90% at 30% 40%, transparent 0%, rgba(8,7,6,.55) 70%, rgba(8,7,6,.9) 100%);
+  }
+  .room.entered > .veil { opacity: 1; }
+
+  .reveal {
+    opacity: 0; transform: translateY(18px);
+    transition: opacity .9s var(--ease), transform 1s var(--ease);
+    transition-delay: calc(var(--i, 0) * 65ms + 150ms);
+  }
+  .entered .reveal { opacity: 1; transform: none; }
+  /* a room nested inside a painting keeps its own state, not its host room's */
+  .room:not(.entered) .reveal { opacity: 0; transform: translateY(18px); }
+
+  /* ---------- portals (paintings you can enter) ---------- */
+  .portal { position: absolute; display: block; color: inherit; text-decoration: none; outline: none; }
+  .portal::before {
+    content: ""; position: absolute; inset: -12px; border: 1px solid var(--line); pointer-events: none;
+    transition: inset .7s var(--ease), border-color .7s;
+  }
+  .portal:hover::before, .portal:focus-visible::before { inset: -20px; border-color: rgba(236,230,220,.4); }
+  .canvas { position: relative; width: 100%; height: 100%; overflow: hidden; background: #000; }
+  .preview { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  .preview, .preview * { pointer-events: none !important; }
+  .paint {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+    filter: saturate(.9) contrast(1.04);
+    transform: translateX(var(--px, 0px)) scale(var(--ps, 1));
+    transition: transform 1.2s var(--ease);
+  }
+  .portal:hover .paint { --ps: 1.045; }
+  .zooming .paint { --ps: 1 !important; }
+  .paint.liquid { filter: url(#liquid) saturate(.9) contrast(1.04); }
+  .label { position: absolute; left: 0; top: calc(100% + 28px); width: 100%; display: flex; align-items: baseline; gap: 14px; }
+  .label .name { font-size: clamp(20px, 1.7vw, 30px); line-height: 1; color: var(--ink); }
+  .label .meta { margin-left: auto; text-align: right; }
+
+  /* ---------- lobby ---------- */
+  .lobby-title { position: absolute; left: 7vw; top: 11vh; margin: 0; font-size: 8vw; line-height: .9; letter-spacing: -.01em; }
+  .lobby-title em { font-style: italic; color: var(--accent); }
+  .lobby-sub { position: absolute; left: 7.3vw; top: calc(11vh + 16.5vw); max-width: 30vw; line-height: 1.8; }
+  .lobby-p1 { left: 7vw; top: 50vh; width: 24vw; height: 24vh; }
+  .lobby-p2 { left: 47vw; top: 17vh; width: 45vw; height: 45vh; }
+
+  /* ---------- projects room ---------- */
+  .room-head { position: absolute; left: 8vw; top: 11vh; right: 8vw; display: flex; align-items: baseline; gap: 28px; }
+  .room-head h2 { margin: 0; font-size: clamp(40px, 5vw, 88px); line-height: 1; }
+  .room-head h2 em { font-style: italic; color: var(--accent); }
+  .track {
+    position: absolute; left: 0; top: 30vh; height: 40vh;
+    display: flex; gap: 7vw; padding: 0 8vw; will-change: transform;
+  }
+  .track .portal { position: relative; flex: 0 0 40vw; height: 40vh; }
+
+  /* ---------- scrolling text rooms ---------- */
+  .scroll { position: absolute; inset: 0; overflow-y: auto; scrollbar-width: none; }
+  .scroll::-webkit-scrollbar { display: none; }
+
+  .about { display: grid; grid-template-columns: 1.15fr 1fr 1fr; gap: 5vw; padding: 17vh 7vw 14vh; }
+  .about h2 { margin: 10px 0 26px; font-size: clamp(48px, 6vw, 104px); line-height: .92; }
+  .about h2 em { font-style: italic; color: var(--accent); }
+  .about p { font-size: 15.5px; line-height: 1.7; color: rgba(236,230,220,.8); margin: 0 0 18px; max-width: 46ch; }
+  .about .lead { font-size: clamp(22px, 1.8vw, 30px); line-height: 1.3; color: var(--ink); }
+  .about .col-title { display: block; padding-bottom: 14px; border-bottom: 1px solid var(--line); margin: 0 0 6px; }
+  .about .col-title.gap { margin-top: 52px; }
+  .entries { list-style: none; margin: 0; padding: 0; }
+  .entries li { padding: 16px 0; border-bottom: 1px solid var(--line); display: grid; gap: 5px; }
+  .entries b { font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 21px; line-height: 1.15; }
+  .entries span:last-child { font-size: 13.5px; color: rgba(236,230,220,.62); line-height: 1.4; }
+  .edu { margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--line); }
+  .edu p { font-size: 14px; margin: 10px 0 0; }
+
+  .detail { display: grid; grid-template-columns: 1.15fr 1fr; gap: 6vw; padding: 17vh 7vw 14vh; align-items: start; }
+  .d-fig { margin: 0; }
+  .d-fig > img { display: block; width: 100%; box-shadow: 0 40px 80px -30px rgba(0,0,0,.8); }
+  .thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 14px; }
+  .thumbs img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; opacity: .8; }
+  .d-text h2 { margin: 16px 0 26px; font-size: clamp(34px, 3.5vw, 60px); line-height: 1.02; }
+  .d-text p { font-size: 15.5px; line-height: 1.7; color: rgba(236,230,220,.8); margin: 0 0 26px; max-width: 54ch; }
+  .d-text .learned { font-family: 'Instrument Serif', serif; font-style: italic; font-size: clamp(20px, 1.6vw, 26px); line-height: 1.35; color: var(--ink); }
+  .tags { list-style: none; padding: 0; margin: 0 0 30px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .tags li { border: 1px solid var(--line); border-radius: 99px; padding: 7px 12px; }
+  .ext { color: var(--accent); text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 3px; }
+
+  /* ---------- HUD, cursor, grain ---------- */
+  .hud { position: fixed; z-index: 60; pointer-events: none; }
+  .hud > * { pointer-events: auto; }
+  #tl { top: 26px; left: 30px; display: flex; align-items: center; gap: 22px; }
+  #tl .brand { font-size: 24px; letter-spacing: .02em; }
+  #back { background: none; border: 1px solid var(--line); color: var(--ink); padding: 8px 14px; border-radius: 99px; opacity: 0; transition: opacity .5s; }
+  #back.show { opacity: 1; }
+  #tr { top: 32px; right: 30px; text-align: right; }
+  #bl { bottom: 28px; left: 30px; }
+  #br { bottom: 28px; right: 30px; text-align: right; font-variant-numeric: tabular-nums; }
+
+  #cur {
+    position: fixed; left: 0; top: 0; z-index: 70; width: 84px; height: 84px; pointer-events: none;
+    display: grid; place-items: center; mix-blend-mode: difference;
+  }
+  #cur svg { position: absolute; inset: 0; transform: rotate(-90deg) scale(var(--rs, .22)); transition: transform .5s var(--ease); }
+  #cur circle { fill: none; stroke: #fff; stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+  #cur .prog { stroke-width: 2.4; stroke-dasharray: 301.6; stroke-dashoffset: 301.6; }
+  #cur span { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: #fff; opacity: 0; transition: opacity .3s; }
+  #cur.on svg { --rs: 1; }
+  #cur.on span { opacity: 1; }
+  @media (pointer: coarse) { #cur { display: none; } }
+
+  .grain {
+    position: fixed; inset: -50%; width: 200%; height: 200%; z-index: 50; pointer-events: none; opacity: .09;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    animation: grain .9s steps(5) infinite;
+  }
+  @keyframes grain {
+    0% { transform: translate(0, 0); } 25% { transform: translate(-3%, 2%); }
+    50% { transform: translate(2%, -4%); } 75% { transform: translate(-4%, 1%); } 100% { transform: translate(0, 0); }
+  }
+  .vignette { position: fixed; inset: 0; z-index: 49; pointer-events: none; background: radial-gradient(130% 100% at 50% 50%, transparent 55%, rgba(0,0,0,.55) 100%); }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="liquid" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence id="turb" type="fractalNoise" baseFrequency="0.007 0.011" numOctaves="2" seed="4" result="noise"/>
+    <feDisplacementMap id="disp" in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<main id="stage" aria-live="polite"></main>
+
+<div class="hud" id="tl"><span class="brand serif">S. M.</span><button id="back" class="mono" aria-label="Step back out">← Step back</button></div>
+<div class="hud mono" id="tr"></div>
+<div class="hud mono" id="bl"></div>
+<div class="hud mono" id="br"></div>
+
+<div id="cur"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" opacity=".35"/><circle class="prog" cx="50" cy="50" r="48"/></svg><span id="curtxt">Hold</span></div>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<script>
+/* ================= content (from frontend/src/data.js + About.jsx) ================= */
+const IMG = f => '/files/' + f;
+
+const PROJECTS = [
+  { id: 2, short: 'Insurance Chatbot', title: 'AI-Powered Insurance Chatbot', category: 'NLP, Full Stack',
+    description: "An AI-powered SME insurance agent chatbot prototype that answers broker questions, makes coverage decisions, refers complex cases to human brokers, and uses rule-based logic combined with OpenAI's GPT model for conversational interactions.",
+    learned: 'How to integrate a React frontend with a FastAPI backend, manage session memory, extract business details with regex, and use the OpenAI API for conversational NLP.',
+    tech: ['NLP', 'REST APIs', 'React', 'OpenAI API', 'Tailwind'], images: ['project2img1.png'] },
+  { id: 3, short: 'LLMs & Subjective Qualities', title: 'An Empirical Evaluation of LLMs for the Assessment of Subjective Qualities', category: 'ML/NLP Research',
+    description: "Research at the Decentralized Information Group, MIT CSAIL. Designed a framework involving human and LLM evaluation to assess subjective qualities, focusing on formality in professional communication.",
+    learned: 'How to design user studies that evaluate both humans and LLMs, and run statistical analyses comparing their alignment on ground-truth metrics.',
+    tech: ['NLP', 'ML', 'HCI'], images: ['project3img1.png'] },
+  { id: 4, short: 'Election Legislation Graphs', title: 'Web Scraping of Legislative Election Data for Knowledge Graph Analysis', category: 'ML/NLP Research',
+    description: 'Research at the MIT Election Data Science Lab. Built a data pipeline to transform unstructured election legislation into knowledge graphs and classified bills to study how lawmakers and interest groups influence election policy.',
+    learned: 'Turning messy political text into structured, analyzable formats with Python and R, and applying data analysis to real policy questions.',
+    tech: ['Data Processing', 'Web Scraping', 'Python', 'R'], link: 'https://github.com/jloffredo2/state-elect-leg-scrapers', linkText: 'View on GitHub', images: ['project4img1.png'] },
+  { id: 5, short: 'dermalab', title: 'dermalab: AI and LLM-Powered Skin Disease Diagnosis', category: 'ML/CV/NLP Hackathon Project',
+    description: 'Winner at PennApps XXIV, Best Use of MATLAB. An end-to-end web platform that uses ML, deep learning, and LLMs to diagnose skin conditions, assess severity, predict disease spread, and explain results to patients and doctors.',
+    learned: 'Working in a team to integrate frontend and backend systems while applying ML, deep learning, and MATLAB to a real healthcare problem, with an emphasis on interpretability.',
+    tech: ['CV', 'Deep Learning', 'MATLAB', 'NLP', 'Flask', 'PyTorch'], link: 'https://devpost.com/software/dermalab', linkText: 'View on DevPost',
+    images: ['project5img1.png', 'project5img2.png', 'project5img3.png', 'project5img4.png'] },
+  { id: 9, short: 'WhartonMunicode', title: 'WhartonMunicode: LLMs for Legal Code Analysis', category: 'ML, NLP Research',
+    description: 'Built a nanoGPT-based language model trained on thousands of municipal codes to explore how LLMs can support legal research and analysis in the public law domain.',
+    learned: 'The computational foundations of large language models, and how to adapt and train them on domain-specific legal text.',
+    tech: ['Hugging Face Transformers', 'PyTorch', 'Web Scraping', 'NLP'], link: 'https://github.com/srilekha511/WhartonMunicode', linkText: 'View on GitHub', images: ['project9img1.png'] },
+  { id: 6, short: 'Dementia Risk Framework', title: 'A Holistic, Personalized Dementia Risk Prediction Framework', category: 'ML Research',
+    description: 'A personalized dementia risk prediction model integrating ML with network theory to capture lifestyle, environmental, and genetic interactions. Awarded a $2,500 prize from the Association for Computing Machinery.',
+    learned: 'Combining ML methods to model environmental, genetic, and lifestyle mechanisms, and translating biological networks into predictive insight.',
+    tech: ['Random Forest', 'SVM', 'Pandas', 'Graph Theory'], link: 'https://arxiv.org/pdf/2311.09229', linkText: 'View on arXiv', images: ['project6img1.png', 'project6img2.png'] },
+  { id: 7, short: 'NeuroCADR', title: 'NeuroCADR: Computational Drug Repurposing for Epilepsy', category: 'Computational Biology Research',
+    description: 'An integrated computational pipeline to identify and prioritize novel anti-epileptic drug candidates through data-driven drug repurposing. 1st Place, Mathematics and Computer Science, National Junior Science and Humanities Symposium.',
+    learned: 'How to combine and preprocess biological data so ML algorithms can use it effectively.',
+    tech: ['KNN', 'Random Forest', 'Drug Repurposing', 'Pandas'], link: 'https://arxiv.org/pdf/2309.13047', linkText: 'View on arXiv', images: ['project7img1.png', 'project7img2.png'] },
+  { id: 8, short: 'Food Shelf-Life Tracking', title: 'ML-Based Food Shelf Life Tracking', category: 'ML, CV Research',
+    description: 'An ML-based iOS app that predicts food expiration dates to reduce waste and foodborne illness. Congressional App Challenge Winner, American Statistical Association Award Winner, MIT Solv[ED] Semifinalist.',
+    learned: 'Applying ML to sustainability and public health, from data preprocessing to deploying predictive models.',
+    tech: ['NumPy', 'Swift / SwiftUI', 'Pandas'], link: 'https://arxiv.org/abs/2309.02598', linkText: 'View on arXiv', images: ['project8img1.png', 'project8img2.png', 'project8img3.png'] },
+  { id: 1, short: 'Campaign Manager', title: 'AI-Powered Performance Campaign Manager', category: 'AI, Web Dev',
+    description: 'A web app that ingests advertising campaign data from multiple platforms, analyzes performance, segments audiences with ML, generates AI-powered optimization recommendations, and exports PDF reports.',
+    learned: 'Building a FastAPI + React app over real marketing data, with scikit-learn segmentation and OpenAI-powered recommendations.',
+    tech: ['FastAPI', 'React', 'Python', 'OpenAI API', 'Vite'], images: ['project1img1.png'] },
+];
+
+const WORK = [
+  ['December 2025 – Present', 'Venture Associate Intern', '525 Venture Capital Firm'],
+  ['September 2024 – Present', 'Research Intern', 'MIT CSAIL, Decentralized Information Group'],
+  ['June – August 2025', 'Software Engineering Intern', 'Earthian AI'],
+  ['December 2024 – January 2025', 'Finance and Operations Intern', 'Majira Project'],
+  ['December 2024 – January 2025', 'Research Intern', 'MIT Election Data Science Lab'],
+  ['June – August 2023', 'Product Management Intern, Technical Writer', 'Eztia'],
+  ['June – August 2023', 'Software Engineering Intern', 'Vertiq'],
+];
+const LEAD = [
+  ['Logistics Coordinator', 'HackMIT'],
+  ['Board Representative, Career Development', 'MIT Society of Women Engineers'],
+  ['Treasurer', 'MIT IEEE/ACM Chapter'],
+  ['Publicity & Marketing Chair', 'MIT Undergraduate Research and Technology Conference'],
+];
+const AWARDS = [
+  ['2024', 'Samuel A. Green Scholarship'],
+  ['2021, 2023, 2024', '3× ISEF Finalist · ACM Special Award'],
+  ['2023', 'PennApps XXIV Winner'],
+  ['2023', 'Math Prize for Girls Invitee'],
+  ['2022', 'NJSHS 1st Place'],
+  ['2020 – 2024', '4× AIME Qualifier'],
+];
+
+/* ================= room graph ================= */
+const ROOMS = {
+  lobby:    { title: 'Lobby', parent: null, bg: '#0e0d0c', hint: 'Hold a painting to step inside' },
+  about:    { title: 'I · The Artist', parent: 'lobby', bg: '#120f0d', art: 'headshot.jpg', pos: '50% 24%', hint: 'Scroll to read · Esc to step back' },
+  projects: { title: 'II · Selected Works', parent: 'lobby', bg: '#0c0d0f', art: 'project5img1.png', pos: '50% 50%', hint: 'Drag to explore · Hold to enter' },
+};
+PROJECTS.forEach((p, i) => {
+  ROOMS['p-' + p.id] = { title: p.short, parent: 'projects', bg: '#0d0c0c', art: p.images[0], pos: '50% 0%', project: p, index: i, hint: 'Scroll up or Esc to step back' };
+});
+
+const portal = (to, cls, num, name, meta) => {
+  const r = ROOMS[to];
+  return `<a class="portal ${cls}" data-to="${to}" href="#${to}" aria-label="Enter ${name}">
+    <div class="canvas"><div class="preview"></div>
+      <img class="paint" src="${IMG(r.art)}" alt="" draggable="false" style="object-position:${r.pos}">
+    </div>
+    <div class="label"><span class="mono reveal" style="--i:3">${num}</span><span class="serif name reveal" style="--i:4">${name}</span><span class="mono meta reveal" style="--i:5">${meta}</span></div>
+  </a>`;
+};
+const backdrop = id => `<img class="backdrop" src="${IMG(ROOMS[id].art)}" alt="" draggable="false" style="object-position:${ROOMS[id].pos}"><div class="veil"></div>`;
+
+function roomHTML(id) {
+  if (id === 'lobby') return `
+    <h1 class="lobby-title serif reveal" style="--i:0">Srilekha<br><em>Mamidala</em></h1>
+    <p class="lobby-sub mono reveal" style="--i:2">A retrospective in two rooms<br>Computer Science, Data Science &amp; Economics · MIT</p>
+    ${portal('about', 'lobby-p1', 'I', 'The Artist', 'About')}
+    ${portal('projects', 'lobby-p2', 'II', 'Selected Works', '9 works')}`;
+
+  if (id === 'about') return `${backdrop(id)}<div class="scroll"><div class="about">
+    <div>
+      <span class="mono reveal" style="--i:0">Room I</span>
+      <h2 class="serif reveal" style="--i:1">The <em>Artist</em></h2>
+      <p class="lead serif reveal" style="--i:2">I'm interested in AI and fintech, and passionate about applying AI and ML to financial services, operations, and investing.</p>
+      <p class="reveal" style="--i:3">Outside of classes, I help organize logistics for HackMIT, captain MIT's Indian Classical Dance Team (MIT Nritya), serve on the MIT Society of Women Engineers board, and am treasurer for MIT's IEEE/ACM chapter.</p>
+      <div class="edu reveal" style="--i:4"><span class="mono">Education</span>
+        <p><b class="serif" style="font-size:21px;font-weight:400">Massachusetts Institute of Technology</b></p>
+        <p>Computer Science, Data Science, and Economics</p>
+        <p style="color:var(--muted)">TA, Physics: Electricity and Magnetism</p></div>
+    </div>
+    <div>
+      <span class="mono col-title reveal" style="--i:2">Work &amp; Research</span>
+      <ol class="entries">${WORK.map(([d, t, p], i) => `<li class="reveal" style="--i:${i + 3}"><span class="mono">${d}</span><b>${t}</b><span>${p}</span></li>`).join('')}</ol>
+    </div>
+    <div>
+      <span class="mono col-title reveal" style="--i:3">Leadership</span>
+      <ol class="entries">${LEAD.map(([t, p], i) => `<li class="reveal" style="--i:${i + 4}"><b>${t}</b><span>${p}</span></li>`).join('')}</ol>
+      <span class="mono col-title gap reveal" style="--i:8">Honors</span>
+      <ol class="entries">${AWARDS.map(([d, t], i) => `<li class="reveal" style="--i:${i + 9}"><span class="mono">${d}</span><b>${t}</b></li>`).join('')}</ol>
+    </div>
+  </div></div>`;
+
+  if (id === 'projects') return `${backdrop(id)}
+    <div class="room-head"><span class="mono reveal" style="--i:0">Room II</span><h2 class="serif reveal" style="--i:1">Selected <em>Works</em></h2></div>
+    <div class="track">${PROJECTS.map((p, i) => portal('p-' + p.id, 'work', String(i + 1).padStart(2, '0'), p.short, p.category)).join('')}</div>`;
+
+  const r = ROOMS[id], p = r.project;
+  return `${backdrop(id)}<div class="scroll"><div class="detail">
+    <figure class="d-fig reveal" style="--i:1"><img src="${IMG(p.images[0])}" alt="${p.short} screenshot" draggable="false">
+      ${p.images.length > 1 ? `<div class="thumbs">${p.images.slice(1, 4).map(f => `<img src="${IMG(f)}" alt="" draggable="false">`).join('')}</div>` : ''}</figure>
+    <div class="d-text">
+      <span class="mono reveal" style="--i:0">No. ${String(r.index + 1).padStart(2, '0')} · ${p.category}</span>
+      <h2 class="serif reveal" style="--i:1">${p.title}</h2>
+      <p class="reveal" style="--i:2">${p.description}</p>
+      <span class="mono reveal" style="--i:3">What I learned</span>
+      <p class="learned reveal" style="--i:4">${p.learned}</p>
+      <ul class="tags reveal" style="--i:5">${p.tech.map(t => `<li class="mono">${t}</li>`).join('')}</ul>
+      ${p.link ? `<a class="ext mono reveal" style="--i:6" href="${p.link}" target="_blank" rel="noopener">${p.linkText} ↗</a>` : ''}
+    </div>
+  </div></div>`;
+}
+
+function buildRoom(id) {
+  const el = document.createElement('section');
+  el.className = 'room';
+  el.dataset.room = id;
+  el.style.setProperty('--room-bg', ROOMS[id].bg);
+  el.innerHTML = roomHTML(id);
+  const tr = el.querySelector('.track');
+  if (tr) tr.style.transform = `translate3d(${track.x}px,0,0)`;
+  return el;
+}
+
+/* ================= state ================= */
+const $ = s => document.querySelector(s);
+const stage = $('#stage'), disp = $('#disp'), turb = $('#turb');
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const smooth = (a, b, t) => { t = clamp((t - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+let current = 'lobby', path = ['lobby'], zoomBase = 1;
+let Z = null;                 // active zoom: { dir, s, fx, fy, cur, target, tween, ... }
+let holding = false, lastWheel = 0, wheelLock = 0, settleT = null;
+const track = { x: 0, tx: 0, v: 0 };
+const mouse = { x: innerWidth / 2, y: innerHeight / 2, speed: 0 };
+
+function mount(id) {
+  const el = buildRoom(id);
+  stage.style.transform = '';
+  stage.replaceChildren(el);
+  current = id;
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('entered')));
+  hud();
+}
+
+/* ================= the zoom =================
+   Stage transform x' = S·x + f·(1 − S), S = s^t. This is an exponential zoom about the
+   fixed point f, chosen so that at t = 1 the portal's canvas exactly fills the viewport.
+   The child room is already mounted inside the canvas at scale 1/s, so at t = 1 it is
+   pixel-identical to the real room and we can swap it in without a visible seam. */
+function geometry(canvas) {
+  const r = canvas.getBoundingClientRect();
+  const s = innerWidth / r.width;
+  return { s, fx: r.left * s / (s - 1), fy: r.top * s / (s - 1) };
+}
+function hostInPreview(canvas, node, s) {
+  const pv = canvas.querySelector('.preview');
+  pv.style.width = innerWidth + 'px';
+  pv.style.height = innerHeight + 'px';
+  pv.style.transform = `scale(${1 / s})`;
+  pv.replaceChildren(node);
+  return pv;
+}
+
+function startIn(portalEl) {
+  if (Z) return Z;
+  if (!stage.contains(portalEl)) return null;
+  const canvas = portalEl.querySelector('.canvas');
+  const g = geometry(canvas);
+  const child = buildRoom(portalEl.dataset.to);
+  const pv = hostInPreview(canvas, child, g.s);
+  const paint = canvas.querySelector('.paint');
+  paint.classList.add('liquid');
+  stage.classList.add('zooming');
+  Z = { dir: 'in', to: portalEl.dataset.to, ...g, cur: 0, target: 0, tween: null, paint, pv, child, base: zoomBase };
+  return Z;
+}
+
+function startOut() {
+  if (Z) return Z;
+  const parent = ROOMS[current].parent;
+  if (!parent) return null;
+  const cur = stage.firstElementChild;
+  const par = buildRoom(parent);
+  par.classList.add('entered');              // added before insertion, so nothing transitions
+  stage.style.transform = '';
+  stage.replaceChildren(par);
+  const canvas = par.querySelector(`[data-to="${current}"] .canvas`);
+  const g = geometry(canvas);
+  const pv = hostInPreview(canvas, cur, g.s);
+  cur.classList.remove('entered');          // backdrop brightens, text recedes as we pull out
+  const paint = canvas.querySelector('.paint');
+  paint.classList.add('liquid');
+  stage.classList.add('zooming');
+  Z = { dir: 'out', to: parent, ...g, cur: 1, target: 1, tween: null, paint, pv, child: cur, par, base: zoomBase / g.s };
+  apply(1);
+  return Z;
+}
+
+let liquid = 0;
+function apply(t) {
+  const S = Math.pow(Z.s, t);
+  stage.style.transform = `translate3d(${Z.fx * (1 - S)}px,${Z.fy * (1 - S)}px,0) scale(${S})`;
+  Z.paint.style.opacity = 1 - smooth(.6, .97, t);
+  liquid = reduceMotion ? 0 : 55 * Math.sin(Math.PI * t) / S;   // visual amplitude ≈ 55px regardless of scale
+  meter(Z.base * S);
+}
+
+function endZoom() {
+  Z.paint.classList.remove('liquid');
+  Z.paint.style.opacity = '';
+  stage.classList.remove('zooming');
+  stage.style.transform = '';
+  holding = false;
+  wheelLock = performance.now() + 260;
+  Z = null;
+}
+function commitIn() {
+  const { child, to, s } = Z;
+  endZoom();
+  stage.replaceChildren(child);
+  zoomBase *= s; path.push(to); current = to;
+  requestAnimationFrame(() => child.classList.add('entered'));
+  hud();
+}
+function cancelIn() { Z.pv.replaceChildren(); endZoom(); meter(zoomBase); }
+function commitOut() {
+  const { pv, to, base } = Z;
+  pv.replaceChildren();
+  endZoom();
+  zoomBase = base; path.pop(); current = to;
+  hud();
+}
+function cancelOut() {
+  const { child } = Z;
+  endZoom();
+  stage.replaceChildren(child);
+  child.classList.add('entered');
+  meter(zoomBase);
+}
+
+function tweenTo(to, dur) {
+  if (!Z) return;
+  Z.tween = { from: Z.cur, to, t0: performance.now(), dur: reduceMotion ? 200 : dur };
+  Z.target = to;
+}
+function scrub(amount) { if (Z && !Z.tween) Z.target = clamp(Z.target + amount * .0016, 0, 1); }
+function settleSoon() {
+  clearTimeout(settleT);
+  settleT = setTimeout(() => {
+    if (!Z || Z.tween || holding) return;
+    const full = Z.dir === 'in' ? Z.target > .4 : Z.target > .6;
+    const to = full ? 1 : 0;
+    tweenTo(to, 380 + 900 * Math.abs(to - Z.cur));
+  }, 190);
+}
+const enter = p => { if (!Z && startIn(p)) tweenTo(1, 1500); };
+const leave = () => { if (!Z && startOut()) tweenTo(0, 1400); };
+
+/* ================= input ================= */
+function portalAt(nearest) {
+  const el = document.elementFromPoint(mouse.x, mouse.y);
+  const p = el && el.closest('.portal');
+  if (p && stage.contains(p)) return p;
+  if (!nearest) return null;
+  let best = null, bd = Infinity;
+  stage.firstElementChild.querySelectorAll(':scope > .portal, :scope > .track > .portal').forEach(q => {
+    const r = q.getBoundingClientRect();
+    if (r.right < 0 || r.left > innerWidth) return;
+    const d = Math.hypot(r.left + r.width / 2 - mouse.x, r.top + r.height / 2 - mouse.y);
+    if (d < bd) { bd = d; best = q; }
+  });
+  return best;
+}
+const trackMin = () => {
+  const tr = stage.querySelector(':scope > .room > .track');
+  return tr ? Math.min(0, innerWidth - tr.scrollWidth) : 0;
+};
+
+let ptr = null, dragging = false;
+stage.addEventListener('pointerdown', e => {
+  if (e.button !== 0 || (Z && Z.tween)) return;
+  const portalEl = e.target.closest('.portal');
+  ptr = { x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, t0: performance.now(), portal: portalEl,
+          track: e.target.closest('.track'), scroll: e.target.closest('.scroll'), moved: false, z: null };
+  if (portalEl && !Z) {
+    ptr.timer = setTimeout(() => { if (ptr && !ptr.moved) { ptr.z = startIn(portalEl); holding = true; } }, 170);
+  }
+});
+addEventListener('pointermove', e => {
+  mouse.speed = Math.max(mouse.speed, Math.hypot(e.clientX - mouse.x, e.clientY - mouse.y));
+  mouse.x = e.clientX; mouse.y = e.clientY;
+  if (!ptr) return;
+  const dx = e.clientX - ptr.lx, dy = e.clientY - ptr.ly;
+  ptr.lx = e.clientX; ptr.ly = e.clientY;
+  if (!ptr.moved && Math.hypot(e.clientX - ptr.x, e.clientY - ptr.y) > 6) {
+    ptr.moved = true;
+    clearTimeout(ptr.timer);
+    if (holding && Z && Z === ptr.z) { holding = false; tweenTo(0, 400); }
+    if (current === 'projects' && !Z) dragging = true;
+  }
+  if (dragging) { track.tx += dx * 1.3; track.v = dx * 1.3; }
+  else if (ptr.moved && ptr.scroll && !Z) ptr.scroll.scrollTop -= dy;
+});
+addEventListener('pointerup', () => {
+  if (!ptr) return;
+  clearTimeout(ptr.timer);
+  const held = performance.now() - ptr.t0;
+  if (!ptr.moved && ptr.portal) {
+    if (!Z && !ptr.z) enter(ptr.portal);                         // quick click (a finished hold already committed)
+    else if (Z === ptr.z && !Z.tween) {                           // released a hold
+      holding = false;
+      if (Z.target > .22 || held < 420) tweenTo(1, 350 + 950 * (1 - Z.cur));
+      else tweenTo(0, 450);
+    }
+  }
+  holding = false; dragging = false; ptr = null;
+});
+stage.addEventListener('click', e => { if (e.target.closest('a.portal')) e.preventDefault(); });
+
+addEventListener('wheel', e => {
+  e.preventDefault();
+  const now = performance.now();
+  const k = e.deltaMode === 1 ? 16 : 1, dy = e.deltaY * k, dx = e.deltaX * k;
+  if (now < wheelLock) { wheelLock = now + 90; return; }       // swallow trackpad momentum after a commit
+  lastWheel = now;
+  if (Z) { if (!Z.tween) { scrub(e.ctrlKey ? -dy * 4 : dy); settleSoon(); } return; }
+
+  if (e.ctrlKey) {                                              // trackpad pinch = zoom anywhere
+    const amt = -dy * 4, p = amt > 0 && portalAt(true);
+    if (p) startIn(p); else if (amt < 0) startOut();
+    scrub(amt); settleSoon(); return;
+  }
+  if (current === 'projects') {
+    const d = Math.abs(dx) > Math.abs(dy) ? dx : dy;
+    if (d < 0 && track.tx > -2 && Math.abs(dy) >= Math.abs(dx)) { if (startOut()) { scrub(d); settleSoon(); } return; }
+    track.tx = clamp(track.tx - d, trackMin(), 0); track.v = 0; return;
+  }
+  const sc = stage.firstElementChild.querySelector(':scope > .scroll');
+  if (sc) {
+    if (dy < 0 && sc.scrollTop <= 0) { if (startOut()) { scrub(dy); settleSoon(); } }
+    else sc.scrollTop += dy;
+    return;
+  }
+  if (dy > 0) { const p = portalAt(true); if (p) { startIn(p); scrub(dy); settleSoon(); } }   // lobby: scroll = zoom
+}, { passive: false });
+
+addEventListener('keydown', e => {
+  if (e.key === 'Escape' || e.key === 'Backspace') leave();
+  else if ((e.key === 'Enter' || e.key === ' ') && document.activeElement?.classList.contains('portal')) { e.preventDefault(); enter(document.activeElement); }
+  else if (current === 'projects' && !Z && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+    track.tx = clamp(track.tx + (e.key === 'ArrowRight' ? -1 : 1) * innerWidth * .47, trackMin(), 0);
+  }
+});
+stage.addEventListener('focusin', e => {
+  const room = stage.firstElementChild; room.scrollLeft = 0; room.scrollTop = 0;
+  const p = e.target.closest('.track > .portal');
+  if (p) { const r = p.getBoundingClientRect(); if (r.left < 0 || r.right > innerWidth) track.tx = clamp(track.tx - (r.left - innerWidth * .3), trackMin(), 0); }
+});
+$('#back').addEventListener('click', leave);
+addEventListener('resize', () => { if (!Z) { track.tx = clamp(track.tx, trackMin(), 0); track.x = track.tx; mount(current); } });
+
+/* ================= HUD & cursor ================= */
+function hud() {
+  $('#bl').textContent = path.map(id => ROOMS[id].title).join('   /   ');
+  $('#tr').textContent = ROOMS[current].hint;
+  $('#back').classList.toggle('show', path.length > 1);
+  meter(zoomBase);
+}
+let fps = 60;
+function meter(z) { $('#br').textContent = `Zoom ×${z < 10 ? z.toFixed(2) : z.toFixed(1)}   ·   ${fps} fps`; }
+
+const curEl = $('#cur'), curTxt = $('#curtxt'), prog = curEl.querySelector('.prog');
+const cp = { x: mouse.x, y: mouse.y };
+let hovered = null;
+
+/* ================= frame loop ================= */
+let last = performance.now(), fN = 0, fT = 0;
+function frame(now) {
+  const dt = Math.min(50, now - last); last = now;
+  fN++; fT += dt; if (fT > 500) { fps = Math.round(fN * 1000 / fT); fN = 0; fT = 0; if (!Z) meter(zoomBase); }
+
+  if (Z) {
+    if (holding && Z.dir === 'in' && !Z.tween) Z.target = Math.min(1, Z.target + dt / 1500);
+    if (Z.tween) {
+      const k = clamp((now - Z.tween.t0) / Z.tween.dur, 0, 1);
+      Z.cur = Z.tween.from + (Z.tween.to - Z.tween.from) * ease(k);
+      if (k >= 1) { Z.cur = Z.tween.to; Z.tween = null; }
+    } else {
+      Z.cur += (Z.target - Z.cur) * (1 - Math.pow(.002, dt / 1000));
+    }
+    apply(Z.cur);
+    const idle = !holding && !Z.tween && now - lastWheel > 230;
+    if (Z.dir === 'in') { if (Z.cur >= .999) commitIn(); else if (idle && Z.target === 0 && Z.cur < .002) cancelIn(); }
+    else { if (Z.cur <= .001) commitOut(); else if (idle && Z.target === 1 && Z.cur > .998) cancelOut(); }
+  } else {
+    // drag / inertia on the projects wall
+    const tr = current === 'projects' && stage.querySelector(':scope > .room > .track');
+    if (tr) {
+      if (!dragging) { track.tx += track.v; track.v *= Math.pow(.92, dt / 16); }
+      const min = trackMin();
+      if (track.tx > 0) track.tx += (0 - track.tx) * .2;
+      if (track.tx < min) track.tx += (min - track.tx) * .2;
+      track.x += (track.tx - track.x) * (1 - Math.pow(.0005, dt / 1000));
+      tr.style.transform = `translate3d(${track.x}px,0,0)`;
+      tr.style.setProperty('--px', clamp((track.x - track.tx) * .12, -40, 40) + 'px');
+    }
+    // liquid distortion on the hovered painting, driven by cursor speed
+    const hp = portalAt(false);
+    const paint = hp && hp.querySelector('.paint');
+    if (paint !== hovered) { hovered?.classList.remove('liquid'); paint?.classList.add('liquid'); hovered = paint; }
+    liquid += (Math.min(mouse.speed * 1.4, 38) - liquid) * .08;
+    if (reduceMotion) liquid = 0;
+  }
+  mouse.speed *= .85;
+  disp.setAttribute('scale', liquid.toFixed(2));
+  turb.setAttribute('baseFrequency', `${(.007 + .002 * Math.sin(now / 1400)).toFixed(4)} ${(.011 + .003 * Math.cos(now / 1900)).toFixed(4)}`);
+
+  // cursor
+  cp.x += (mouse.x - cp.x) * .2; cp.y += (mouse.y - cp.y) * .2;
+  curEl.style.transform = `translate3d(${cp.x - 42}px,${cp.y - 42}px,0)`;
+  const overPortal = !Z && portalAt(false);
+  const overTrack = !Z && current === 'projects' && !overPortal;
+  const zoomingIn = Z && Z.dir === 'in';
+  curEl.classList.toggle('on', !!(overPortal || zoomingIn || dragging));
+  curTxt.textContent = zoomingIn ? 'Enter' : dragging || (overTrack && ptr) ? 'Drag' : 'Hold';
+  prog.style.strokeDashoffset = 301.6 * (1 - (zoomingIn ? Z.cur : 0));
+
+  requestAnimationFrame(frame);
+}
+
+mount('lobby');
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

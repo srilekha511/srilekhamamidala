@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gallery Walk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --paper: #efe7d8; --ink: #231d17; --muted: #7a6f63; --red: #d23a1f; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #1a1816; color: #eee6da; font-family: 'Inter Tight', system-ui, sans-serif; padding: 36px 28px 80px; -webkit-font-smoothing: antialiased; }
+  .mono { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+  .wrap { max-width: 1200px; margin: 0 auto; }
+  h1 { font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 40px; }
+  .lede { color: #a39c91; margin-top: 8px; font-size: 15px; line-height: 1.6; max-width: 880px; }
+  .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 20px 0 12px; color: #a39c91; }
+  .controls button { background: none; color: #eee6da; border: 1px solid rgba(238,230,218,.3); border-radius: 99px; padding: 9px 16px; cursor: pointer; }
+  .controls button:hover { background: #eee6da; color: #1a1816; }
+  .pv { position: relative; width: 100%; overflow: hidden; border-radius: 4px; background: #111; outline: none; }
+  .pv:focus-visible { box-shadow: 0 0 0 3px #d23a1f; }
+  .scaler { position: absolute; left: 0; top: 0; width: 1440px; height: 900px; transform-origin: 0 0; }
+  #view { position: absolute; inset: 0; width: 1440px; height: 900px; }
+  .grain { position: absolute; inset: 0; pointer-events: none; opacity: .26; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .38  0 0 0 0 .3  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+
+  /* HUD */
+  .hud { position: absolute; transition: opacity .8s ease; }
+  .pre .hud { opacity: 0; pointer-events: none; }
+  #brand { left: 28px; top: 24px; font-family: 'Instrument Serif', serif; font-size: 24px; color: var(--ink); }
+  #brand small { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-left: 10px; }
+  #planBtn { right: 28px; top: 22px; background: rgba(247,241,230,.9); color: var(--ink); border: 1px solid rgba(35,29,23,.25); border-radius: 99px; padding: 9px 16px; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
+  #keys { right: 28px; bottom: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #4a4036; background: rgba(247,241,230,.85); padding: 8px 14px; border-radius: 99px; }
+  #map { left: 28px; bottom: 26px; width: 520px; height: 34px; cursor: pointer; }
+  #map svg { width: 100%; height: 100%; overflow: visible; }
+  #prompt { left: 50%; top: 612px; transform: translateX(-50%); font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: .16em; text-transform: uppercase;
+    background: #231d17; color: #f7f1e6; padding: 8px 14px; border-radius: 99px; opacity: 0; pointer-events: none; }
+  #prompt.show { opacity: 1; }
+
+  /* floor plan */
+  #plan { position: absolute; right: 28px; top: 70px; width: 330px; max-height: 700px; overflow: auto; background: #f7f1e6; color: var(--ink); border-radius: 6px; padding: 22px 24px;
+    box-shadow: 0 30px 70px -30px rgba(40,25,10,.6); opacity: 0; transform: translateY(-8px); pointer-events: none; transition: opacity .3s, transform .3s; }
+  #plan.open { opacity: 1; transform: none; pointer-events: auto; }
+  #plan h4 { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--red); margin: 14px 0 6px; font-weight: 500; }
+  #plan h4:first-child { margin-top: 0; }
+  #plan button { display: block; width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid rgba(35,29,23,.12); padding: 8px 0; font-family: 'Instrument Serif', serif; font-size: 20px; color: var(--ink); cursor: pointer; }
+  #plan button:hover { color: var(--red); }
+
+  /* a painting, opened */
+  #room { position: absolute; left: 50%; top: 50%; width: 1180px; height: 700px; transform: translate(-50%, -50%); display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center;
+    padding: 60px 70px; background: #f7f1e6; color: var(--ink); border-radius: 3px; opacity: 0; pointer-events: none; transition: opacity .45s ease; }
+  #room.open { opacity: 1; pointer-events: auto; }
+  #room .art { height: 100%; max-height: 560px; background: #eee4d2 center/cover no-repeat; border-radius: 2px; box-shadow: 0 24px 50px -30px rgba(40,25,10,.6); display: grid; place-items: center; }
+  #room .art span { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 84px; color: rgba(35,29,23,.85); }
+  #room .k { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--red); }
+  #room h2 { font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 52px; line-height: 1.02; margin: 12px 0 18px; }
+  #room p { font-size: 17px; line-height: 1.65; color: rgba(35,29,23,.82); margin-bottom: 14px; }
+  #room .meta { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-top: 8px; }
+  #room .back { position: absolute; left: 28px; top: 22px; background: none; border: 1px solid rgba(35,29,23,.3); border-radius: 99px; padding: 8px 14px; cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
+  .note { color: #8f887d; font-size: 13px; line-height: 1.6; margin-top: 12px; max-width: 940px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Lights On, then the gallery walk</h1>
+  <p class="lede">The gallery starts dark. Spotlights click on, the last one finds you, you wave, and your name paints itself on the wall. Then walk the hall. Click the preview first so it can hear the keyboard.</p>
+  <div class="controls">
+    <button id="replay" class="mono">Replay opening</button>
+    <span class="mono" style="margin-left:auto">← → walk · ↑ / Enter step into a painting · Esc step back · or just click a painting</span>
+  </div>
+  <div class="pv pre" id="pv" tabindex="0"><div class="scaler">
+    <canvas id="view" width="1440" height="900"></canvas>
+    <div class="grain"></div>
+    <div class="hud" id="brand">S. Mamidala<small>A Retrospective</small></div>
+    <button class="hud" id="planBtn">Floor plan</button>
+    <div class="hud" id="map"></div>
+    <div class="hud" id="keys">← → walk · ↑ enter</div>
+    <div class="hud" id="prompt">↑ Step into the painting</div>
+    <div id="plan"></div>
+    <div id="room"><button class="back">← Back to the hall</button><div class="art"></div><div><div class="k"></div><h2></h2><p class="body"></p><div class="meta"></div></div></div>
+  </div></div>
+  <p class="note">A prototype: the character, the hall and the lights are all drawn in code. On phones this would use tap-to-walk (tap a painting) and the floor plan.</p>
+</div>
+
+<script>
+const W = 1440, H = 900, FLOOR = 720;
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const smooth = (a, b, t) => { t = clamp((t - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const img = f => { const i = new Image(); i.src = '/files/' + f; return i; };
+
+/* ======================= the collection ======================= */
+const WINGS = [
+  { name: 'Foyer', color: '#e9dfcc', items: [
+    { k: 'About', t: 'The Artist', s: 'Portrait, 2025', image: 'headshot.jpg', pos: '50% 22%',
+      body: "I'm a student at MIT studying Computer Science, Data Science, and Economics. I'm interested in AI and fintech, and passionate about applying AI and ML to financial services, operations, and investing.", meta: 'MIT · CS, Data Science & Economics' },
+    { k: 'Guide', t: 'The Collection', s: 'A map of the halls', card: ['#d9532e', '#f09a7e'], label: 'Index',
+      body: 'Walk right through the About wing, then Experience, then Selected Works. The gift shop at the end has my contact details. Or open the floor plan to jump anywhere.', meta: 'About · Experience · Selected Works · Gift shop' },
+  ] },
+  { name: 'About', color: '#ecdcc8', items: [
+    { k: 'Education', t: 'MIT', s: 'CS, Data Science & Economics', card: ['#c9442a', '#e0764d'], label: 'MIT',
+      body: 'Coursework in data structures and algorithms, machine learning, econometrics, game theory, linear algebra, optimisation for business analytics, and probability. Teaching assistant for Physics: Electricity & Magnetism.', meta: 'Massachusetts Institute of Technology' },
+    { k: 'Leadership', t: 'Around campus', s: 'HackMIT · Nritya · SWE · IEEE/ACM', card: ['#3f6fbf', '#7fa6d2'], label: 'Leadership',
+      body: 'Logistics coordinator for HackMIT, captain of MIT Nritya (Indian classical dance), board representative for the Society of Women Engineers, and treasurer of the MIT IEEE/ACM chapter.', meta: '2024 – present' },
+    { k: 'Honors', t: 'Honors', s: 'A selection', card: ['#e3b448', '#f0cf7a'], label: 'Honors',
+      body: 'Samuel A. Green Scholarship ($20,000). Three-time ISEF finalist with an ACM Special Award. PennApps XXIV winner. NJSHS 1st place. Math Prize for Girls invitee. Four-time AIME qualifier.', meta: '2020 – 2024' },
+  ] },
+  { name: 'Experience', color: '#e4dccb', items: [
+    { k: 'Experience', t: 'MIT CSAIL', s: 'Research Intern · 2024–', card: ['#2b4a9e', '#5b82c0'], label: 'CSAIL',
+      body: 'Developing mathematical metrics to evaluate 10+ LLMs with Liberty Mutual, and designing human/LLM studies with 300+ ratings to create auto-evaluation metrics for agentic AI.', meta: 'Decentralized Information Group' },
+    { k: 'Experience', t: '525 Venture Capital', s: 'Venture Associate Intern · 2025–', card: ['#6f9a5f', '#9dbf86'], label: '525',
+      body: 'Building an AI system that reviews founder calls, applications, and pitch decks to draft deal memos and SWOT analyses, learning from past decisions to flag risks.', meta: 'Venture capital' },
+    { k: 'Experience', t: 'Earthian AI', s: 'Software Engineering Intern · 2025', card: ['#d9532e', '#e89a8a'], label: 'Earthian',
+      body: 'Built a full-stack AI chatbot with PyTorch, FastAPI, AWS, and React to improve climate-risk analysis and insurance workflows, cutting decision time by 70%.', meta: 'June – August 2025' },
+    { k: 'Experience', t: 'Election Data Lab', s: 'Research Intern · 2024–25', card: ['#8a6a9e', '#b39ad6'], label: 'MEDSL',
+      body: 'Turned unstructured election legislation into knowledge graphs, classified 500+ bills, and processed 10K+ legislative transcripts in Python and R.', meta: 'MIT Election Data Science Lab' },
+  ] },
+  { name: 'Selected Works', color: '#e8e0d0', items: [
+    { k: 'Project', t: 'dermalab', s: 'PennApps XXIV winner', image: 'project5img1.png', body: 'An end-to-end platform that uses ML, deep learning, and LLMs to diagnose skin conditions, assess severity, predict spread, and explain results to patients and doctors.', meta: 'PyTorch · MATLAB · Flask' },
+    { k: 'Project', t: 'LLMs & Formality', s: 'MIT CSAIL', image: 'project3img1.png', body: 'A framework involving human and LLM evaluation to assess subjective qualities, focused on formality in professional communication.', meta: 'NLP · HCI' },
+    { k: 'Project', t: 'Insurance Chatbot', s: 'NLP, full stack', image: 'project2img1.png', body: 'An SME insurance agent chatbot that answers broker questions, makes coverage decisions, and refers complex cases to humans.', meta: 'React · FastAPI · OpenAI API' },
+    { k: 'Project', t: 'Election Legislation', s: 'Knowledge graphs', image: 'project4img1.png', body: 'A pipeline turning unstructured election legislation into knowledge graphs to study how lawmakers and interest groups shape policy.', meta: 'Python · R · Web scraping' },
+    { k: 'Project', t: 'WhartonMunicode', s: 'LLMs for legal code', image: 'project9img1.png', body: 'A nanoGPT-based language model trained on thousands of municipal codes to support legal research.', meta: 'PyTorch · Transformers' },
+    { k: 'Project', t: 'Dementia Risk', s: 'ACM $2,500 award', image: 'project6img1.png', body: 'A personalised dementia risk prediction model combining ML with network theory across lifestyle, environmental, and genetic factors.', meta: 'Random forest · SVM · Graph theory' },
+    { k: 'Project', t: 'NeuroCADR', s: 'NJSHS 1st place', image: 'project7img1.png', body: 'A computational pipeline to identify and prioritise anti-epileptic drug candidates through data-driven drug repurposing.', meta: 'KNN · Random forest' },
+    { k: 'Project', t: 'Food Shelf-Life', s: 'Congressional App Challenge', image: 'project8img1.png', body: 'An ML-based iOS app that predicts food expiration dates to reduce waste and foodborne illness.', meta: 'Swift · NumPy · Pandas' },
+    { k: 'Project', t: 'Campaign Manager', s: 'AI, web', image: 'project1img1.png', body: 'Upload ad campaign data from many platforms, segment audiences with ML, get AI-powered recommendations, and export PDF reports.', meta: 'FastAPI · React · scikit-learn' },
+  ] },
+  { name: 'Gift Shop', color: '#eadfcf', items: [
+    { k: 'Contact', t: 'Say hello', s: 'The gift shop', card: ['#d9532e', '#e3b448'], label: 'Hello',
+      body: 'GitHub: github.com/srilekha511 · LinkedIn: linkedin.com/in/srilekha-mamidala. Thanks for visiting the exhibition.', meta: 'Open every day' },
+  ] },
+];
+// lay the hall out: frames every 440px, an archway between wings
+const FRAMES = [], ARCHES = [];
+let X = 250;
+WINGS.forEach((wing, wi) => {
+  if (wi === 0) { wing.items.forEach((it, i) => FRAMES.push({ ...it, x: [250, 1190][i], wing: wing.name })); X = 1560; return; }
+  ARCHES.push({ x: X, name: wing.name }); X += 380;
+  wing.items.forEach(it => { FRAMES.push({ ...it, x: X, wing: wing.name }); X += 440; });
+  X += 40;
+});
+const WORLD = X + 300;
+FRAMES.forEach(f => { if (f.image) f.img = img(f.image); });
+const FW = 330, FH = 250, FY = 370;                  // frame size and centre height
+
+/* the title cards painted inside text-only frames */
+function cardArt(f) {
+  if (f.art) return f.art;
+  const c = document.createElement('canvas'); c.width = 600; c.height = 450; const g = c.getContext('2d');
+  g.fillStyle = '#f3ead8'; g.fillRect(0, 0, 600, 450);
+  for (let i = 0; i < 26; i++) { g.globalAlpha = .07; g.fillStyle = f.card[i % 2]; g.beginPath(); g.ellipse(300 + Math.sin(i * 1.7) * 120, 225 + Math.cos(i * 2.3) * 70, 190 + (i % 5) * 18, 120 + (i % 3) * 20, i, 0, 7); g.fill(); }
+  g.globalAlpha = 1; g.fillStyle = '#231d17'; g.textAlign = 'center';
+  g.font = `italic 400 ${f.label.length > 7 ? 86 : 110}px "Instrument Serif"`; g.fillText(f.label, 300, 255);
+  g.globalAlpha = .9; g.fillStyle = f.card[0]; g.fillRect(200, 285, 200, 5);
+  return (f.art = c);
+}
+
+/* ======================= drawing the hall ======================= */
+const cv = document.getElementById('view'), g = cv.getContext('2d');
+function wallAt(x) { return WINGS[ARCHES.filter(a => a.x < x).length].color; }
+function drawHall(cx0, cx1) {
+  // wall, in wash panels per wing
+  for (let x = Math.floor(cx0 / 120) * 120; x < cx1; x += 120) {
+    g.fillStyle = wallAt(x); g.fillRect(x, 0, 121, FLOOR);
+    g.globalAlpha = .05; g.fillStyle = '#8a6a44'; g.fillRect(x + 60 + Math.sin(x) * 30, 0, 40 + (x % 7) * 6, FLOOR); g.globalAlpha = 1;
+  }
+  // cornice, dado rail, skirting, floor
+  g.fillStyle = 'rgba(120,95,60,.18)'; g.fillRect(cx0, 90, cx1 - cx0, 6);
+  g.fillStyle = 'rgba(120,95,60,.16)'; g.fillRect(cx0, 610, cx1 - cx0, 5);
+  g.fillStyle = '#d8c8ae'; g.fillRect(cx0, 660, cx1 - cx0, FLOOR - 660);
+  const fl = g.createLinearGradient(0, FLOOR, 0, H); fl.addColorStop(0, '#b99670'); fl.addColorStop(1, '#8e6c4a');
+  g.fillStyle = fl; g.fillRect(cx0, FLOOR, cx1 - cx0, H - FLOOR);
+  g.strokeStyle = 'rgba(60,40,20,.14)'; g.lineWidth = 2;
+  for (let y = FLOOR + 30; y < H; y += 34 + (y - FLOOR) * .15) { g.beginPath(); g.moveTo(cx0, y); g.lineTo(cx1, y); g.stroke(); }
+  // skylights: soft shafts of daylight
+  for (let x = Math.floor(cx0 / 900) * 900 + 450; x < cx1 + 450; x += 900) {
+    const sg = g.createLinearGradient(0, 0, 0, FLOOR); sg.addColorStop(0, 'rgba(255,250,235,.35)'); sg.addColorStop(1, 'rgba(255,250,235,0)');
+    g.fillStyle = sg; g.beginPath(); g.moveTo(x - 90, 0); g.lineTo(x + 90, 0); g.lineTo(x + 230, FLOOR); g.lineTo(x + 10, FLOOR); g.fill();
+  }
+  // archways between wings, with the wing's name painted above
+  for (const a of ARCHES) {
+    if (a.x < cx0 - 300 || a.x > cx1 + 300) continue;
+    g.fillStyle = 'rgba(80,60,40,.14)'; g.beginPath(); g.moveTo(a.x - 110, FLOOR); g.lineTo(a.x - 110, 330); g.arc(a.x, 330, 110, Math.PI, 0); g.lineTo(a.x + 110, FLOOR); g.fill();
+    g.fillStyle = 'rgba(60,40,20,.2)'; g.beginPath(); g.moveTo(a.x - 92, FLOOR); g.lineTo(a.x - 92, 336); g.arc(a.x, 336, 92, Math.PI, 0); g.lineTo(a.x + 92, FLOOR); g.fill();
+    g.fillStyle = '#231d17'; g.textAlign = 'center'; g.font = 'italic 400 44px "Instrument Serif"'; g.fillText(a.name, a.x, 186);
+    g.font = '500 12px "IBM Plex Mono"'; g.fillStyle = '#7a6f63'; g.fillText('THIS WAY  →', a.x, 212); g.textAlign = 'left';
+  }
+  // the paintings
+  for (const f of FRAMES) {
+    if (f.x < cx0 - 300 || f.x > cx1 + 300) continue;
+    const x = f.x - FW / 2, y = FY - FH / 2;
+    g.fillStyle = 'rgba(60,40,20,.18)'; g.filter = 'blur(10px)'; g.fillRect(x + 8, y + 14, FW, FH); g.filter = 'none';
+    g.fillStyle = '#a57b3e'; g.fillRect(x - 16, y - 16, FW + 32, FH + 32);
+    g.fillStyle = '#d7b46a'; g.fillRect(x - 10, y - 10, FW + 20, FH + 20);
+    g.fillStyle = '#8a6430'; g.fillRect(x - 3, y - 3, FW + 6, FH + 6);
+    const src = f.img && f.img.complete && f.img.naturalWidth ? f.img : f.card ? cardArt(f) : null;
+    if (src) {
+      const ir = src.width / src.height, r = FW / FH; let sw = src.width, sh = src.height, sx = 0, sy = 0;
+      if (ir > r) { sw = sh * r; sx = (src.width - sw) / 2; } else { sh = sw / r; sy = f.pos ? (src.height - sh) * .22 : 0; }
+      g.drawImage(src, sx, sy, sw, sh, x, y, FW, FH);
+    } else { g.fillStyle = '#eee4d2'; g.fillRect(x, y, FW, FH); }
+    // museum label
+    g.fillStyle = '#f7f1e6'; g.fillRect(f.x - 95, 540, 190, 50);
+    g.fillStyle = '#231d17'; g.textAlign = 'center'; g.font = 'italic 400 21px "Instrument Serif"'; g.fillText(f.t, f.x, 564);
+    g.font = '500 10px "IBM Plex Mono"'; g.fillStyle = '#7a6f63'; g.fillText(f.s.toUpperCase().slice(0, 30), f.x, 581); g.textAlign = 'left';
+    // track light
+    g.fillStyle = '#2a2420'; g.fillRect(f.x - 14, 96, 28, 12); g.beginPath(); g.moveTo(f.x - 10, 108); g.lineTo(f.x + 10, 108); g.lineTo(f.x + 18, 130); g.lineTo(f.x - 18, 130); g.fill();
+  }
+}
+function drawBench(x) {
+  g.fillStyle = 'rgba(58,42,28,.85)'; g.fillRect(x - 110, 780, 220, 18);
+  g.fillRect(x - 96, 798, 12, 50); g.fillRect(x + 84, 798, 12, 50);
+}
+function drawVisitor(x, tone) {
+  g.fillStyle = tone; g.globalAlpha = .55;
+  g.beginPath(); g.arc(x, 560, 18, 0, 7); g.fill();
+  g.beginPath(); g.roundRect(x - 22, 582, 44, 78, 14); g.fill();
+  g.fillRect(x - 16, 650, 12, 70); g.fillRect(x + 4, 650, 12, 70);
+  g.globalAlpha = 1;
+}
+
+/* ======================= you ======================= */
+const ME = { x: 720, vx: 0, dir: 1, phase: 0, pose: 'front', wave: 0, still: 0 };
+const C = { skin: '#c8987a', skinDark: '#a97a5c', hair: '#1f1a17', top: '#c9442a', topDark: '#a8341d', pants: '#2b3a5e', shoe: '#1a1614', lens: '#1a1614' };
+function limb(x1, y1, a1, l1, a2, l2, w, col) {
+  const kx = x1 + Math.sin(a1) * l1, ky = y1 + Math.cos(a1) * l1, fx = kx + Math.sin(a2) * l2, fy = ky + Math.cos(a2) * l2;
+  g.strokeStyle = col; g.lineWidth = w; g.lineCap = 'round'; g.lineJoin = 'round';
+  g.beginPath(); g.moveTo(x1, y1); g.lineTo(kx, ky); g.lineTo(fx, fy); g.stroke();
+  return [fx, fy];
+}
+function drawMe(t) {
+  const { x, dir, pose } = ME, walking = Math.abs(ME.vx) > 5, ph = ME.phase;
+  const bob = walking ? -Math.abs(Math.sin(ph)) * 4 : Math.sin(t * 2) * 1.2;
+  const hipY = FLOOR - 86 + bob, shY = FLOOR - 150 + bob, headY = FLOOR - 178 + bob;
+  g.save();
+  // shadow
+  g.fillStyle = 'rgba(40,25,10,.22)'; g.beginPath(); g.ellipse(x, FLOOR + 4, 36, 7, 0, 0, 7); g.fill();
+  if (pose === 'side') {
+    const s = walking ? Math.sin(ph) * .55 : 0;
+    // far arm and leg first
+    limb(x, shY + 6, -s * .8, 30, -s * .8 + .35, 28, 11, C.skinDark);
+    const f1 = limb(x, hipY, -s, 42, -s + Math.max(0, -Math.sin(ph)) * .6, 42, 15, '#23304e');
+    g.fillStyle = C.shoe; g.beginPath(); g.ellipse(f1[0] + dir * 6, f1[1] + 2, 12, 6, 0, 0, 7); g.fill();
+    // body
+    g.fillStyle = C.top; g.beginPath(); g.roundRect(x - 17, shY, 34, hipY - shY + 8, 12); g.fill();
+    const f2 = limb(x, hipY, s, 42, s + Math.max(0, Math.sin(ph)) * .6, 42, 15, C.pants);
+    g.fillStyle = C.shoe; g.beginPath(); g.ellipse(f2[0] + dir * 6, f2[1] + 2, 12, 6, 0, 0, 7); g.fill();
+    limb(x, shY + 6, s * .8, 30, s * .8 + .35, 28, 11, C.skin);
+    // head, hair, glasses in profile
+    // long hair falls down her back, behind the head
+    g.fillStyle = C.hair; g.beginPath(); g.roundRect(x - dir * 22 - 12, headY - 4, 24, 62, 11); g.fill();
+    g.fillStyle = C.skin; g.beginPath(); g.arc(x + dir * 3, headY, 21, 0, 7); g.fill();
+    // hair over the crown and the back of the head, face left clear
+    g.fillStyle = C.hair; g.beginPath(); g.arc(x - dir * 1, headY - 3, 22, Math.PI, Math.PI * 2); g.fill();
+    g.beginPath(); g.arc(x - dir * 10, headY + 2, 15, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = C.lens; g.lineWidth = 2; g.beginPath(); g.arc(x + dir * 14, headY - 1, 6.5, 0, 7); g.stroke();
+    g.beginPath(); g.moveTo(x + dir * 8, headY - 2); g.lineTo(x - dir * 6, headY - 4); g.stroke();
+  } else {
+    const back = pose === 'back';
+    // legs and shoes
+    limb(x - 9, hipY, 0, 42, 0, 42, 15, C.pants); limb(x + 9, hipY, 0, 42, 0, 42, 15, C.pants);
+    g.fillStyle = C.shoe; g.beginPath(); g.ellipse(x - 10, FLOOR - 2, 11, 6, 0, 0, 7); g.ellipse(x + 10, FLOOR - 2, 11, 6, 0, 0, 7); g.fill();
+    // hair behind the body when facing you
+    if (!back) { g.fillStyle = C.hair; g.beginPath(); g.roundRect(x - 25, headY - 4, 50, 62, 16); g.fill(); }
+    g.fillStyle = C.top; g.beginPath(); g.roundRect(x - 23, shY, 46, hipY - shY + 8, 14); g.fill();
+    // arms: one waves
+    limb(x - 22, shY + 8, .12, 30, .05, 28, 11, C.skin);
+    if (ME.wave > 0) { const w = Math.sin(t * 12) * .45; limb(x + 22, shY + 8, Math.PI - .5, 28, Math.PI - .1 + w, 26, 11, C.skin); }
+    else limb(x + 22, shY + 8, -.12, 30, -.05, 28, 11, C.skin);
+    g.fillStyle = C.skin; g.beginPath(); g.arc(x, headY, 22, 0, 7); g.fill();
+    g.fillStyle = C.hair;
+    if (back) { g.beginPath(); g.arc(x, headY - 2, 23, 0, 7); g.fill(); g.beginPath(); g.roundRect(x - 24, headY, 48, 66, 16); g.fill(); }
+    else {
+      g.beginPath(); g.arc(x, headY - 6, 23, Math.PI, 0); g.fill();                          // hair on top, parted
+      g.strokeStyle = C.lens; g.lineWidth = 2.2;
+      g.beginPath(); g.arc(x - 9, headY + 1, 7, 0, 7); g.moveTo(x + 16, headY + 1); g.arc(x + 9, headY + 1, 7, 0, 7); g.moveTo(x - 2, headY); g.lineTo(x + 2, headY); g.stroke();
+      g.strokeStyle = C.skinDark; g.lineWidth = 1.6; g.beginPath(); g.arc(x, headY + 10, 5, .2, Math.PI - .2); g.stroke();
+    }
+  }
+  g.restore();
+}
+
+/* ======================= the camera and the opening ======================= */
+const cam = { x: 720, y: H / 2, z: 1 };
+let opening = null, entered = null, zoomAnim = null, autoTarget = null;
+const DARK = Object.assign(document.createElement('canvas'), { width: W, height: H });
+const SPOTS = [{ x: 250, at: .55 }, { x: 1190, at: 1.05 }, { x: 720, at: 1.6, me: true }];
+function startOpening() { opening = { t0: performance.now() }; pv.classList.add('pre'); ME.x = 720; ME.pose = 'front'; ME.dir = 1; cam.x = 720; }
+function lightsDraw(t) {
+  // darkness with holes where the spotlights are, flickering on
+  const house = smooth(4.1, 5.2, t);
+  const d = DARK.getContext('2d'); d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, W, H);
+  d.fillStyle = `rgba(12,10,9,${.94 * (1 - house)})`; d.fillRect(0, 0, W, H);
+  d.globalCompositeOperation = 'destination-out';
+  for (const s of SPOTS) {
+    const u = t - s.at; if (u < 0) continue;
+    const on = u < .25 ? (Math.sin(u * 90) > -.2 ? .9 : .2) : 1;
+    const sx = (s.x - cam.x) * cam.z + W / 2, top = s.me ? 20 : 110, half = s.me ? 190 : 230, topHalf = s.me ? 210 : 26;
+    const cg = d.createLinearGradient(0, top, 0, FLOOR + 40); cg.addColorStop(0, `rgba(0,0,0,${.95 * on})`); cg.addColorStop(1, `rgba(0,0,0,${.75 * on})`);
+    d.fillStyle = cg; d.filter = 'blur(18px)';
+    d.beginPath(); d.moveTo(sx - topHalf, top); d.lineTo(sx + topHalf, top); d.lineTo(sx + half, FLOOR + 40); d.lineTo(sx - half, FLOOR + 40); d.fill();
+    d.beginPath(); d.ellipse(sx, FLOOR + 20, half * 1.05, 44, 0, 0, 7); d.fill(); d.filter = 'none';
+  }
+  g.drawImage(DARK, 0, 0);
+  // a warm tint inside the beams
+  g.globalCompositeOperation = 'soft-light';
+  for (const s of SPOTS) { if (t < s.at) continue; const sx = (s.x - cam.x) * cam.z + W / 2; const rg = g.createRadialGradient(sx, 420, 20, sx, 420, 420); rg.addColorStop(0, `rgba(255,214,150,${.35 * (1 - house)})`); rg.addColorStop(1, 'rgba(255,214,150,0)'); g.fillStyle = rg; g.fillRect(0, 0, W, H); }
+  g.globalCompositeOperation = 'source-over';
+  // the title paints itself across the wall
+  const p = smooth(2.35, 3.7, t);
+  if (p > 0) {
+    g.save(); g.beginPath(); g.rect(0, 0, 330 + p * 800, H); g.clip();
+    g.fillStyle = '#231d17'; g.textAlign = 'center'; g.font = 'italic 400 78px "Instrument Serif"'; g.fillText('Srilekha Mamidala', 720, 230);
+    g.font = '500 15px "IBM Plex Mono"'; g.fillStyle = '#b8452a'; g.fillText('A  R E T R O S P E C T I V E', 720, 270);
+    g.globalAlpha = .85; g.fillStyle = '#c9442a'; g.beginPath(); g.ellipse(720, 292, 150 * p, 3, 0, 0, 7); g.fill();
+    g.restore(); g.textAlign = 'left';
+  }
+  const hint = smooth(4.6, 5.3, t);
+  if (hint > 0) { g.globalAlpha = hint; g.fillStyle = '#4a4036'; g.textAlign = 'center'; g.font = '500 14px "IBM Plex Mono"'; g.fillText('← →  TO WALK   ·   ↑  TO STEP INTO A PAINTING', 720, 330); g.textAlign = 'left'; g.globalAlpha = 1; }
+  ME.wave = t > 2.0 && t < 3.5 ? 1 : 0;
+  if (t > 5.4) { opening = null; pv.classList.remove('pre'); }
+}
+// the foyer title stays on the wall after the opening
+function foyerTitle() {
+  if (opening) return;
+  g.fillStyle = '#231d17'; g.textAlign = 'center'; g.font = 'italic 400 78px "Instrument Serif"'; g.fillText('Srilekha Mamidala', 720, 230);
+  g.font = '500 15px "IBM Plex Mono"'; g.fillStyle = '#b8452a'; g.fillText('A  R E T R O S P E C T I V E', 720, 270);
+  g.globalAlpha = .85; g.fillStyle = '#c9442a'; g.beginPath(); g.ellipse(720, 292, 150, 3, 0, 0, 7); g.fill(); g.globalAlpha = 1;
+  g.font = '500 14px "IBM Plex Mono"'; g.fillStyle = '#7a6f63'; g.fillText('←  →  TO WALK   ·   ↑  TO STEP INTO A PAINTING', 720, 330); g.textAlign = 'left';
+}
+
+/* ======================= stepping into a painting ======================= */
+const room = document.getElementById('room');
+function nearest() { let best = null, bd = 150; for (const f of FRAMES) { const d = Math.abs(f.x - ME.x); if (d < bd) { bd = d; best = f; } } return best; }
+function enter(f) {
+  if (entered || zoomAnim) return;
+  ME.pose = 'back'; ME.vx = 0;
+  zoomAnim = { from: { ...cam }, to: { x: f.x, y: FY, z: (W * .86) / FW }, t0: performance.now(), dur: 1100, then: () => openRoom(f) };
+  entered = f;
+}
+function openRoom(f) {
+  const art = room.querySelector('.art');
+  art.style.backgroundImage = f.image ? `url(/files/${f.image})` : ''; art.style.backgroundPosition = f.pos || 'center top';
+  art.innerHTML = f.image ? '' : `<span>${f.label}</span>`; art.style.background = f.image ? art.style.background : `radial-gradient(60% 60% at 50% 50%, ${f.card[1]}55, #eee4d2)`;
+  if (f.image) { art.style.backgroundImage = `url(/files/${f.image})`; art.style.backgroundSize = 'cover'; art.style.backgroundPosition = f.pos || 'center top'; }
+  room.querySelector('.k').textContent = `${f.wing} · ${f.k}`; room.querySelector('h2').textContent = f.t;
+  room.querySelector('.body').textContent = f.body; room.querySelector('.meta').textContent = f.meta;
+  room.classList.add('open');
+}
+let pendingLeave = false;
+function leave() {
+  if (!entered) return;
+  if (zoomAnim) { pendingLeave = true; return; }
+  room.classList.remove('open');
+  zoomAnim = { from: { ...cam }, to: { x: clamp(ME.x, W / 2, WORLD - W / 2), y: H / 2, z: 1 }, t0: performance.now() + 250, dur: 950, then: () => { entered = null; } };
+}
+room.querySelector('.back').addEventListener('click', e => { e.stopPropagation(); leave(); });
+
+/* ======================= input and loop ======================= */
+const keys = {};
+const pv = document.getElementById('pv'), scaler = pv.querySelector('.scaler');
+const fit = () => { const k = pv.clientWidth / W; scaler.style.transform = `scale(${k})`; pv.style.height = H * k + 'px'; };
+fit(); addEventListener('resize', fit);
+pv.addEventListener('keydown', e => {
+  if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) e.preventDefault();
+  if (opening) { if (e.key !== 'Tab') opening.t0 = performance.now() - 5300; return; }
+  keys[e.key] = true;
+  if (e.key === 'Escape') { if (entered) leave(); plan.classList.remove('open'); }
+  if ((e.key === 'ArrowUp' || e.key === 'Enter' || e.key === 'w') && !entered) { const f = nearest(); if (f && Math.abs(f.x - ME.x) < 150) enter(f); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'a' || e.key === 'd') autoTarget = null;
+});
+pv.addEventListener('keyup', e => { keys[e.key] = false; });
+cv.addEventListener('click', e => {
+  pv.focus();
+  if (opening) { opening.t0 = performance.now() - 5300; return; }
+  if (entered) return;
+  const r = cv.getBoundingClientRect(), k = r.width / W, sx = (e.clientX - r.left) / k, sy = (e.clientY - r.top) / k;
+  const wx = (sx - W / 2) / cam.z + cam.x;
+  const f = FRAMES.find(f => Math.abs(f.x - wx) < FW / 2 + 20 && sy > FY - FH / 2 - 20 && sy < 600);
+  if (f) autoTarget = f; else autoTarget = { x: clamp(wx, 80, WORLD - 80), walkOnly: true };
+});
+// floor plan and mini-map
+const plan = document.getElementById('plan');
+plan.innerHTML = WINGS.map(w => `<h4>${w.name}</h4>` + FRAMES.filter(f => f.wing === w.name).map(f => `<button data-x="${f.x}">${f.t}</button>`).join('')).join('');
+plan.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; plan.classList.remove('open'); if (entered) leave(); autoTarget = FRAMES.find(f => f.x === +b.dataset.x); pv.focus(); });
+document.getElementById('planBtn').addEventListener('click', e => { e.stopPropagation(); plan.classList.toggle('open'); });
+const map = document.getElementById('map');
+map.innerHTML = `<svg viewBox="0 0 520 34"><line x1="0" y1="17" x2="520" y2="17" stroke="#7a6f63" stroke-width="1.5"/>${ARCHES.map(a => `<line x1="${a.x / WORLD * 520}" y1="8" x2="${a.x / WORLD * 520}" y2="26" stroke="#7a6f63" stroke-width="1.5"/>`).join('')}${FRAMES.map(f => `<circle cx="${f.x / WORLD * 520}" cy="17" r="4" fill="#f7f1e6" stroke="#231d17" stroke-width="1.2"/>`).join('')}<circle id="meDot" cx="0" cy="17" r="7" fill="#c9442a"/></svg>`;
+map.addEventListener('click', e => { const r = map.getBoundingClientRect(); const wx = (e.clientX - r.left) / r.width * WORLD; autoTarget = { x: clamp(wx, 80, WORLD - 80), walkOnly: true }; pv.focus(); });
+document.getElementById('replay').addEventListener('click', () => { if (entered) { room.classList.remove('open'); entered = null; zoomAnim = null; cam.z = 1; cam.y = H / 2; } startOpening(); pv.focus(); });
+
+let last = performance.now();
+function loop(now) {
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  // movement
+  if (!opening && !entered && !zoomAnim) {
+    let want = (keys.ArrowRight || keys.d ? 1 : 0) - (keys.ArrowLeft || keys.a ? 1 : 0);
+    if (!want && autoTarget) { const dx = autoTarget.x - ME.x; if (Math.abs(dx) < 8) { const t = autoTarget; autoTarget = null; if (!t.walkOnly) enter(t); } else want = Math.sign(dx); }
+    const speed = autoTarget && Math.abs(autoTarget.x - ME.x) > 1400 ? 900 : 330;
+    ME.vx = lerp(ME.vx, want * speed, 1 - Math.pow(.0005, dt));
+    ME.x = clamp(ME.x + ME.vx * dt, 60, WORLD - 60);
+    if (Math.abs(ME.vx) > 5) { ME.dir = Math.sign(ME.vx); ME.phase += dt * Math.abs(ME.vx) / 26; ME.pose = 'side'; ME.still = 0; }
+    else { ME.still += dt; const f = nearest(); ME.pose = f && Math.abs(f.x - ME.x) < 120 && ME.still > .35 ? 'back' : ME.still > .35 ? 'front' : 'side'; }
+    cam.x = lerp(cam.x, clamp(ME.x, W / 2, WORLD - W / 2), 1 - Math.pow(.02, dt));
+  }
+  if (zoomAnim) {
+    const u = clamp((now - zoomAnim.t0) / zoomAnim.dur, 0, 1), e = ease(u);
+    cam.x = lerp(zoomAnim.from.x, zoomAnim.to.x, e); cam.y = lerp(zoomAnim.from.y, zoomAnim.to.y, e);
+    cam.z = Math.exp(lerp(Math.log(zoomAnim.from.z), Math.log(zoomAnim.to.z), e));
+    if (u >= 1) { const then = zoomAnim.then; zoomAnim = null; then(); if (pendingLeave) { pendingLeave = false; if (entered) leave(); } }
+  }
+  // draw
+  g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#e9dfcc'; g.fillRect(0, 0, W, H);
+  g.setTransform(cam.z, 0, 0, cam.z, W / 2 - cam.x * cam.z, H / 2 - cam.y * cam.z);
+  const cx0 = cam.x - W / 2 / cam.z - 20, cx1 = cam.x + W / 2 / cam.z + 20;
+  drawHall(cx0, cx1);
+  if (cam.z < 1.05) foyerTitle();
+  drawVisitor(2400, '#6d5a4a'); drawVisitor(6330, '#4a5670'); drawVisitor(6420, '#7a4a44');
+  drawMe(now / 1000);
+  for (const bx of [1960, 3900, 6800, 8600]) drawBench(bx);
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  if (opening) lightsDraw((now - opening.t0) / 1000);
+  // HUD
+  const f = nearest();
+  document.getElementById('prompt').classList.toggle('show', !opening && !entered && !zoomAnim && !!f && Math.abs(f.x - ME.x) < 120 && Math.abs(ME.vx) < 40);
+  const dot = document.getElementById('meDot'); if (dot) dot.setAttribute('cx', ME.x / WORLD * 520);
+  requestAnimationFrame(loop);
+}
+document.fonts.load('italic 400 40px "Instrument Serif"').then(() => { startOpening(); requestAnimationFrame(loop); });
+</script>
+</body>
+</html>

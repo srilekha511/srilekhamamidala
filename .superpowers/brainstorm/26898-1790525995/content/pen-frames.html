@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pen-Drawn Frames</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --paper: #efe7d8; --ink: #16120f; --muted: #7a6f63; --red: #d23a1f; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #1a1816; color: #eee6da; font-family: 'Inter Tight', system-ui, sans-serif; padding: 40px 28px 90px; -webkit-font-smoothing: antialiased; }
+  .mono { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+  .wrap { max-width: 1200px; margin: 0 auto; }
+  h1 { font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 42px; }
+  .lede { color: #a39c91; margin-top: 10px; font-size: 15px; line-height: 1.65; max-width: 780px; }
+  .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 26px; margin: 26px 0 14px; color: #a39c91; }
+  .seg { display: inline-flex; border: 1px solid rgba(238,230,218,.3); border-radius: 99px; overflow: hidden; }
+  .seg button { background: none; border: 0; color: #eee6da; padding: 8px 15px; cursor: pointer; }
+  .seg button.on { background: #eee6da; color: #1a1816; }
+  #replay { margin-left: auto; background: #d23a1f; color: #fff; border: 0; border-radius: 99px; padding: 10px 20px; cursor: pointer; }
+
+  .pv { position: relative; width: 100%; overflow: hidden; border-radius: 4px; background: var(--paper); }
+  .scaler { position: absolute; left: 0; top: 0; width: 1440px; height: 900px; transform-origin: 0 0; }
+  .scaler iframe { position: absolute; inset: 0; width: 1440px; height: 900px; border: 0; }
+  .ov { position: absolute; inset: 0; background-color: var(--paper); transition: background-color 1s ease; cursor: pointer; }
+  .ov canvas { position: absolute; inset: 0; width: 100%; height: 100%; transition: opacity 1s ease; }
+  .ov.lift { background-color: transparent; pointer-events: none; }
+  .ov.lift.engraved canvas { opacity: 0; }
+  .grain { position: absolute; inset: 0; pointer-events: none; opacity: .28; mix-blend-mode: multiply; transition: opacity 1s;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .38  0 0 0 0 .3  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+  .ov.lift .grain { opacity: 0; }
+  .skip { position: absolute; right: 30px; bottom: 26px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; opacity: .7; }
+  .ov.lift .skip { display: none; }
+  .note { color: #8f887d; font-size: 13px; line-height: 1.6; margin-top: 14px; max-width: 900px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>The frames, drawn by hand</h1>
+  <p class="lede">A dip pen inks each frame stroke by stroke: the outer rules, the inner border, curls in the corners, the crests, and finally the wire and nail it hangs from. The line swells and thins with the direction of the nib, the way a real broad-nib pen does. Try both settings below. Click the preview to skip to the end.</p>
+
+  <div class="controls">
+    <span class="mono">Pens</span>
+    <span class="seg" id="pens"><button class="mono on" data-v="2">Two, mirrored</button><button class="mono" data-v="1">One</button></span>
+    <span class="mono">Ending</span>
+    <span class="seg" id="ending"><button class="mono on" data-v="keep">Keep the ink frames</button><button class="mono" data-v="engraved">Settle into engraved frames</button></span>
+    <button id="replay" class="mono">Replay</button>
+  </div>
+
+  <div class="pv" id="pv"><div class="scaler"><iframe title="Landing page"></iframe>
+    <div class="ov"><canvas id="c" width="1440" height="900"></canvas><div class="grain"></div><span class="skip">Click to skip</span></div></div></div>
+  <p class="note">With "Keep the ink frames", the hand-drawn frames become the real frames on the landing page (the engraved ones are hidden). In this preview the drawing is a separate layer, so it won't lift with the frame on hover the way the real one would.</p>
+</div>
+
+<script>
+const W = 1440, H = 900;
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+
+/* ---------------- geometry: the two lobby frames (must match the landing page) ---------------- */
+const FR = [.13, .56].map(l => {
+  const px = l * W, py = .38 * H, pw = .31 * W, ph = .31 * H;
+  return { px, py, pw, ph, x: px - 58, y: py - 58, w: pw + 116, h: ph + 116 };
+});
+
+/* ---------------- path helpers ---------------- */
+function seg(a, b) {                       // dense samples along a straight line
+  const n = Math.max(2, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 2)), out = [];
+  for (let i = 0; i <= n; i++) out.push([lerp(a[0], b[0], i / n), lerp(a[1], b[1], i / n)]);
+  return out;
+}
+function bez(p0, p1, p2, p3) {
+  const out = [], n = 60;
+  for (let i = 0; i <= n; i++) {
+    const t = i / n, u = 1 - t;
+    out.push([u*u*u*p0[0] + 3*u*u*t*p1[0] + 3*u*t*t*p2[0] + t*t*t*p3[0], u*u*u*p0[1] + 3*u*u*t*p1[1] + 3*u*t*t*p2[1] + t*t*t*p3[1]]);
+  }
+  return out;
+}
+const join = (...parts) => parts.reduce((a, p) => a.concat(a.length ? p.slice(1) : p), []);
+function wobble(pts, amp) {                // a hand is never perfectly straight
+  const f1 = .004 + Math.random() * .004, f2 = .02 + Math.random() * .02, p1 = Math.random() * 9, p2 = Math.random() * 9;
+  let len = 0;
+  return pts.map((p, i) => {
+    if (i) len += Math.hypot(p[0] - pts[i - 1][0], p[1] - pts[i - 1][1]);
+    const q = pts[Math.min(i + 1, pts.length - 1)], r = pts[Math.max(i - 1, 0)];
+    const dx = q[0] - r[0], dy = q[1] - r[1], d = Math.hypot(dx, dy) || 1;
+    const n = amp * (.7 * Math.sin(len * f1 + p1) + .3 * Math.sin(len * f2 + p2));
+    return [p[0] - dy / d * n, p[1] + dx / d * n];
+  });
+}
+function spiral(cx, cy, r0, turns, a0, dir) {
+  const out = [], n = 120;
+  for (let i = 0; i <= n; i++) {
+    const s = i / n, a = a0 + dir * s * turns * Math.PI * 2, r = r0 * Math.pow(1 - s, .85) + 1.5;
+    out.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
+  }
+  return out;
+}
+const mirrorX = pts => pts.map(([x, y]) => [W - x, y]);
+
+/* ---------------- the strokes for one frame (the left one; the right is its mirror) ---------------- */
+const PEN = {
+  rule:  { wMin: 1.1, wMax: 3.6, speed: 2100, blot: 2.6, wob: 1.6 },
+  inner: { wMin: .7,  wMax: 2.0, speed: 2600, blot: 1.4, wob: 1.1 },
+  curl:  { wMin: .8,  wMax: 2.9, speed: 620,  blot: 2.0, wob: .3 },
+  crest: { wMin: .7,  wMax: 2.6, speed: 900,  blot: 1.6, wob: .4 },
+  wire:  { wMin: .6,  wMax: 1.3, speed: 1500, blot: 1.2, wob: .6 },
+  nail:  { wMin: 2.5, wMax: 4.5, speed: 300,  blot: 3.5, wob: 0 },
+};
+function frameStrokes(F) {
+  const { x, y, w, h, px, pw } = F, S = [];
+  const add = (kind, pts) => S.push({ kind, pts: wobble(pts, PEN[kind].wob), ...PEN[kind] });
+  // outer rules: four confident strokes that overshoot the corners
+  add('rule', seg([x - 9, y + 2], [x + w + 11, y - 1]));
+  add('rule', seg([x + w + 1, y - 9], [x + w - 1, y + h + 10]));
+  add('rule', seg([x + w + 9, y + h + 1], [x - 10, y + h - 1]));
+  add('rule', seg([x + 1, y + h + 9], [x - 1, y - 10]));
+  // inner border around the title card, one continuous loop
+  const i = 50;
+  add('inner', join(seg([x + i, y + i], [x + w - i, y + i]), seg([x + w - i, y + i], [x + w - i, y + h - i]),
+                    seg([x + w - i, y + h - i], [x + i, y + h - i]), seg([x + i, y + h - i], [x + i, y + i + 3])));
+  // a scroll in each corner
+  const corners = [[x, y, 1, 1], [x + w, y, -1, 1], [x + w, y + h, -1, -1], [x, y + h, 1, -1]];
+  for (const [cx, cy, sx, sy] of corners) {
+    const a0 = Math.atan2(-sy, -sx), dir = sx * sy;
+    add('curl', join(seg([cx + sx * 6, cy + sy * 44], [cx + sx * 7, cy + sy * 30]), spiral(cx + sx * 26, cy + sy * 26, 20, 1.2, a0 + dir * -.6, dir)));
+  }
+  // crests at top and bottom centre
+  const mid = x + w / 2;
+  for (const [cy, s] of [[y, 1], [y + h, -1]]) {
+    const Y = v => cy + s * v;
+    add('crest', join(bez([mid, Y(16)], [mid - 20, Y(-18)], [mid - 52, Y(-14)], [mid - 62, Y(10)]), bez([mid - 62, Y(10)], [mid - 66, Y(20)], [mid - 52, Y(24)], [mid - 50, Y(14)])));
+    add('crest', join(bez([mid, Y(16)], [mid + 20, Y(-18)], [mid + 52, Y(-14)], [mid + 62, Y(10)]), bez([mid + 62, Y(10)], [mid + 66, Y(20)], [mid + 52, Y(24)], [mid + 50, Y(14)])));
+    add('crest', join(bez([mid, Y(24)], [mid - 11, Y(10)], [mid - 7, Y(-8)], [mid, Y(-18)]), bez([mid, Y(-18)], [mid + 7, Y(-8)], [mid + 11, Y(10)], [mid, Y(24)])));
+  }
+  // the hanging wire and its nail
+  const nail = [px + .5 * pw, y - .08 * H];
+  add('wire', seg([px + .1 * pw, y], nail));
+  add('wire', seg(nail, [px + .9 * pw, y]));
+  add('nail', spiral(nail[0], nail[1], 3, 1.4, 0, 1));
+  return S;
+}
+
+/* ---------------- a pen's timeline ---------------- */
+function measure(st) {
+  const L = [0];
+  for (let i = 1; i < st.pts.length; i++) L.push(L[i - 1] + Math.hypot(st.pts[i][0] - st.pts[i - 1][0], st.pts[i][1] - st.pts[i - 1][1]));
+  st.L = L; st.len = L[L.length - 1]; st.dur = st.len / st.speed + .04;
+}
+function timeline(strokes, start, home, exit) {
+  const T = []; let t = start, at = home;
+  for (const st of strokes) {
+    measure(st);
+    const to = st.pts[0], d = Math.hypot(to[0] - at[0], to[1] - at[1]);
+    const md = .05 + d / 5200;
+    T.push({ type: 'move', from: at, to, t0: t, dur: md }); t += md;
+    T.push({ type: 'draw', st, t0: t, dur: st.dur }); t += st.dur;
+    at = st.pts[st.pts.length - 1];
+  }
+  T.push({ type: 'move', from: at, to: exit, t0: t, dur: .7, exit: true });
+  return { T, end: t };
+}
+
+/* ---------------- ink ---------------- */
+const view = document.getElementById('c'), ctx = view.getContext('2d');
+const ink = document.createElement('canvas'); ink.width = W; ink.height = H;
+const ictx = ink.getContext('2d');
+const NIB = -Math.PI / 4;                                     // broad nib held at 45°
+const stroke_s = k => k - Math.sin(2 * Math.PI * k) / (2 * Math.PI) * .55;   // slow start, fast middle, slow finish
+function pointAt(st, l) {
+  let i = 1; while (i < st.L.length - 1 && st.L[i] < l) i++;
+  const a = st.pts[i - 1], b = st.pts[i], seg = st.L[i] - st.L[i - 1] || 1, u = clamp((l - st.L[i - 1]) / seg, 0, 1);
+  return { x: lerp(a[0], b[0], u), y: lerp(a[1], b[1], u), ang: Math.atan2(b[1] - a[1], b[0] - a[0]) };
+}
+function stamp(st, from, to) {
+  for (let l = from; l <= to; l += .55) {
+    const p = pointAt(st, l);
+    const nib = Math.abs(Math.sin(p.ang - NIB));
+    const env = Math.min(1, Math.pow(Math.min(l / 14, (st.len - l) / 10, 1) + .001, .5));
+    const w = (st.wMin + (st.wMax - st.wMin) * nib) * (.35 + .65 * env);
+    ictx.globalAlpha = .82 + .12 * Math.sin(l * .09 + st.len);   // ink loads unevenly
+    ictx.beginPath(); ictx.arc(p.x, p.y, w / 2, 0, Math.PI * 2); ictx.fill();
+  }
+  ictx.globalAlpha = 1;
+}
+function blot(st) {                                           // ink pools where the nib first lands
+  const p = st.pts[0];
+  ictx.globalAlpha = .9; ictx.beginPath(); ictx.arc(p[0], p[1], st.blot, 0, Math.PI * 2); ictx.fill(); ictx.globalAlpha = 1;
+}
+
+/* ---------------- the pen itself ---------------- */
+function drawPen(x, y, lift, flip) {
+  const ang = .5;
+  const sh = 12 + lift * 26;
+  for (const shadow of [true, false]) {
+    ctx.save();
+    if (shadow) { ctx.translate(x + sh, y + sh * 1.25); ctx.filter = `blur(${5 + lift * 5}px)`; ctx.globalAlpha = .2 - lift * .06; }
+    else ctx.translate(x, y - lift * 16);
+    if (flip) ctx.scale(-1, 1);
+    ctx.rotate(ang);
+    const dark = shadow ? '#000' : null;
+    // holder
+    ctx.fillStyle = dark || '#1d1512';
+    ctx.beginPath(); ctx.roundRect(-8.5, -360, 17, 282, 8); ctx.fill();
+    if (!shadow) { ctx.fillStyle = 'rgba(255,255,255,.14)'; ctx.fillRect(-4, -350, 2.2, 262); }
+    // ferrule
+    if (!shadow) { const g = ctx.createLinearGradient(-10, 0, 10, 0); g.addColorStop(0, '#6e5526'); g.addColorStop(.45, '#e0bf73'); g.addColorStop(1, '#6e5526'); ctx.fillStyle = g; }
+    ctx.beginPath(); ctx.roundRect(-10, -84, 20, 30, 3); ctx.fill();
+    // nib
+    if (!shadow) { const g = ctx.createLinearGradient(-9, 0, 9, 0); g.addColorStop(0, '#5f6266'); g.addColorStop(.4, '#e9eaec'); g.addColorStop(1, '#55585c'); ctx.fillStyle = g; }
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-6, -24); ctx.quadraticCurveTo(-9.5, -44, -8.5, -58); ctx.lineTo(8.5, -58); ctx.quadraticCurveTo(9.5, -44, 6, -24); ctx.closePath(); ctx.fill();
+    if (!shadow) {
+      ctx.strokeStyle = '#2a2a2a'; ctx.lineWidth = .9; ctx.beginPath(); ctx.moveTo(0, -1.5); ctx.lineTo(0, -30); ctx.stroke();
+      ctx.fillStyle = '#2a2a2a'; ctx.beginPath(); ctx.arc(0, -32, 2.1, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(22,18,15,.9)'; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-3.2, -9); ctx.lineTo(3.2, -9); ctx.closePath(); ctx.fill();  // wet ink on the tip
+    }
+    ctx.restore();
+  }
+}
+
+/* ---------------- runner ---------------- */
+const pv = document.getElementById('pv'), scaler = pv.querySelector('.scaler'), ov = pv.querySelector('.ov'), iframe = pv.querySelector('iframe');
+const fit = () => { const k = pv.clientWidth / W; scaler.style.transform = `scale(${k})`; pv.style.height = H * k + 'px'; };
+fit(); addEventListener('resize', fit);
+let landingHTML = '';
+const landing = fetch('/files/ink-site-v2.html').then(r => r.text()).then(t => { landingHTML = t; });
+const opt = { pens: '2', ending: 'keep' };
+document.querySelectorAll('.seg').forEach(g => g.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  g.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+  opt[g.id] = b.dataset.v; play();
+}));
+document.getElementById('replay').addEventListener('click', play);
+
+let pens, raf = 0, t0 = 0, endT = 0, loaded = false, lifted = false;
+function play() {
+  cancelAnimationFrame(raf);
+  ictx.clearRect(0, 0, W, H); ictx.fillStyle = '#16120f';
+  ov.classList.remove('lift'); ov.classList.toggle('engraved', opt.ending === 'engraved');
+  iframe.srcdoc = '<p></p>';
+  loaded = lifted = false;
+  const left = frameStrokes(FR[0]);
+  const right = frameStrokes(FR[0]).map(st => ({ ...st, pts: wobble(mirrorX(st.pts), 0) }));   // same order, mirrored; own wobble below
+  right.forEach(st => { st.pts = wobble(st.pts, st.wob * .8); });
+  if (opt.pens === '2') {
+    pens = [timeline(left, .5, [-120, H * .7], [-200, H + 360]), timeline(right, .5, [W + 120, H * .7], [W + 200, H + 360])];
+    pens[1].flip = true;
+  } else {
+    const both = left.concat(right);
+    both.forEach(st => { st.speed *= 1.75; });                 // one hand works faster to keep the intro short
+    const a = timeline(both, .5, [-120, H * .7], [W + 220, H + 380]);
+    pens = [a];
+  }
+  pens.forEach(p => { p.i = 0; p.done = 0; });
+  endT = Math.max(...pens.map(p => p.end));
+  t0 = performance.now();
+  raf = requestAnimationFrame(loop);
+}
+function finishLanding() {
+  const css = opt.ending === 'keep' ? '.orn,.wire{visibility:hidden!important}' : '';
+  iframe.srcdoc = landingHTML.replace('</style>', css + '</style>');
+}
+function loop(now) {
+  const t = (now - t0) / 1000;
+  ctx.clearRect(0, 0, W, H);
+  const heads = [];
+  for (const p of pens) {
+    let x = p.T[0].from[0], y = p.T[0].from[1], lift = 1;
+    for (let k = p.i; k < p.T.length; k++) {
+      const s = p.T[k];
+      if (t < s.t0) break;
+      const u = clamp((t - s.t0) / s.dur, 0, 1);
+      if (s.type === 'move') {
+        const e = u * u * (3 - 2 * u);
+        x = lerp(s.from[0], s.to[0], e); y = lerp(s.from[1], s.to[1], e);
+        lift = s.exit ? Math.min(1, u * 3) : Math.sin(Math.PI * u) * .9 + .1 * (1 - u);
+      } else {
+        if (p.done === 0) blot(s.st);
+        const l = stroke_s(u) * s.st.len;
+        stamp(s.st, p.done, l);
+        p.done = l;
+        const q = pointAt(s.st, l); x = q.x; y = q.y; lift = 0;
+      }
+      if (u >= 1) { p.i = k + 1; p.done = 0; } else break;
+    }
+    heads.push([x, y, lift, p.flip]);
+  }
+  ctx.drawImage(ink, 0, 0);
+  for (const h of heads) drawPen(...h);
+  if (t > endT + .15 && !loaded) { loaded = true; finishLanding(); }
+  if (t > endT + .45 && !lifted) { lifted = true; ov.classList.add('lift'); }
+  if (t < endT + 1.4) raf = requestAnimationFrame(loop);
+  else { ctx.clearRect(0, 0, W, H); ctx.drawImage(ink, 0, 0); }
+}
+ov.addEventListener('click', () => {                         // skip: finish every stroke now
+  if (lifted) return;
+  for (const p of pens) for (let k = p.i; k < p.T.length; k++) {
+    const s = p.T[k]; if (s.type !== 'draw') continue;
+    stamp(s.st, k === p.i ? p.done : 0, s.st.len);
+  }
+  pens.forEach(p => { p.i = p.T.length - 1; p.T[p.i].t0 = (performance.now() - t0) / 1000; });
+  endT = (performance.now() - t0) / 1000;
+});
+landing.then(play);
+</script>
+</body>
+</html>
