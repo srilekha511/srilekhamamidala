@@ -39,9 +39,13 @@ export default function GameCanvas({ options, handlers, onReady, children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const onPointerDown = (e) => {
+  const at = (e) => {
     const rect = e.currentTarget.getBoundingClientRect()
-    gameRef.current?.walkToScreen((e.clientX - rect.left) / rect.width)
+    return [(e.clientX - rect.left) / rect.width, (e.clientY - rect.top) / rect.height]
+  }
+  const onPointerDown = (e) => gameRef.current?.clickAt(...at(e))
+  const onPointerMove = (e) => {
+    e.currentTarget.style.cursor = gameRef.current?.isClickableAt(...at(e)) ? 'pointer' : ''
   }
 
   return (
@@ -52,6 +56,7 @@ export default function GameCanvas({ options, handlers, onReady, children }) {
         role="img"
         aria-label="A pixel-art gallery. Srilekha's avatar walks past framed paintings. Use the Quick view button for a text version."
         onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
       />
       {children}
     </div>

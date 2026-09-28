@@ -19,6 +19,7 @@ import { createIntroReveal, drawWelcome, paintFull } from './draw/intro.js'
 import { buildRooms, AVATAR_FEET_Y, TILE_Y } from '../scenes/rooms.js'
 import { createHallScene } from '../scenes/hallScene.js'
 import { spawnFor } from '../scenes/spawn.js'
+import { frameAt } from '../scenes/hitTest.js'
 
 const screenRect = () => ({ x: 0, y: 0, w: VIEW_W, h: VIEW_H })
 const foldTarget = () => ({ x: Math.round(VIEW_W / 2 - 28), y: 66, w: 56, h: 44 })
@@ -290,8 +291,22 @@ export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIn
     },
     press: (a) => input.press(a),
     release: (a) => input.release(a),
-    walkToScreen(fx) {
-      if (director.state.mode === 'play') scene.walkTo(camX + fx * VIEW_W)
+    // Click/tap at (fx, fy), fractions of the canvas: a hall painting travels into its room; anywhere else walks there.
+    clickAt(fx, fy) {
+      if (director.state.mode !== 'play') return
+      const frame = frameAt(scene.room, camX + fx * VIEW_W, fy * VIEW_H)
+      if (frame?.target) {
+        if (director.request(frame.target, { origin: originOf(frame) })) {
+          emitter.emit('bubble', null)
+          emitter.emit('card', null)
+          audio.sfx('whoosh')
+        }
+        return
+      }
+      scene.walkTo(camX + fx * VIEW_W)
+    },
+    isClickableAt(fx, fy) {
+      return director.state.mode === 'play' && !!frameAt(scene.room, camX + fx * VIEW_W, fy * VIEW_H)?.target
     },
     skipIntro() {
       handleDirectorEvents(director.skipIntro())

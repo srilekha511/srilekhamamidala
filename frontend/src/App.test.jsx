@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 
-const fakeGame = { skipIntro: vi.fn(), replayIntro: vi.fn(() => true), setPaused: vi.fn(), setSoundOn: vi.fn(), goTo: vi.fn(), press: vi.fn(), release: vi.fn(), walkToScreen: vi.fn() }
+const fakeGame = { skipIntro: vi.fn(), replayIntro: vi.fn(() => true), setPaused: vi.fn(), setSoundOn: vi.fn(), goTo: vi.fn(), press: vi.fn(), release: vi.fn(), clickAt: vi.fn(), isClickableAt: vi.fn(() => false) }
 let handlers
 vi.mock('./ui/GameCanvas.jsx', () => ({
   default: (props) => {
