@@ -133,7 +133,7 @@ describe('rooms', () => {
       'LLM Memory Inference @ MIT Media Lab', 'Behavioral Econ RCT @ MIT Economics', 'LLM Evaluation @ MIT CSAIL',
     ])
     expect(researchProjects.map((p) => p.plaque)).toEqual([
-      'Election Law Graphs @ MIT Election Lab', 'LLMs for Legal Code @ University of Pennsylvania',
+      'Knowledge Graph QA', 'Election Law Graphs @ MIT Election Lab', 'LLMs for Legal Code @ University of Pennsylvania',
       'Dementia Risk via ML', 'ML + Drug Repurposing @ Drexel University',
     ])
     expect(rooms.research.frames.map((f) => f.plaque)).toEqual([...researchRoles, ...researchProjects].map((x) => x.plaque))
@@ -192,5 +192,14 @@ describe('rooms', () => {
   it('the Economics plaque topic fits on one line', () => {
     const econ = rooms.research.frames.find((f) => f.id === 'exp-mitecon')
     expect(plaqueLines(econ.plaque)).toEqual(['Behavioral Econ RCT', 'MIT Economics'])
+  })
+  it('TRACE hangs right after the LLM Evaluation frame and links to its page', () => {
+    const frames = rooms.research.frames
+    const i = frames.findIndex((f) => f.id === 'exp-csail')
+    const trace = frames[i + 1]
+    expect(trace.card.title).toBe('TRACE: An Interactive Visual Paradigm for Knowledge Graph Question-Answering')
+    expect(trace.thumb.art).toBe('trace')
+    expect(trace.card.links).toEqual([{ href: 'https://purl.org/trace', label: 'View TRACE' }])
+    expect(trace.card.body.join(' ')).toMatch(/34\.5% → 71\.4%/)
   })
 })

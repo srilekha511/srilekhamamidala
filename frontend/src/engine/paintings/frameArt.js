@@ -158,6 +158,17 @@ const SCENES = {
     r(29, 19, 4, 4, '#2d6a4f'); r(34, 19, 4, 4, '#e05a3a'); r(29, 24, 4, 4, '#1f4e6e'); r(34, 24, 4, 4, '#f2c94c')
   },
 
+  // TRACE: a knowledge graph with a highlighted reasoning path (and one broken link)
+  trace(r, px, t) {
+    r(0, 0, 42, 32, '#eef2fb')
+    r(7, 9, 1, 14, '#b8c2d8'); r(8, 22, 12, 1, '#b8c2d8'); r(21, 7, 1, 15, '#b8c2d8'); r(34, 21, 1, 7, '#b8c2d8')
+    r(7, 6, 14, 1, '#f2a93b'); r(21, 6, 1, 1, '#f2a93b'); r(22, 6, 12, 1, '#f2a93b'); r(34, 7, 1, 7, '#f2a93b')
+    r(34, 16, 1, 1, '#e05a7a'); r(34, 18, 1, 1, '#e05a7a') // broken hop
+    for (const [nx, ny, c] of [[5, 4, '#1f4e6e'], [19, 4, '#6a3f8a'], [32, 4, '#6a3f8a'], [32, 12, '#2d6a4f'], [5, 20, '#9aa7b8'], [19, 20, '#9aa7b8'], [32, 25, '#9aa7b8']]) r(nx, ny, 5, 5, c)
+    if (Math.floor(t * 2) % 2) r(33, 13, 3, 3, '#9ee6c1')
+    r(4, 27, 14, 3, '#1f4e6e'); r(5, 28, 2, 1, '#ffffff'); r(8, 28, 6, 1, '#ffffff')
+  },
+
   // ---- Experience ----
   // Disney Streaming: a fairytale castle and a play button
   castleStream(r, px, t) {

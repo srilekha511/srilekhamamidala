@@ -167,6 +167,18 @@ export const projects = [
     ]
   },
   {
+    id: 13,
+    room: "research",
+    plaque: "Knowledge Graph QA",
+    art: "trace",
+    title: "TRACE: An Interactive Visual Paradigm for Knowledge Graph Question-Answering",
+    category: "NLP + HCI Research",
+    description: "**TRACE** (Traceable Reasoning and Answer-path Comprehension Engine) distills the evidence behind a **knowledge-graph QA** answer into a single **reasoning path** users can explore: **connected** when the answer is supported by the graph, **visibly broken** when it isn't. In a **mixed-methods user study** (24 WebQSP questions, 3-, 4- and 6-hop), **calibration accuracy more than doubled** on supported answers (**34.5% → 71.4%**, p = 2.0 × 10⁻⁴).",
+    technologies: ["Knowledge Graphs", "NLP", "Graph Search", "HCI", "User Studies"],
+    link: "https://purl.org/trace",
+    linkText: "View TRACE",
+  },
+  {
     id: 4,
     room: "research",
     plaque: "Election Law Graphs @ MIT Election Lab",
