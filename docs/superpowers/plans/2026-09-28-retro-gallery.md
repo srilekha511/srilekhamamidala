@@ -1207,7 +1207,7 @@ export function contactItems(profile) {
     {
       id: 'contact-linkedin',
       thumb: { type: 'icon', icon: 'link' },
-      card: card({ title: 'LinkedIn', body: ["Let's connect."], links: [{ href: profile.social.linkedin, label: 'linkedin.com/in/srilekha-mamidala' }] }),
+      card: card({ title: 'LinkedIn', body: ["Let's connect!"], links: [{ href: profile.social.linkedin, label: 'linkedin.com/in/srilekha-mamidala' }] }),
     },
   ]
 }
