@@ -8,6 +8,7 @@ export const ICONS = {
   envelope: ['........', 'xxxxxxxx', 'xx....xx', 'x.x..x.x', 'x..xx..x', 'x......x', 'xxxxxxxx', '........'],
   book: ['xxx..xxx', 'x.xxxx.x', 'x.x..x.x', 'x.x..x.x', 'x.x..x.x', 'x.xxxx.x', 'xxx..xxx', '........'],
   star: ['...xx...', '...xx...', 'xxxxxxxx', '.xxxxxx.', '..xxxx..', '.xx..xx.', 'xx....xx', '........'],
+  flask: ['..xxxx..', '...xx...', '...xx...', '..x..x..', '.x....x.', 'x.xxxx.x', 'x.xxxx.x', '.xxxxxx.'],
   heart: ['.xx..xx.', 'xxxxxxxx', 'xxxxxxxx', 'xxxxxxxx', '.xxxxxx.', '..xxxx..', '...xx...', '........'],
   code: ['........', '....x...', '..x.xx..', '.x..x.x.', 'x..x...x', '.x.x..x.', '..xx.x..', '...x....'],
   link: ['........', 'xxxx....', 'x..x....', 'x..xxxxx', 'xxxx...x', '...x...x', '...xxxxx', '........'],

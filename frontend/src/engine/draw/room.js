@@ -4,7 +4,7 @@ import { drawTile } from '../sprites/tiles.js'
 import { drawIcon } from '../sprites/icons.js'
 import { drawCover } from '../paintings/covers.js'
 import { drawFrameArt } from '../paintings/frameArt.js'
-import { drawPlaque } from '../sprites/tinyFont.js'
+import { drawPlaque, drawTinyText, textWidth } from '../sprites/tinyFont.js'
 import { WAINSCOT_Y, FLOOR_Y, TILE_Y, TILE_H } from '../../scenes/rooms.js'
 
 export const frameInnerScreenRect = (f, camX) => ({ x: f.x - camX + 3, y: f.y + 3, w: f.w - 6, h: f.h - 6 })
@@ -57,12 +57,8 @@ export function drawRoom(ctx, room, camX, t, assets, activeTileId) {
     const active = tile.id === activeTileId
     drawTile(ctx, sx, TILE_Y, tile.w, TILE_H, t, active, room.theme.accent)
     drawIcon(ctx, tile.icon, sx + (tile.w - 8) / 2, WAINSCOT_Y + 8, '#fbf3e0')
-    ctx.font = '8px "Press Start 2P"'
-    ctx.textBaseline = 'top'
-    ctx.fillStyle = room.theme.accent
-    const label = tile.label.toUpperCase()
-    const lw = ctx.measureText(label).width
+    const lw = textWidth(tile.label)
     const lx = Math.round(sx + tile.w / 2 - lw / 2)
-    if (lx >= 0 && lx + lw <= VIEW_W) ctx.fillText(label, lx, WAINSCOT_Y - 12)
+    if (lx >= 0 && lx + lw <= VIEW_W) drawTinyText(ctx, tile.label, lx, WAINSCOT_Y - 10, room.theme.accent)
   }
 }

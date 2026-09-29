@@ -28,7 +28,7 @@ describe('Starry Night', () => {
 })
 
 describe('covers', () => {
-  for (const id of ['about', 'projects', 'experience', 'contact', 'unknown']) {
+  for (const id of ['about', 'research', 'projects', 'experience', 'contact', 'unknown']) {
     it(`${id} cover stays inside its frame`, () => {
       const ctx = stubCtx()
       const X = 100, Y = 47, W = 50, H = 38

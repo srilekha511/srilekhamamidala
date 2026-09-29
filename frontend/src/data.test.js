@@ -34,6 +34,10 @@ describe('content', () => {
     expect(data.interests.length).toBeGreaterThan(0)
     expect(exists(data.profile.headshot)).toBe(true)
   })
+  it('files every project and role into a room', () => {
+    for (const p of data.projects) expect(['research', 'projects'], p.title).toContain(p.room)
+    for (const e of data.experience) expect(['research', 'experience'], e.company).toContain(e.room)
+  })
   it('never exposes a GPA', () => {
     const all = JSON.stringify(data)
     expect(all).not.toMatch(/GPA/i)

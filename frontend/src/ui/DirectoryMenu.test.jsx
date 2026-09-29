@@ -8,7 +8,7 @@ describe('DirectoryMenu', () => {
     render(<DirectoryMenu room="hall" onGo={onGo} />)
     const nav = screen.getByRole('navigation', { name: /gallery directory/i })
     const names = [...nav.querySelectorAll('li button')].map((b) => b.textContent.trim())
-    expect(names).toEqual(['Home', 'About', 'Projects', 'Experience', 'Contact'])
+    expect(names).toEqual(['Home', 'About', 'Research', 'Projects', 'Experience', 'Contact'])
     fireEvent.click(screen.getByRole('button', { name: 'Projects' }))
     expect(onGo).toHaveBeenCalledWith('projects')
   })

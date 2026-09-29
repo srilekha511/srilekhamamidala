@@ -40,9 +40,10 @@ export const interests = [
   "Quantitative finance & economics",
 ];
 
+// room: 'research' puts a role in the Research room; 'experience' keeps it with jobs.
 export const experience = [
   {
-    id: "disney", plaque: "Disney Streaming", art: "castleStream", company: "Disney Streaming", role: "Software Engineering Intern",
+    id: "disney", room: "experience", plaque: "Disney Streaming", art: "castleStream", company: "Disney Streaming", role: "Software Engineering Intern",
     location: "Santa Monica, CA", dates: "June 2026 – August 2026",
     bullets: [
       "Developed internal developer tooling for Disney Streaming using Databricks, Apache Spark, AWS, Linux, and Terraform, improving platform scalability and engineering productivity across distributed data pipelines, reducing latency by over 400%",
@@ -50,7 +51,7 @@ export const experience = [
     ],
   },
   {
-    id: "acronym", plaque: "Acronym", art: "clusterJudge", company: "Acronym", role: "Machine Learning Intern",
+    id: "acronym", room: "experience", plaque: "Acronym", art: "clusterJudge", company: "Acronym", role: "Machine Learning Intern",
     location: "New York, NY", dates: "September 2026 – Present",
     bullets: [
       "Building an LLM evaluation pipeline that scores signal extractions against source artifacts using LLM-as-a-Judge, surfacing model and prompt failure modes across unstructured data",
@@ -59,7 +60,7 @@ export const experience = [
     ],
   },
   {
-    id: "hof", plaque: "HOF Capital", art: "rocketDiligence", company: "HOF Capital", role: "Investment Intern",
+    id: "hof", room: "experience", plaque: "HOF Capital", art: "rocketDiligence", company: "HOF Capital", role: "Investment Intern",
     location: "", dates: "September 2026 – Present",
     bullets: [
       "Source and conduct market and company diligence on AI, software, and frontier technology startups, assessing founders, products, markets, competitive landscapes, and technical differentiation to identify high-potential investment opportunities",
@@ -67,7 +68,7 @@ export const experience = [
     ],
   },
   {
-    id: "medialab", plaque: "MIT Media Lab", art: "memoryLoop", company: "MIT Media Lab", role: "Research Intern",
+    id: "medialab", room: "research", plaque: "MIT Media Lab", art: "memoryLoop", company: "MIT Media Lab", role: "Research Intern",
     location: "", dates: "September 2026 – Present",
     bullets: [
       "Investigating self-confirming inference in persistent LLM memory by instrumenting an open-source memory system to trace preference updates to interaction evidence and distinguish user beliefs from preferences reinforced by agent interactions",
@@ -75,7 +76,7 @@ export const experience = [
     ],
   },
   {
-    id: "mitecon", plaque: "MIT Economics", art: "phoneWellbeing", company: "MIT Department of Economics", role: "Research Intern",
+    id: "mitecon", room: "research", plaque: "MIT Economics", art: "phoneWellbeing", company: "MIT Department of Economics", role: "Research Intern",
     location: "Cambridge, MA", dates: "June 2026 – Present",
     bullets: [
       "Developed and evaluated technical infrastructure for a large-scale RCT studying smartphone use and adolescent well-being",
@@ -83,7 +84,7 @@ export const experience = [
     ],
   },
   {
-    id: "csail", plaque: "MIT CSAIL", art: "ratingRobot", company: "MIT CSAIL, Decentralized Information Group", role: "Research Intern",
+    id: "csail", room: "research", plaque: "MIT CSAIL", art: "ratingRobot", company: "MIT CSAIL, Decentralized Information Group", role: "Research Intern",
     location: "Cambridge, MA", dates: "August 2024 – Present",
     bullets: [
       "Accelerated insurance communication services by >60% by researching development of mathematical metrics for subjective quality evaluation across 10+ large language models (LLMs) in coordination with industry partner Liberty Mutual",
@@ -91,7 +92,7 @@ export const experience = [
     ],
   },
   {
-    id: "525vc", plaque: "525 VC", art: "voiceMemo", company: "525 Venture Capital Firm", role: "Venture Associate Intern",
+    id: "525vc", room: "experience", plaque: "525 VC", art: "voiceMemo", company: "525 Venture Capital Firm", role: "Venture Associate Intern",
     location: "New York, NY", dates: "December 2025 – February 2026",
     bullets: [
       "Built AI-driven investment portfolio management system using voice and text agentic AI models to ingest founder calls, inbound applications, pitch decks, and market research for deal sourcing, generating first-pass deal memos and SWOT analyses",
@@ -99,7 +100,7 @@ export const experience = [
     ],
   },
   {
-    id: "earthian", plaque: "Earthian AI", art: "climateGlobe", company: "Earthian AI — Dutch Commercial Property Insurance Optimization Startup", role: "Software Engineering Intern",
+    id: "earthian", room: "experience", plaque: "Earthian AI", art: "climateGlobe", company: "Earthian AI — Dutch Commercial Property Insurance Optimization Startup", role: "Software Engineering Intern",
     location: "Enschede, Netherlands", dates: "June 2025 – August 2025",
     bullets: [
       "Improved climate risk analysis and expedited claim processing and underwriting by 200+% and delivered 2x more accurate insights for insurers in energy markets via PyTorch, FastAPI, AWS, React, leading development of full-stack AI chatbot",
@@ -107,9 +108,11 @@ export const experience = [
   },
 ];
 
+// room: 'research' puts a project in the Research room; 'projects' keeps it with the builds.
 export const projects = [
   {
     id: 2,
+    room: "projects",
     plaque: "Insurance Chatbot",
     art: "chatbot",
     title: "AI-Powered Insurance Chatbot",
@@ -124,6 +127,7 @@ export const projects = [
   },
   {
     id: 3,
+    room: "research",
     plaque: "LLM Formality Study",
     art: "formality",
     title: "An Empirical Evaluation of LLMs for the Assessment of Subjective Qualities",
@@ -138,6 +142,7 @@ export const projects = [
   },
   {
     id: 4,
+    room: "research",
     plaque: "Election Law Graphs",
     art: "election",
     title: "Web Scraping of Legislative Election Data for Knowledge Graph Analysis",
@@ -153,6 +158,7 @@ export const projects = [
   },
   {
     id: 5,
+    room: "projects",
     plaque: "dermalab",
     art: "dermalab",
     title: "dermalab: AI and LLM-Powered Skin Disease Diagnosis",
@@ -171,6 +177,7 @@ export const projects = [
   },
   {
     id: 9,
+    room: "research",
     plaque: "WhartonMunicode",
     art: "legal",
     title: "WhartonMunicode: LLMs for Legal Code Analysis",
@@ -187,6 +194,7 @@ export const projects = [
   },
   {
     id: 6,
+    room: "research",
     plaque: "Dementia Risk ML",
     art: "brainNetwork",
     title: "A Holistic, Personalized Dementia Risk Prediction Framework",
@@ -204,6 +212,7 @@ export const projects = [
   },
   {
     id: 7,
+    room: "research",
     plaque: "NeuroCADR",
     art: "drugRepurposing",
     title: "NeuroCADR: Computational Drug Repurposing for Epilepsy",
@@ -221,6 +230,7 @@ export const projects = [
   },
   {
     id: 8,
+    room: "projects",
     plaque: "Food Shelf Life",
     art: "foodShelfLife",
     title: "ML-Based Food Shelf Life Tracking",
@@ -239,6 +249,7 @@ export const projects = [
   },
   {
     id: 1,
+    room: "projects",
     plaque: "Campaign AI",
     art: "campaign",
     title: "AI-Powered Performance Campaign Manager",

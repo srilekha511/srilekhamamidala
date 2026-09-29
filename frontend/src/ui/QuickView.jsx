@@ -1,6 +1,26 @@
 import { useEffect, useRef } from 'react'
 import { asset } from '../asset.js'
 
+const inResearch = (x) => x.room === 'research'
+
+const role = (e) => (
+  <article key={e.id} className="quick-view__entry">
+    <h3>{e.company}</h3>
+    <p className="quick-view__meta">{[e.role, e.location, e.dates].filter(Boolean).join(' · ')}</p>
+    <ul>{e.bullets.map((b) => <li key={b}>{b}</li>)}</ul>
+  </article>
+)
+
+const project = (p) => (
+  <article key={p.id} className="quick-view__entry">
+    <h3>{p.title}</h3>
+    <p className="quick-view__meta">{p.category}</p>
+    <p>{p.description}</p>
+    {p.technologies?.length > 0 && <p className="quick-view__meta">{p.technologies.join(' · ')}</p>}
+    {p.link && <a href={p.link} target="_blank" rel="noopener noreferrer">{p.linkText ?? 'View project'}</a>}
+  </article>
+)
+
 export default function QuickView({ data, onClose }) {
   const closeRef = useRef(null)
   const { profile, education, skills, interests, experience, projects } = data
@@ -40,27 +60,19 @@ export default function QuickView({ data, onClose }) {
         </section>
 
         <section>
+          <h2>Research</h2>
+          {experience.filter(inResearch).map(role)}
+          {projects.filter(inResearch).map(project)}
+        </section>
+
+        <section>
           <h2>Experience</h2>
-          {experience.map((e) => (
-            <article key={e.id} className="quick-view__entry">
-              <h3>{e.company}</h3>
-              <p className="quick-view__meta">{[e.role, e.location, e.dates].filter(Boolean).join(' · ')}</p>
-              <ul>{e.bullets.map((b) => <li key={b}>{b}</li>)}</ul>
-            </article>
-          ))}
+          {experience.filter((e) => !inResearch(e)).map(role)}
         </section>
 
         <section>
           <h2>Projects</h2>
-          {projects.map((p) => (
-            <article key={p.id} className="quick-view__entry">
-              <h3>{p.title}</h3>
-              <p className="quick-view__meta">{p.category}</p>
-              <p>{p.description}</p>
-              {p.technologies?.length > 0 && <p className="quick-view__meta">{p.technologies.join(' · ')}</p>}
-              {p.link && <a href={p.link} target="_blank" rel="noopener noreferrer">{p.linkText ?? 'View project'}</a>}
-            </article>
-          ))}
+          {projects.filter((p) => !inResearch(p)).map(project)}
         </section>
 
         <section>

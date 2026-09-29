@@ -1,4 +1,4 @@
-export const ROOM_IDS = ['hall', 'about', 'projects', 'experience', 'contact']
+export const ROOM_IDS = ['hall', 'about', 'research', 'projects', 'experience', 'contact']
 
 export function parseHash(hash) {
   const m = /^#?\/?([a-z]*)\/?$/.exec(String(hash ?? '').toLowerCase())

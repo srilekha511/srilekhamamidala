@@ -4,6 +4,7 @@ import { parseHash, hashFor } from './routing.js'
 describe('routing', () => {
   it('parses known rooms', () => {
     expect(parseHash('#/projects')).toEqual({ room: 'projects', quick: false })
+    expect(parseHash('#/research')).toEqual({ room: 'research', quick: false })
     expect(parseHash('#/about/')).toEqual({ room: 'about', quick: false })
     expect(parseHash('#/Experience')).toEqual({ room: 'experience', quick: false })
   })

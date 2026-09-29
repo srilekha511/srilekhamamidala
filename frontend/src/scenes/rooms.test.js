@@ -1,23 +1,28 @@
 import { describe, it, expect } from 'vitest'
 import * as data from '../data.js'
 import { buildRooms, SECTIONS, THEMES } from './rooms.js'
-import { plaqueWidth } from '../engine/sprites/tinyFont.js'
+import { plaqueWidth, textWidth } from '../engine/sprites/tinyFont.js'
 
 const rooms = buildRooms(data)
 const sectionIds = SECTIONS.map((s) => s.id)
+const researchRoles = data.experience.filter((e) => e.room === 'research')
+const jobs = data.experience.filter((e) => e.room !== 'research')
+const researchProjects = data.projects.filter((p) => p.room === 'research')
+const builds = data.projects.filter((p) => p.room !== 'research')
 
 describe('rooms', () => {
-  it('main hall has the five frames in spec order and no tiles', () => {
-    expect(rooms.hall.frames.map((f) => f.id)).toEqual(['starry', 'about', 'projects', 'experience', 'contact'])
+  it('main hall has its six frames in order and no tiles', () => {
+    expect(rooms.hall.frames.map((f) => f.id)).toEqual(['starry', 'about', 'research', 'projects', 'experience', 'contact'])
     expect(rooms.hall.tiles).toEqual([])
     const [starry, about] = rooms.hall.frames
     expect(starry.w).toBeLessThan(about.w)
     expect(starry.h).toBeLessThan(about.h)
     for (const f of rooms.hall.frames.slice(1)) expect(f.target).toBe(f.id)
   })
-  it('has one frame per project and per experience entry', () => {
-    expect(rooms.projects.frames).toHaveLength(data.projects.length)
-    expect(rooms.experience.frames).toHaveLength(data.experience.length)
+  it('shows every project and role exactly once across the three work rooms', () => {
+    const work = ['research', 'projects', 'experience'].flatMap((id) => rooms[id].frames)
+    expect(work).toHaveLength(data.projects.length + data.experience.length)
+    expect(new Set(work.map((f) => f.id)).size).toBe(work.length)
     expect(rooms.about.frames.map((f) => f.id)).toEqual(['about-me', 'about-education', 'about-skills', 'about-interests'])
     expect(rooms.contact.frames.map((f) => f.id)).toEqual(['contact-email', 'contact-github', 'contact-linkedin'])
   })
@@ -37,7 +42,7 @@ describe('rooms', () => {
       const end = room.tiles.slice(1)
       const targets = end.map((t) => t.target)
       expect(targets[0]).toBe('hall')
-      expect(targets).toHaveLength(4)
+      expect(targets).toHaveLength(SECTIONS.length)
       expect(targets).not.toContain(id)
       expect(new Set(targets)).toEqual(new Set(['hall', ...sectionIds.filter((s) => s !== id)]))
       const lastFrame = room.frames.at(-1)
@@ -45,14 +50,32 @@ describe('rooms', () => {
       expect(room.width).toBeGreaterThanOrEqual(end.at(-1).x + end.at(-1).w)
     }
   })
-  it('tile labels (8px pixel font) never overlap', () => {
+  it('tile labels (tiny plaque font) never overlap', () => {
     for (const id of sectionIds) {
       const tiles = rooms[id].tiles.slice(1)
       tiles.forEach((t, i) => {
         if (i === 0) return
         const prev = tiles[i - 1]
         const gap = (t.x + t.w / 2) - (prev.x + prev.w / 2)
-        expect(gap).toBeGreaterThanOrEqual((t.label.length + prev.label.length) * 4 + 8)
+        expect(gap).toBeGreaterThanOrEqual((textWidth(t.label) + textWidth(prev.label)) / 2 + 6)
+      })
+    }
+  })
+  it('the whole row of end portals fits on a laptop-width view', () => {
+    for (const id of sectionIds) {
+      const end = rooms[id].tiles.slice(1)
+      const span = rooms[id].width - (end[0].x + end[0].w / 2 - textWidth(end[0].label) / 2)
+      expect(span, id).toBeLessThanOrEqual(288)
+    }
+  })
+  it('neighbouring plaques keep breathing room', () => {
+    for (const id of sectionIds) {
+      const frames = rooms[id].frames
+      frames.forEach((f, i) => {
+        if (i === 0) return
+        const prev = frames[i - 1]
+        const gap = (f.x + f.w / 2) - (prev.x + prev.w / 2)
+        expect(gap - (plaqueWidth(f.plaque) + plaqueWidth(prev.plaque)) / 2, `${prev.plaque} | ${f.plaque}`).toBeGreaterThanOrEqual(8)
       })
     }
   })
@@ -101,16 +124,26 @@ describe('rooms', () => {
   })
   it('project frames show their pixel scene instead of a screenshot', () => {
     rooms.projects.frames.forEach((f, i) => {
-      expect(f.thumb).toEqual({ type: 'art', art: data.projects[i].art })
-      expect(f.card.image).toBe(data.projects[i].image) // screenshot still in the card
+      expect(f.thumb).toEqual({ type: 'art', art: builds[i].art })
+      expect(f.card.image).toBe(builds[i].image) // screenshot still in the card
     })
+  })
+  it('splits work into Research (roles then papers), Experience (jobs) and Projects (builds)', () => {
+    expect(researchRoles.map((e) => e.plaque)).toEqual(['MIT Media Lab', 'MIT Economics', 'MIT CSAIL'])
+    expect(researchProjects.map((p) => p.plaque)).toEqual(['LLM Formality Study', 'Election Law Graphs', 'WhartonMunicode', 'Dementia Risk ML', 'NeuroCADR'])
+    expect(rooms.research.frames.map((f) => f.plaque)).toEqual([...researchRoles, ...researchProjects].map((x) => x.plaque))
+    expect(rooms.experience.frames.map((f) => f.plaque)).toEqual(jobs.map((e) => e.plaque))
+    expect(rooms.projects.frames.map((f) => f.plaque)).toEqual(builds.map((p) => p.plaque))
+    const csail = rooms.research.frames.findIndex((f) => f.plaque === 'MIT CSAIL')
+    expect(rooms.research.frames[csail + 1].plaque).toBe('LLM Formality Study') // role next to its paper
   })
   it('every section frame has a short plaque title, and neighbouring plaques never touch', () => {
     const expected = {
       about: ['Srilekha', 'Education', 'Skills', 'Interests'],
       contact: ['Email', 'GitHub', 'LinkedIn'],
-      projects: data.projects.map((p) => p.plaque),
-      experience: data.experience.map((e) => e.plaque),
+      projects: builds.map((p) => p.plaque),
+      experience: jobs.map((e) => e.plaque),
+      research: [...researchRoles, ...researchProjects].map((x) => x.plaque),
     }
     for (const id of sectionIds) {
       const frames = rooms[id].frames
@@ -125,7 +158,7 @@ describe('rooms', () => {
     }
   })
   it('experience frames show their pixel scene', () => {
-    rooms.experience.frames.forEach((f, i) => expect(f.thumb).toEqual({ type: 'art', art: data.experience[i].art }))
+    rooms.experience.frames.forEach((f, i) => expect(f.thumb).toEqual({ type: 'art', art: jobs[i].art }))
   })
   it('about and contact frames use drawn scenes, not photos', () => {
     expect(rooms.about.frames.map((f) => f.thumb.art)).toEqual(['avatar', 'mit', 'inventory', 'interests'])
@@ -135,6 +168,6 @@ describe('rooms', () => {
     expect(rooms.contact.frames.map((f) => f.href)).toEqual([
       `mailto:${data.profile.email}`, data.profile.social.github, data.profile.social.linkedin,
     ])
-    for (const id of ['about', 'projects', 'experience']) for (const f of rooms[id].frames) expect(f.href).toBeUndefined()
+    for (const id of ['about', 'research', 'projects', 'experience']) for (const f of rooms[id].frames) expect(f.href).toBeUndefined()
   })
 })

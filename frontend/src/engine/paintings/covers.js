@@ -13,6 +13,34 @@ const COVERS = {
     const size = 32
     drawPixelArt(ctx, portrait, AVATAR_PALETTE, x + Math.floor((w - size) / 2), y + h - size, { scale: 2 })
   },
+  research(ctx, x, y, w, h, t) {
+    ctx.fillStyle = '#f6efcc'
+    ctx.fillRect(x, y, w, h)
+    // microscope
+    ctx.fillStyle = '#34466b'
+    ctx.fillRect(x + 8, y + 20, 14, 3)
+    ctx.fillRect(x + 12, y + 8, 3, 12)
+    ctx.fillStyle = '#6f7488'
+    ctx.fillRect(x + 15, y + 2, 4, 9)
+    ctx.fillRect(x + 11, y + 15, 10, 2)
+    ctx.fillStyle = '#2b2b2b'
+    ctx.fillRect(x + 14, y + 1, 6, 2)
+    // bubbling flask
+    drawIcon(ctx, 'flask', x + 32, y + 6, '#2d6a4f', 2)
+    ctx.fillStyle = '#9ee6c1'
+    ctx.fillRect(x + 38, y + 3 - (Math.floor(t * 3) % 2), 2, 2)
+    // open journal
+    ctx.fillStyle = '#fbf3e0'
+    ctx.fillRect(x + 4, y + 25, 20, 10)
+    ctx.fillRect(x + 26, y + 25, 20, 10)
+    ctx.fillStyle = '#8a1f2b'
+    ctx.fillRect(x + 24, y + 25, 2, 11)
+    ctx.fillStyle = '#b8a888'
+    for (const ly of [27, 30, 33]) {
+      ctx.fillRect(x + 6, y + ly, 15, 1)
+      ctx.fillRect(x + 28, y + ly, 15, 1)
+    }
+  },
   projects(ctx, x, y, w, h, t) {
     ctx.fillStyle = '#1d3f8c'
     ctx.fillRect(x, y, w, h)
