@@ -79,7 +79,7 @@ export const experience = [
     ],
   },
   {
-    id: "mitecon", room: "research", plaque: "Behavioral Economics RCT @ MIT Economics", art: "phoneWellbeing", company: "MIT Department of Economics", role: "Research Intern",
+    id: "mitecon", room: "research", plaque: "Behavioral Econ RCT @ MIT Economics", art: "phoneWellbeing", company: "MIT Department of Economics", role: "Research Intern",
     location: "Cambridge, MA", dates: "June 2026 – Present",
     bullets: [
       "Built and evaluated infrastructure for a **large-scale RCT** on **smartphone use and adolescent well-being**",

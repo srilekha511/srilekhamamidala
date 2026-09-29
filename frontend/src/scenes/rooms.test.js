@@ -130,7 +130,7 @@ describe('rooms', () => {
   })
   it('splits work into Research (roles then papers), Experience (jobs) and Projects (builds)', () => {
     expect(researchRoles.map((e) => e.plaque)).toEqual([
-      'LLM Memory Inference @ MIT Media Lab', 'Behavioral Economics RCT @ MIT Economics', 'LLM Formality Eval @ MIT CSAIL',
+      'LLM Memory Inference @ MIT Media Lab', 'Behavioral Econ RCT @ MIT Economics', 'LLM Formality Eval @ MIT CSAIL',
     ])
     expect(researchProjects.map((p) => p.plaque)).toEqual([
       'Election Law Graphs @ MIT Election Lab', 'LLMs for Legal Code @ University of Pennsylvania',
@@ -188,5 +188,9 @@ describe('rooms', () => {
       { label: 'Academic & Research', text: data.interests.academic.join(', ') },
       { label: 'For Fun', text: data.interests.personal.join(', ') },
     ])
+  })
+  it('the Economics plaque topic fits on one line', () => {
+    const econ = rooms.research.frames.find((f) => f.id === 'exp-mitecon')
+    expect(plaqueLines(econ.plaque)).toEqual(['Behavioral Econ RCT', 'MIT Economics'])
   })
 })
