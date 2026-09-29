@@ -123,7 +123,7 @@ export const projects = [
     art: "hardwareHub",
     title: "HackMIT Hardware Hub",
     category: "Full Stack · HackMIT Organizing Team",
-    description: "Built with the **HackMIT organizing team (TechX)**: the hardware desk's web app, used by **700+ hackers** to browse and check out **200+ types of hardware**, with **badge QR-code checkout**, a **3D-print queue** with print-time estimates, and **\"order ready\" push notifications**.",
+    description: "Built with the **HackMIT organizing team**: the hardware desk's web app, used by **700+ hackers** to browse and check out **200+ types of hardware**, with **badge QR-code checkout**, a **3D-print queue** with print-time estimates, and **\"order ready\" push notifications**.",
     whatILearned: "Shipping a **production app for a live event** as a team: a **React + TypeScript** frontend, **Flask + PostgreSQL** backend, and **Docker** deploys.",
     technologies: ["React", "TypeScript", "Flask", "PostgreSQL", "Docker"],
     link: "https://hardware.hackmit.org/",
@@ -184,7 +184,7 @@ export const projects = [
   {
     id: 5,
     room: "projects",
-    plaque: "AI Skin Diagnosis",
+    plaque: "ML for Skin Diagnosis",
     art: "dermalab",
     title: "dermalab: AI and LLM-Powered Skin Disease Diagnosis",
     category: "ML/CV/NLP Hackathon Project",
