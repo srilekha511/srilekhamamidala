@@ -111,7 +111,7 @@ export function aboutItems({ profile, education, skills, interests }) {
       id: 'about-skills',
       plaque: 'Skills',
       thumb: { type: 'art', art: 'inventory' },
-      card: card({ title: 'Skills', bullets: skills.map((g) => `${g.group}: ${g.items.join(', ')}`) }),
+      card: card({ title: 'Skills', bullets: skills.map((g) => ({ label: g.group, text: g.items.join(', ') })) }),
     },
     {
       id: 'about-interests',

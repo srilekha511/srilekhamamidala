@@ -170,4 +170,8 @@ describe('rooms', () => {
     ])
     for (const id of ['about', 'research', 'projects', 'experience']) for (const f of rooms[id].frames) expect(f.href).toBeUndefined()
   })
+  it('the Skills card keeps each group name separate so it can be bold', () => {
+    const skills = rooms.about.frames.find((f) => f.id === 'about-skills').card
+    expect(skills.bullets).toEqual(data.skills.map((g) => ({ label: g.group, text: g.items.join(', ') })))
+  })
 })

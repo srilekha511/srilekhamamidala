@@ -24,4 +24,10 @@ describe('InfoCard', () => {
     render(<InfoCard card={{ ...card, links: [{ href: 'mailto:a@b.c', label: 'a@b.c' }] }} onClose={() => {}} />)
     expect(screen.getByRole('link', { name: 'a@b.c' }).getAttribute('target')).toBe(null)
   })
+  it('shows a bullet heading in bold before its text', () => {
+    render(<InfoCard card={{ ...card, bullets: [{ label: 'Programming', text: 'Python, Java' }] }} onClose={() => {}} />)
+    const heading = screen.getByText('Programming:')
+    expect(heading.tagName).toBe('STRONG')
+    expect(heading.closest('li').textContent).toBe('Programming: Python, Java')
+  })
 })
