@@ -58,8 +58,8 @@ describe('App', () => {
   it('announces bubbles and cards in a live region', () => {
     window.localStorage.setItem('rg.introSeen', 'true')
     render(<App />)
-    act(() => handlers.bubble({ text: 'Press Enter to step into Projects!' }))
-    expect(screen.getByRole('status').textContent).toContain('Press Enter to step into Projects!')
+    act(() => handlers.bubble({ text: 'Press Enter to step into the Projects page!' }))
+    expect(screen.getByRole('status').textContent).toContain('Press Enter to step into the Projects page!')
   })
   it('records that the intro was seen', () => {
     render(<App />)
