@@ -174,4 +174,11 @@ describe('rooms', () => {
     const skills = rooms.about.frames.find((f) => f.id === 'about-skills').card
     expect(skills.bullets).toEqual(data.skills.map((g) => ({ label: g.group, text: g.items.join(', ') })))
   })
+  it('the Interests card splits academic and non-academic interests under bold headings', () => {
+    const interests = rooms.about.frames.find((f) => f.id === 'about-interests').card
+    expect(interests.bullets).toEqual([
+      { label: 'Academic & Research', text: data.interests.academic.join(', ') },
+      { label: 'Beyond the Classroom', text: data.interests.personal.join(', ') },
+    ])
+  })
 })

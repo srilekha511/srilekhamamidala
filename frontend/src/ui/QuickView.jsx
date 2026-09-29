@@ -47,7 +47,8 @@ export default function QuickView({ data, onClose }) {
         <section>
           <h2>About</h2>
           <p>{profile.bio}</p>
-          <p><strong>Interests:</strong> {interests.join(' · ')}</p>
+          <p><strong>Academic & Research interests:</strong> {interests.academic.join(' · ')}</p>
+          <p><strong>Beyond the Classroom:</strong> {interests.personal.join(' · ')}</p>
           <ul>{skills.map((g) => <li key={g.group}><strong>{g.group}:</strong> {g.items.join(', ')}</li>)}</ul>
         </section>
 

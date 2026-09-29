@@ -33,12 +33,15 @@ export const skills = [
   { group: "Tools & Platforms", items: ["Bloomberg Terminal", "PowerPoint", "Word", "Excel", "Tableau", "Power BI", "Databricks", "AWS"] },
 ];
 
-export const interests = [
-  "AI & machine learning",
-  "NLP & LLM evaluation research",
-  "Venture capital & startups",
-  "Quantitative finance & economics",
-];
+export const interests = {
+  academic: [
+    "AI & machine learning",
+    "NLP & LLM evaluation research",
+    "Venture capital & startups",
+    "Quantitative finance & economics",
+  ],
+  personal: ["Classical Dance", "Traveling/Backpacking", "Cooking", "Philadelphia Eagles", "Painting", "Singing"],
+};
 
 // room: 'research' puts a role in the Research room; 'experience' keeps it with jobs.
 export const experience = [

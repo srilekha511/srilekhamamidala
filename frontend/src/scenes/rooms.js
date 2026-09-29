@@ -117,7 +117,13 @@ export function aboutItems({ profile, education, skills, interests }) {
       id: 'about-interests',
       plaque: 'Interests',
       thumb: { type: 'art', art: 'interests' },
-      card: card({ title: 'Interests', bullets: interests }),
+      card: card({
+        title: 'Interests',
+        bullets: [
+          { label: 'Academic & Research', text: interests.academic.join(', ') },
+          { label: 'Beyond the Classroom', text: interests.personal.join(', ') },
+        ],
+      }),
     },
   ]
 }

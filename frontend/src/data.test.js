@@ -31,7 +31,8 @@ describe('content', () => {
     expect(data.education.school).toMatch(/Massachusetts Institute of Technology/)
     expect(data.education.coursework.length).toBeGreaterThan(0)
     expect(data.skills.every((g) => g.group && g.items.length)).toBe(true)
-    expect(data.interests.length).toBeGreaterThan(0)
+    expect(data.interests.academic.length).toBeGreaterThan(0)
+    expect(data.interests.personal).toEqual(['Classical Dance', 'Traveling/Backpacking', 'Cooking', 'Philadelphia Eagles', 'Painting', 'Singing'])
     expect(exists(data.profile.headshot)).toBe(true)
   })
   it('files every project and role into a room', () => {
