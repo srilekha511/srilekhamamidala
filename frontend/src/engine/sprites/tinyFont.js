@@ -1,4 +1,4 @@
-// 3×5 pixel font for plaques (M and W are 5 wide so they don't read as H): crisp at any scale, no web fonts.
+// 3×5 pixel font for plaques (M, W and @ are 5 wide so they stay legible): crisp at any scale, no web fonts.
 export const GLYPHS = {
   A: ['.x.', 'x.x', 'xxx', 'x.x', 'x.x'], B: ['xx.', 'x.x', 'xx.', 'x.x', 'xx.'], C: ['.xx', 'x..', 'x..', 'x..', '.xx'],
   D: ['xx.', 'x.x', 'x.x', 'x.x', 'xx.'], E: ['xxx', 'x..', 'xx.', 'x..', 'xxx'], F: ['xxx', 'x..', 'xx.', 'x..', 'x..'],
@@ -15,6 +15,7 @@ export const GLYPHS = {
   9: ['xxx', 'x.x', 'xxx', '..x', 'xx.'],
   ' ': ['...', '...', '...', '...', '...'], '&': ['.x.', 'x.x', '.x.', 'x.x', '.xx'], '-': ['...', '...', 'xxx', '...', '...'],
   '.': ['...', '...', '...', '...', '.x.'], "'": ['.x.', '.x.', '...', '...', '...'], '?': ['xx.', '..x', '.x.', '...', '.x.'],
+  '@': ['.xxx.', 'x...x', 'x.xxx', 'x....', '.xxx.'],
 }
 
 const GAP = 1
@@ -39,17 +40,42 @@ export function drawTinyText(ctx, text, x, y, color) {
 }
 
 const PAD_X = 3
-export const plaqueWidth = (text) => textWidth(text) + PAD_X * 2 + 2
+const LINE_H = 7
+const MAX_LINE = 20
 
-// Brass museum plaque centred on cx.
+// "Topic @ Lab" puts the lab on its own line; any line over 20 characters wraps at a space.
+export function plaqueLines(text) {
+  const at = text.indexOf(' @ ')
+  const parts = at < 0 ? [text] : [text.slice(0, at), text.slice(at + 1)]
+  const lines = []
+  for (const part of parts) {
+    let line = ''
+    for (const word of part.split(' ')) {
+      if (line && (line + ' ' + word).length > MAX_LINE) {
+        lines.push(line)
+        line = word
+      } else {
+        line = line ? `${line} ${word}` : word
+      }
+    }
+    lines.push(line)
+  }
+  return lines
+}
+
+export const plaqueWidth = (text) => Math.max(...plaqueLines(text).map(textWidth)) + PAD_X * 2 + 2
+
+// Brass museum plaque centred on cx, one row per line.
 export function drawPlaque(ctx, cx, y, text) {
+  const lines = plaqueLines(text)
   const w = plaqueWidth(text)
+  const h = lines.length * LINE_H + 4
   const x = Math.round(cx - w / 2)
   ctx.fillStyle = '#8a6420'
-  ctx.fillRect(x, y, w, 11)
+  ctx.fillRect(x, y, w, h)
   ctx.fillStyle = '#d4a93a'
-  ctx.fillRect(x + 1, y + 1, w - 2, 9)
+  ctx.fillRect(x + 1, y + 1, w - 2, h - 2)
   ctx.fillStyle = '#f2d27a'
   ctx.fillRect(x + 1, y + 1, w - 2, 1)
-  drawTinyText(ctx, text, x + 1 + PAD_X, y + 3, '#3a2a10')
+  lines.forEach((line, i) => drawTinyText(ctx, line, Math.round(cx - textWidth(line) / 2), y + 3 + i * LINE_H, '#3a2a10'))
 }

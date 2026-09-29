@@ -44,4 +44,16 @@ describe('content', () => {
     expect(all).not.toMatch(/GPA/i)
     expect(all).not.toMatch(/4\.7/)
   })
+  it('research cards are trimmed and bold their key words', () => {
+    for (const e of data.experience.filter((x) => x.room === 'research')) for (const b of e.bullets) expect(b, e.company).toContain('**')
+    for (const p of data.projects.filter((x) => x.room === 'research')) expect(p.description, p.title).toContain('**')
+  })
+  it('the formality paper lives on the CSAIL role, and projects are titled by topic', () => {
+    expect(data.projects.some((p) => /Subjective Qualities/.test(p.title))).toBe(false)
+    expect(data.experience.find((e) => e.id === 'csail').paper).toBe('An Empirical Evaluation of LLMs for the Assessment of Subjective Qualities')
+    const titles = data.projects.map((p) => p.title)
+    expect(titles).toContain('LLMs for Legal Code')
+    expect(titles).toContain('Drug Repurposing for Epilepsy')
+    expect(titles.join(' ')).not.toMatch(/^WhartonMunicode|NeuroCADR:/)
+  })
 })

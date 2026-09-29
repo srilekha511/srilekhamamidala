@@ -82,7 +82,10 @@ export function experienceItems(experience) {
       title: e.company,
       subtitle: e.role,
       meta: [e.location, e.dates].filter(Boolean).join(' · '),
+      body: e.paper ? [`**Paper:** ${e.paper}`] : [],
       bullets: e.bullets,
+      tags: e.tags ?? [],
+      image: e.image ?? null,
     }),
   }))
 }

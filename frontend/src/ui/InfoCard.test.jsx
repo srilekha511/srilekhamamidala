@@ -30,4 +30,8 @@ describe('InfoCard', () => {
     expect(heading.tagName).toBe('STRONG')
     expect(heading.closest('li').textContent).toBe('Programming: Python, Java')
   })
+  it('renders **bold** key words in body text and bullets', () => {
+    const { container } = render(<InfoCard card={{ ...card, body: ['Won **PennApps**.'], bullets: ['Built **RCT** infra'] }} onClose={() => {}} />)
+    expect([...container.querySelectorAll('strong')].map((s) => s.textContent)).toEqual(['PennApps', 'RCT'])
+  })
 })

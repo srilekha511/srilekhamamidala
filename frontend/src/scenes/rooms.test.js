@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import * as data from '../data.js'
 import { buildRooms, SECTIONS, THEMES } from './rooms.js'
-import { plaqueWidth, textWidth } from '../engine/sprites/tinyFont.js'
+import { plaqueWidth, plaqueLines, textWidth } from '../engine/sprites/tinyFont.js'
 
 const rooms = buildRooms(data)
 const sectionIds = SECTIONS.map((s) => s.id)
@@ -129,13 +129,21 @@ describe('rooms', () => {
     })
   })
   it('splits work into Research (roles then papers), Experience (jobs) and Projects (builds)', () => {
-    expect(researchRoles.map((e) => e.plaque)).toEqual(['MIT Media Lab', 'MIT Economics', 'MIT CSAIL'])
-    expect(researchProjects.map((p) => p.plaque)).toEqual(['LLM Formality Study', 'Election Law Graphs', 'WhartonMunicode', 'Dementia Risk ML', 'NeuroCADR'])
+    expect(researchRoles.map((e) => e.plaque)).toEqual([
+      'LLM Memory Inference @ MIT Media Lab', 'Teen Phone Use RCT @ MIT Economics', 'LLM Formality Eval @ MIT CSAIL',
+    ])
+    expect(researchProjects.map((p) => p.plaque)).toEqual([
+      'Election Law Graphs @ MIT Election Lab', 'LLMs for Legal Code @ University of Pennsylvania',
+      'Dementia Risk via ML', 'Drug Repurposing @ Drexel University',
+    ])
     expect(rooms.research.frames.map((f) => f.plaque)).toEqual([...researchRoles, ...researchProjects].map((x) => x.plaque))
     expect(rooms.experience.frames.map((f) => f.plaque)).toEqual(jobs.map((e) => e.plaque))
     expect(rooms.projects.frames.map((f) => f.plaque)).toEqual(builds.map((p) => p.plaque))
-    const csail = rooms.research.frames.findIndex((f) => f.plaque === 'MIT CSAIL')
-    expect(rooms.research.frames[csail + 1].plaque).toBe('LLM Formality Study') // role next to its paper
+    const csail = rooms.research.frames.find((f) => f.id === 'exp-csail')
+    expect(csail.thumb.art).toBe('formality') // role and its formality paper are one frame
+    expect(csail.card.body.join(' ')).toContain('An Empirical Evaluation of LLMs for the Assessment of Subjective Qualities')
+    expect(csail.card.tags).toEqual(['NLP', 'ML', 'Human-Computer Interaction (HCI)'])
+    expect(csail.card.image).toBe('/project3img1.png')
   })
   it('every section frame has a short plaque title, and neighbouring plaques never touch', () => {
     const expected = {
@@ -149,7 +157,7 @@ describe('rooms', () => {
       const frames = rooms[id].frames
       expect(frames.map((f) => f.plaque)).toEqual(expected[id])
       frames.forEach((f, i) => {
-        expect(f.plaque.length, f.plaque).toBeLessThanOrEqual(20)
+        for (const line of plaqueLines(f.plaque)) expect(line.length, line).toBeLessThanOrEqual(20)
         if (i === 0) return
         const prev = frames[i - 1]
         const gap = (f.x + f.w / 2) - (prev.x + prev.w / 2)

@@ -172,15 +172,6 @@ const SCENES = {
     px(ICONS.heart, { x: '#e05a7a' }, 24, 2)
     r(22, 22, 3, 7, '#2d6a4f'); r(26, 24, 3, 5, '#2d6a4f'); r(30, 19, 3, 10, '#2d6a4f'); r(34, 25, 3, 4, '#2d6a4f'); r(21, 29, 18, 1, '#1e3a2e')
   },
-  // MIT CSAIL DIG: rating stars for LLM quality, with a robot
-  ratingRobot(r, px) {
-    r(0, 0, 42, 32, '#e0f0ea')
-    drawPixelArtScaled(px, ROBOT, { x: '#5b6475' }, 2, 8, 2)
-    r(6, 12, 2, 2, '#6fb3d9'); r(12, 12, 2, 2, '#6fb3d9')
-    px(ICONS.star, { x: '#f2a93b' }, 21, 3); px(ICONS.star, { x: '#f2a93b' }, 31, 3)
-    px(ICONS.star, { x: '#f2a93b' }, 21, 13); px(ICONS.star, { x: '#f2a93b' }, 31, 13)
-    px(ICONS.star, { x: '#c9c9d6' }, 26, 23)
-  },
   // 525 VC: voice-agent deal memos with a SWOT grid
   voiceMemo(r) {
     r(0, 0, 42, 32, '#f7e2cf')
