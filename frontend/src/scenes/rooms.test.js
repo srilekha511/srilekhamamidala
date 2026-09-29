@@ -178,7 +178,7 @@ describe('rooms', () => {
     const interests = rooms.about.frames.find((f) => f.id === 'about-interests').card
     expect(interests.bullets).toEqual([
       { label: 'Academic & Research', text: data.interests.academic.join(', ') },
-      { label: 'Beyond the Classroom', text: data.interests.personal.join(', ') },
+      { label: 'For Fun', text: data.interests.personal.join(', ') },
     ])
   })
 })

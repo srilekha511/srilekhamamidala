@@ -39,7 +39,7 @@ describe('QuickView', () => {
     render(<QuickView data={data} onClose={() => {}} />)
     const about = screen.getByRole('heading', { name: 'About' }).closest('section').textContent
     expect(about).toContain('Academic & Research')
-    expect(about).toContain('Beyond the Classroom')
+    expect(about).toContain('For Fun')
     expect(about).toContain('Philadelphia Eagles')
   })
 })

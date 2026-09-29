@@ -121,7 +121,7 @@ export function aboutItems({ profile, education, skills, interests }) {
         title: 'Interests',
         bullets: [
           { label: 'Academic & Research', text: interests.academic.join(', ') },
-          { label: 'Beyond the Classroom', text: interests.personal.join(', ') },
+          { label: 'For Fun', text: interests.personal.join(', ') },
         ],
       }),
     },
