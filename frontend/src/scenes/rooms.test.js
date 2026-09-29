@@ -133,7 +133,7 @@ describe('rooms', () => {
       'LLM Memory Inference @ MIT Media Lab', 'Behavioral Econ RCT @ MIT Economics', 'LLM Evaluation @ MIT CSAIL',
     ])
     expect(researchProjects.map((p) => p.plaque)).toEqual([
-      'Knowledge Graph QA', 'Election Law Graphs @ MIT Election Lab', 'LLMs for Legal Code @ University of Pennsylvania',
+      'Knowledge Graph QA @ MIT CSAIL, Decentralized Information Group', 'Election Law Graphs @ MIT Election Lab', 'LLMs for Legal Code @ University of Pennsylvania',
       'Dementia Risk via ML', 'ML + Drug Repurposing @ Drexel University',
     ])
     expect(rooms.research.frames.map((f) => f.plaque)).toEqual([...researchRoles, ...researchProjects].map((x) => x.plaque))
@@ -201,5 +201,9 @@ describe('rooms', () => {
     expect(trace.thumb.art).toBe('trace')
     expect(trace.card.links).toEqual([{ href: 'https://purl.org/trace', label: 'View TRACE' }])
     expect(trace.card.body.join(' ')).toMatch(/34\.5% → 71\.4%/)
+  })
+  it('TRACE credits the Decentralized Information Group on its plaque', () => {
+    const trace = rooms.research.frames.find((f) => f.thumb.art === 'trace')
+    expect(plaqueLines(trace.plaque)).toEqual(['Knowledge Graph QA', 'MIT CSAIL,', 'Decentralized', 'Information Group'])
   })
 })

@@ -11,7 +11,7 @@ describe('tiny plaque font', () => {
     }
   })
   it('covers letters, digits and plaque punctuation', () => {
-    for (const ch of "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 &-.'?+") expect(GLYPHS, ch).toHaveProperty(ch)
+    for (const ch of "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 &-.,'?+") expect(GLYPHS, ch).toHaveProperty(ch)
   })
   it('measures 4px per character minus the trailing gap', () => {
     expect(textWidth('ABC')).toBe(11)

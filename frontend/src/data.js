@@ -169,7 +169,7 @@ export const projects = [
   {
     id: 13,
     room: "research",
-    plaque: "Knowledge Graph QA",
+    plaque: "Knowledge Graph QA @ MIT CSAIL, Decentralized Information Group",
     art: "trace",
     title: "TRACE: An Interactive Visual Paradigm for Knowledge Graph Question-Answering",
     category: "NLP + HCI Research",
