@@ -87,7 +87,7 @@ export const experience = [
     ],
   },
   {
-    id: "csail", room: "research", plaque: "LLM Formality Eval @ MIT CSAIL", art: "formality", company: "MIT CSAIL, Decentralized Information Group", role: "Research Intern",
+    id: "csail", room: "research", plaque: "LLM Evaluation @ MIT CSAIL", art: "formality", company: "MIT CSAIL, Decentralized Information Group", role: "Research Intern",
     location: "Cambridge, MA", dates: "August 2024 – Present",
     paper: "An Empirical Evaluation of LLMs for the Assessment of Subjective Qualities",
     tags: ["NLP", "ML", "Human-Computer Interaction (HCI)"],

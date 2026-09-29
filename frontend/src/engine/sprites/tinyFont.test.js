@@ -37,7 +37,7 @@ describe('tiny plaque font', () => {
   })
   it('puts the lab on its own line and wraps long lines at word breaks', () => {
     expect(plaqueLines('Skills')).toEqual(['Skills'])
-    expect(plaqueLines('LLM Formality Eval @ MIT CSAIL')).toEqual(['LLM Formality Eval', 'MIT CSAIL'])
+    expect(plaqueLines('LLM Evaluation @ MIT CSAIL')).toEqual(['LLM Evaluation', 'MIT CSAIL'])
     expect(plaqueLines('LLMs for Legal Code @ University of Pennsylvania')).toEqual(['LLMs for Legal Code', 'University of', 'Pennsylvania'])
   })
   it('multi-line plaques are as wide as their widest line and draw every line', () => {
