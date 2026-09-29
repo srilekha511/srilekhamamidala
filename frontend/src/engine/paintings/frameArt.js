@@ -25,6 +25,16 @@ const LINKEDIN = [
   '.xxxxxxxxxxxx.', 'xxxxxxxxxxxxxx', 'xxooxxxxxxxxxx', 'xxooxxxxxxxxxx', 'xxxxxxxxxxxxxx', 'xxooxoooooxxxx', 'xxooxooxxooxxx',
   'xxooxooxxooxxx', 'xxooxooxxooxxx', 'xxooxooxxooxxx', 'xxooxooxxooxxx', 'xxxxxxxxxxxxxx', 'xxxxxxxxxxxxxx', '.xxxxxxxxxxxx.',
 ]
+// 8×8 icons for the For Fun interests, in the order they appear in data.js.
+export const HOBBY_ICONS = {
+  dance: { rows: ['...xx...', 'x..xx..x', '.xxxxxx.', '...xx...', '..xxxx..', '.xxxxxx.', 'xxxxxxxx', '..x..x..'], palette: { x: '#8a1f2b' } },
+  travel: { rows: ['..xxxx..', '..x..x..', '.xxxxxx.', 'xxxxxxxx', 'xppppppx', 'xpxxxxpx', 'xppppppx', '.xxxxxx.'], palette: { x: '#2d6a4f', p: '#6fb38a' } },
+  cooking: { rows: ['.s..s...', '..s..s..', '.s..s...', 'xxxxxxxx', '.xxxxxx.', '.xxxxxx.', '.xxxxxx.', '..xxxx..'], palette: { x: '#34466b', s: '#9aa7b8' } },
+  eagles: { rows: ['........', '..xxxx..', '.xxwxwx.', 'xxwwwwxx', '.xxwxwx.', '..xxxx..', '........', '........'], palette: { x: '#004c54', w: '#ffffff' } },
+  painting: { rows: ['..xxxx..', '.xrxxbx.', 'xxxxxxyx', 'xgxx..xx', 'xxxx..x.', 'xxxxxx..', '.xxxxx..', '..xxx...'], palette: { x: '#c9a36a', r: '#e05a3a', b: '#1f6fb3', y: '#f2c94c', g: '#2e7d32' } },
+  singing: { rows: ['...xxxxx', '...x...x', '...x...x', '...x...x', '.xxx.xxx', 'xxxx.xxx', '.xx...x.', '........'], palette: { x: '#6a3f8a' } },
+}
+
 const BOLT = ['....xxxx', '...xxxx.', '..xxxx..', '.xxxx...', 'xxxxxxxx', '...xxxx.', '..xxxx..', '.xxxx...', 'xxx.....', 'xx......']
 
 const SCENES = {
@@ -217,12 +227,13 @@ const SCENES = {
       if (i === glint) r(sx + 9, sy + 2, 1, 1, '#ffffff')
     })
   },
+  // For Fun: a heart ringed by the non-academic interests
   interests(r, px, t) {
-    r(0, 0, 42, 32, '#1f2a4a')
-    for (const [sx, sy] of [[12, 2], [30, 30], [2, 16], [40, 17], [20, 30], [21, 1]]) if (Math.floor(t * 3 + sx) % 2) r(sx, sy, 1, 1, '#ffffff')
+    r(0, 0, 42, 32, '#fde7d6')
     drawPixelArtScaled(px, ICONS.heart, { x: '#e05a7a' }, 13, 8, 2)
-    px(ROBOT, { x: '#9aa7b8' }, 3, 3); px(BUBBLE, { x: '#fbf3e0' }, 31, 3)
-    px(ROCKET, { x: '#f2a93b' }, 3, 22); px(CHART, { x: '#9ee6c1' }, 31, 22)
+    if (Math.floor(t * 2) % 2) { r(12, 6, 1, 1, '#ffffff'); r(29, 24, 1, 1, '#ffffff') } else { r(29, 7, 1, 1, '#ffffff'); r(12, 24, 1, 1, '#ffffff') }
+    const slots = [[2, 2], [32, 2], [2, 12], [32, 12], [2, 22], [32, 22]]
+    Object.values(HOBBY_ICONS).forEach(({ rows, palette }, i) => px(rows, palette, ...slots[i]))
   },
 
   // ---- Contact ----

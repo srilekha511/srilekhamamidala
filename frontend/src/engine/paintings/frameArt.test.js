@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { stubCtx } from '../../test/stubCtx.js'
 import * as data from '../../data.js'
-import { FRAME_ART, drawFrameArt } from './frameArt.js'
+import { FRAME_ART, drawFrameArt, HOBBY_ICONS } from './frameArt.js'
 
 const X = 100, Y = 53, W = 42, H = 32 // item frame inner area
 
@@ -32,5 +32,12 @@ describe('frame art', () => {
     const arts = [...data.projects, ...data.experience].map((p) => p.art)
     for (const a of arts) expect(FRAME_ART, String(a)).toHaveProperty(a)
     expect(new Set(arts).size).toBe(arts.length)
+  })
+  it('the Interests painting shows one 8x8 icon per For Fun hobby', () => {
+    expect(Object.keys(HOBBY_ICONS)).toEqual(['dance', 'travel', 'cooking', 'eagles', 'painting', 'singing'])
+    for (const [name, { rows }] of Object.entries(HOBBY_ICONS)) {
+      expect(rows, name).toHaveLength(8)
+      for (const r of rows) expect(r.length, name).toBe(8)
+    }
   })
 })
