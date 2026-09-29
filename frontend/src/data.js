@@ -254,7 +254,7 @@ export const projects = [
   {
     id: 8,
     room: "projects",
-    plaque: "Food Expiry Predictor",
+    plaque: "ML-Based Food Expiry Predictor",
     art: "foodShelfLife",
     title: "ML-Based Food Shelf Life Tracking",
     category: "ML, CV Research",

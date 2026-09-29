@@ -71,7 +71,7 @@ describe('content', () => {
   it('titles the projects room plaques as short overviews', () => {
     expect(data.projects.filter((p) => p.room === 'projects').map((p) => p.plaque)).toEqual([
       'HackMIT Hardware Hub', 'AI Stock-Move Analyst', 'AI Deal Memo Generator',
-      'AI Insurance Chatbot', 'ML for Skin Diagnosis', 'Food Expiry Predictor', 'AI Ad Campaign Manager',
+      'AI Insurance Chatbot', 'ML for Skin Diagnosis', 'ML-Based Food Expiry Predictor', 'AI Ad Campaign Manager',
     ])
   })
 })
