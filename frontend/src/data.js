@@ -119,7 +119,7 @@ export const projects = [
   {
     id: 10,
     room: "projects",
-    plaque: "Hackathon Hardware Hub",
+    plaque: "HackMIT Hardware Hub",
     art: "hardwareHub",
     title: "HackMIT Hardware Hub",
     category: "Full Stack · HackMIT Organizing Team",

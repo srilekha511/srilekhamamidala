@@ -70,7 +70,7 @@ describe('content', () => {
   })
   it('titles the projects room plaques as short overviews', () => {
     expect(data.projects.filter((p) => p.room === 'projects').map((p) => p.plaque)).toEqual([
-      'Hackathon Hardware Hub', 'AI Stock-Move Analyst', 'AI Deal Memo Generator',
+      'HackMIT Hardware Hub', 'AI Stock-Move Analyst', 'AI Deal Memo Generator',
       'AI Insurance Chatbot', 'AI Skin Diagnosis', 'Food Expiry Predictor', 'AI Ad Campaign Manager',
     ])
   })
