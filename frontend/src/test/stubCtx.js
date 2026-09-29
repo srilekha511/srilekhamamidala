@@ -11,6 +11,7 @@ export function stubCtx() {
       return (...args) => { calls.push([key, ...args]) }
     },
     set(t, key, value) {
+      if (key === 'fillStyle') calls.push(['fillStyle', value])
       t[key] = value
       return true
     },

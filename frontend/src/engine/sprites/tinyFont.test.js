@@ -3,15 +3,15 @@ import { stubCtx } from '../../test/stubCtx.js'
 import { GLYPHS, textWidth, drawTinyText, plaqueWidth, plaqueLines, drawPlaque } from './tinyFont.js'
 
 describe('tiny plaque font', () => {
-  it('every glyph is 5 tall and 3 wide, except the wide M, W and @', () => {
+  it('every glyph is 5 tall and 3 wide, except the wide M and W', () => {
     for (const [ch, rows] of Object.entries(GLYPHS)) {
       expect(rows, ch).toHaveLength(5)
-      const w = 'MW@'.includes(ch) ? 5 : 3
+      const w = 'MW'.includes(ch) ? 5 : 3
       for (const r of rows) expect(r.length, ch).toBe(w)
     }
   })
   it('covers letters, digits and plaque punctuation', () => {
-    for (const ch of "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 &-.'?@") expect(GLYPHS, ch).toHaveProperty(ch)
+    for (const ch of "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 &-.'?+") expect(GLYPHS, ch).toHaveProperty(ch)
   })
   it('measures 4px per character minus the trailing gap', () => {
     expect(textWidth('ABC')).toBe(11)
@@ -37,15 +37,21 @@ describe('tiny plaque font', () => {
   })
   it('puts the lab on its own line and wraps long lines at word breaks', () => {
     expect(plaqueLines('Skills')).toEqual(['Skills'])
-    expect(plaqueLines('LLM Formality Eval @ MIT CSAIL')).toEqual(['LLM Formality Eval', '@ MIT CSAIL'])
-    expect(plaqueLines('LLMs for Legal Code @ University of Pennsylvania')).toEqual(['LLMs for Legal Code', '@ University of', 'Pennsylvania'])
+    expect(plaqueLines('LLM Formality Eval @ MIT CSAIL')).toEqual(['LLM Formality Eval', 'MIT CSAIL'])
+    expect(plaqueLines('LLMs for Legal Code @ University of Pennsylvania')).toEqual(['LLMs for Legal Code', 'University of', 'Pennsylvania'])
   })
   it('multi-line plaques are as wide as their widest line and draw every line', () => {
-    const text = 'Drug Repurposing @ Drexel University'
-    expect(plaqueWidth(text)).toBe(plaqueWidth('@ Drexel University'))
+    const text = 'ML + Drug Repurposing @ Drexel University'
+    expect(plaqueWidth(text)).toBe(plaqueWidth('Drexel University'))
     const ctx = stubCtx()
     drawPlaque(ctx, 100, 50, text)
     const ys = new Set(ctx.calls.filter((c) => c[0] === 'fillRect' && c[3] === 1 && c[4] === 1).map((c) => c[2]))
     expect(Math.max(...ys) - Math.min(...ys)).toBeGreaterThanOrEqual(7 + 4) // two lines of glyphs
+  })
+  it('shows the lab in maroon instead of an @', () => {
+    const ctx = stubCtx()
+    drawPlaque(ctx, 100, 50, 'Topic @ Lab')
+    const styles = ctx.calls.filter((c) => c[0] === 'fillStyle').map((c) => c[1])
+    expect(styles.slice(-2)).toEqual(['#3a2a10', '#8a1f2b']) // topic ink, then lab maroon
   })
 })

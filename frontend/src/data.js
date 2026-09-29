@@ -79,7 +79,7 @@ export const experience = [
     ],
   },
   {
-    id: "mitecon", room: "research", plaque: "Teen Phone Use RCT @ MIT Economics", art: "phoneWellbeing", company: "MIT Department of Economics", role: "Research Intern",
+    id: "mitecon", room: "research", plaque: "Behavioral Economics RCT @ MIT Economics", art: "phoneWellbeing", company: "MIT Department of Economics", role: "Research Intern",
     location: "Cambridge, MA", dates: "June 2026 – Present",
     bullets: [
       "Built and evaluated infrastructure for a **large-scale RCT** on **smartphone use and adolescent well-being**",
@@ -117,9 +117,44 @@ export const experience = [
 // room: 'research' puts a project in the Research room; 'projects' keeps it with the builds.
 export const projects = [
   {
+    id: 10,
+    room: "projects",
+    plaque: "Hackathon Hardware Hub",
+    art: "hardwareHub",
+    title: "HackMIT Hardware Hub",
+    category: "Full Stack · HackMIT Organizing Team",
+    description: "Built with the **HackMIT organizing team (TechX)**: the hardware desk's web app, used by **700+ hackers** to browse and check out **200+ types of hardware**, with **badge QR-code checkout**, a **3D-print queue** with print-time estimates, and **\"order ready\" push notifications**.",
+    whatILearned: "Shipping a **production app for a live event** as a team: a **React + TypeScript** frontend, **Flask + PostgreSQL** backend, and **Docker** deploys.",
+    technologies: ["React", "TypeScript", "Flask", "PostgreSQL", "Docker"],
+    link: "https://hardware.hackmit.org/",
+    linkText: "Visit Hardware Hub",
+  },
+  {
+    id: 11,
+    room: "projects",
+    plaque: "AI Stock-Move Analyst",
+    art: "prism",
+    title: "PRISM",
+    category: "AI, Quant Finance · Bridgewater AI Hackathon",
+    description: "Built at the **Bridgewater Associates AI Immersion Hackathon** (one of **~20 students** selected) with a team of four. When a stock makes a **sharp move**, PRISM uses **Claude** to explain why from cited **news, SEC filings, and earnings calls**, then judges whether the move is **structural (lean in)** or **transient (fade it)**.",
+    whatILearned: "Building an **evidence-grounded LLM pipeline** over financial data, checked with **ablations and backtests**.",
+    technologies: ["Python", "FastAPI", "Claude API", "SEC EDGAR", "pandas"],
+  },
+  {
+    id: 12,
+    room: "projects",
+    plaque: "AI Deal Memo Generator",
+    art: "dealMemo",
+    title: "Investment Memo Generator",
+    category: "AI, Venture Capital · 525 VC",
+    description: "Built at **525 Venture Capital**: a web app that turns a **founder call**, **pitch deck**, and **financials** into a **first-draft investment memo**, with company research, a **SWOT analysis**, and a \"what do you have to believe\" section.",
+    whatILearned: "Wiring **LLM research, transcription, and document parsing** into one workflow, deployed on **Google Cloud Run**.",
+    technologies: ["Python", "Flask", "Gemini API", "Google Cloud Run", "Docker"],
+  },
+  {
     id: 2,
     room: "projects",
-    plaque: "Insurance Chatbot",
+    plaque: "AI Insurance Chatbot",
     art: "chatbot",
     title: "AI-Powered Insurance Chatbot",
     category: "NLP, Full Stack",
@@ -141,7 +176,6 @@ export const projects = [
     description: "At the **MIT Election Data Science Lab**, built a pipeline turning **unstructured election legislation** into **knowledge graphs**, and classified bills to study how **lawmakers and interest groups** shape election policy.",
     whatILearned: "Turning messy political text into **structured, analyzable data** with **Python and R** to answer real policy questions.",
     technologies: ["Data Processing", "Web Scraping", "Python", "R"],
-    link: "https://github.com/jloffredo2/state-elect-leg-scrapers",
     image: "/project4img1.png",
     images: [
       "/project4img1.png"
@@ -150,7 +184,7 @@ export const projects = [
   {
     id: 5,
     room: "projects",
-    plaque: "dermalab",
+    plaque: "AI Skin Diagnosis",
     art: "dermalab",
     title: "dermalab: AI and LLM-Powered Skin Disease Diagnosis",
     category: "ML/CV/NLP Hackathon Project",
@@ -176,8 +210,6 @@ export const projects = [
     description: "WhartonMunicode: trained a **nanoGPT-based language model** on **thousands of municipal codes** to explore how LLMs can support **legal research** in public law.",
     whatILearned: "The **foundations of LLMs**, and how to adapt and train them on **domain-specific legal text**.",
     technologies: ["Hugging Face Transformers", "PyTorch", "Web Scraping", "NLP"],
-    link: "https://github.com/srilekha511/WhartonMunicode",
-    linkText: "View on GitHub",
     image: "/project9img1.png",
     images: [
       "/project9img1.png",
@@ -204,9 +236,9 @@ export const projects = [
   {
     id: 7,
     room: "research",
-    plaque: "Drug Repurposing @ Drexel University",
+    plaque: "ML + Drug Repurposing @ Drexel University",
     art: "drugRepurposing",
-    title: "Drug Repurposing for Epilepsy",
+    title: "ML + Drug Repurposing for Epilepsy",
     category: "Computational Biology Research",
     description: "NeuroCADR: built a **computational drug-repurposing pipeline** to find and rank **anti-epileptic drug candidates**. **1st place, Math & CS** at the **National Junior Science and Humanities Symposium**.",
     whatILearned: "Combining and preprocessing **biological data** so **ML algorithms** can use it well.",
@@ -222,7 +254,7 @@ export const projects = [
   {
     id: 8,
     room: "projects",
-    plaque: "Food Shelf Life",
+    plaque: "Food Expiry Predictor",
     art: "foodShelfLife",
     title: "ML-Based Food Shelf Life Tracking",
     category: "ML, CV Research",
@@ -241,7 +273,7 @@ export const projects = [
   {
     id: 1,
     room: "projects",
-    plaque: "Campaign AI",
+    plaque: "AI Ad Campaign Manager",
     art: "campaign",
     title: "AI-Powered Performance Campaign Manager",
     category: "AI, Web Dev",

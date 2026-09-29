@@ -11,9 +11,9 @@ describe('content', () => {
     expect(data.projects.length).toBeGreaterThan(0)
     for (const p of data.projects) {
       expect(p.id).toBeDefined()
-      for (const f of ['title', 'category', 'description', 'image']) expect(typeof p[f]).toBe('string')
+      for (const f of ['title', 'category', 'description']) expect(typeof p[f]).toBe('string')
       expect(Array.isArray(p.technologies)).toBe(true)
-      expect(exists(p.image), p.image).toBe(true)
+      if (p.image) expect(exists(p.image), p.image).toBe(true)
     }
   })
   it('has 8 experience entries with required fields and unique ids', () => {
@@ -53,7 +53,25 @@ describe('content', () => {
     expect(data.experience.find((e) => e.id === 'csail').paper).toBe('An Empirical Evaluation of LLMs for the Assessment of Subjective Qualities')
     const titles = data.projects.map((p) => p.title)
     expect(titles).toContain('LLMs for Legal Code')
-    expect(titles).toContain('Drug Repurposing for Epilepsy')
+    expect(titles).toContain('ML + Drug Repurposing for Epilepsy')
     expect(titles.join(' ')).not.toMatch(/^WhartonMunicode|NeuroCADR:/)
+  })
+  it('links no code repositories', () => {
+    for (const p of data.projects) expect(p.link ?? '', p.title).not.toMatch(/github\.com|gitlab\.com/)
+  })
+  it('opens the Projects room with the three new projects', () => {
+    const builds = data.projects.filter((p) => p.room === 'projects')
+    expect(builds.slice(0, 3).map((p) => p.title)).toEqual(['HackMIT Hardware Hub', 'PRISM', 'Investment Memo Generator'])
+    const hub = builds[0]
+    expect(hub.link).toBe('https://hardware.hackmit.org/')
+    expect(hub.description).toMatch(/700\+ hackers/)
+    expect(hub.description).toMatch(/200\+ types of hardware/)
+    expect(builds[1].description).toMatch(/~20 students/)
+  })
+  it('titles the projects room plaques as short overviews', () => {
+    expect(data.projects.filter((p) => p.room === 'projects').map((p) => p.plaque)).toEqual([
+      'Hackathon Hardware Hub', 'AI Stock-Move Analyst', 'AI Deal Memo Generator',
+      'AI Insurance Chatbot', 'AI Skin Diagnosis', 'Food Expiry Predictor', 'AI Ad Campaign Manager',
+    ])
   })
 })

@@ -125,6 +125,39 @@ const SCENES = {
     r(22, 20, 4, 9, '#2d6a4f'); r(27, 16, 4, 13, '#2d6a4f'); r(32, 11, 4, 18, '#2d6a4f'); r(37, 6, 4, 23, '#2d6a4f')
     r(21, 29, 21, 1, '#1e3a2e')
   },
+  // HackMIT Hardware Hub: a microcontroller board, a 3D printer, and a badge QR code
+  hardwareHub(r, px, t) {
+    r(0, 0, 42, 32, '#e8eef8')
+    r(1, 13, 3, 4, '#9aa7b8'); r(3, 10, 18, 14, '#1f7a8c'); r(8, 14, 6, 5, '#2b2b2b')
+    for (let i = 0; i < 7; i++) r(5 + i * 2, 11, 1, 1, '#f2c94c')
+    r(17, 20, 2, 2, Math.floor(t * 3) % 2 ? '#e05a3a' : '#f4a28c')
+    r(3, 26, 5, 5, '#2b2b2b'); r(4, 27, 1, 1, '#ffffff'); r(6, 28, 1, 1, '#ffffff'); r(4, 29, 2, 1, '#ffffff')
+    r(24, 4, 16, 2, '#34466b'); r(24, 4, 2, 22, '#34466b'); r(38, 4, 2, 22, '#34466b'); r(24, 24, 16, 2, '#34466b')
+    r(27 + (Math.floor(t * 4) % 6), 8, 4, 3, '#e05a3a')
+    r(28, 19, 8, 4, '#f2a93b'); r(26, 23, 12, 1, '#9aa7b8')
+  },
+  // PRISM: a sharp stock move split into lean / hold / fade by a prism
+  prism(r) {
+    r(0, 0, 42, 32, '#1f2a4a')
+    r(2, 22, 4, 1, '#9ee6c1'); r(6, 21, 3, 1, '#9ee6c1'); r(9, 20, 3, 1, '#9ee6c1'); r(12, 12, 1, 9, '#9ee6c1'); r(13, 12, 4, 1, '#9ee6c1')
+    for (let i = 0; i < 14; i++) {
+      const half = Math.floor(i / 2)
+      r(23 - half, 8 + i, 1 + half * 2, 1, i < 2 ? '#ffffff' : '#cfe8f7')
+    }
+    r(31, 11, 9, 1, '#9ee6c1'); r(31, 15, 9, 1, '#f2c94c'); r(31, 19, 9, 1, '#e05a7a')
+    r(38, 9, 1, 1, '#9ee6c1'); r(39, 10, 1, 1, '#9ee6c1'); r(38, 20, 1, 1, '#e05a7a'); r(39, 19, 1, 1, '#e05a7a')
+  },
+  // 525 Investment Memo Generator: call audio + pitch deck flowing into a memo with a SWOT grid
+  dealMemo(r) {
+    r(0, 0, 42, 32, '#f7e2cf')
+    ;[2, 5, 8, 4, 9, 3, 6].forEach((hgt, i) => r(3 + i * 2, 10 - Math.floor(hgt / 2), 1, hgt, '#34466b'))
+    r(3, 18, 12, 9, '#8a3a12'); r(4, 19, 10, 7, '#fbf3e0'); r(6, 23, 1, 2, '#2d6a4f'); r(8, 21, 1, 4, '#2d6a4f'); r(10, 22, 1, 3, '#2d6a4f')
+    r(17, 15, 5, 2, '#8a3a12'); r(22, 13, 1, 6, '#8a3a12'); r(23, 14, 1, 4, '#8a3a12'); r(24, 15, 1, 2, '#8a3a12')
+    r(26, 3, 14, 27, '#5a3a2f'); r(27, 4, 12, 25, '#fbf3e0'); r(29, 6, 8, 2, '#8a1f2b')
+    for (const ly of [10, 12, 14, 16]) r(29, ly, 8, 1, '#b8a888')
+    r(29, 19, 4, 4, '#2d6a4f'); r(34, 19, 4, 4, '#e05a3a'); r(29, 24, 4, 4, '#1f4e6e'); r(34, 24, 4, 4, '#f2c94c')
+  },
+
   // ---- Experience ----
   // Disney Streaming: a fairytale castle and a play button
   castleStream(r, px, t) {

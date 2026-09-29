@@ -130,11 +130,11 @@ describe('rooms', () => {
   })
   it('splits work into Research (roles then papers), Experience (jobs) and Projects (builds)', () => {
     expect(researchRoles.map((e) => e.plaque)).toEqual([
-      'LLM Memory Inference @ MIT Media Lab', 'Teen Phone Use RCT @ MIT Economics', 'LLM Formality Eval @ MIT CSAIL',
+      'LLM Memory Inference @ MIT Media Lab', 'Behavioral Economics RCT @ MIT Economics', 'LLM Formality Eval @ MIT CSAIL',
     ])
     expect(researchProjects.map((p) => p.plaque)).toEqual([
       'Election Law Graphs @ MIT Election Lab', 'LLMs for Legal Code @ University of Pennsylvania',
-      'Dementia Risk via ML', 'Drug Repurposing @ Drexel University',
+      'Dementia Risk via ML', 'ML + Drug Repurposing @ Drexel University',
     ])
     expect(rooms.research.frames.map((f) => f.plaque)).toEqual([...researchRoles, ...researchProjects].map((x) => x.plaque))
     expect(rooms.experience.frames.map((f) => f.plaque)).toEqual(jobs.map((e) => e.plaque))

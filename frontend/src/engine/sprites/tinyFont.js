@@ -1,4 +1,4 @@
-// 3×5 pixel font for plaques (M, W and @ are 5 wide so they stay legible): crisp at any scale, no web fonts.
+// 3×5 pixel font for plaques (M and W are 5 wide so they don't read as H): crisp at any scale, no web fonts.
 export const GLYPHS = {
   A: ['.x.', 'x.x', 'xxx', 'x.x', 'x.x'], B: ['xx.', 'x.x', 'xx.', 'x.x', 'xx.'], C: ['.xx', 'x..', 'x..', 'x..', '.xx'],
   D: ['xx.', 'x.x', 'x.x', 'x.x', 'xx.'], E: ['xxx', 'x..', 'xx.', 'x..', 'xxx'], F: ['xxx', 'x..', 'xx.', 'x..', 'x..'],
@@ -15,7 +15,7 @@ export const GLYPHS = {
   9: ['xxx', 'x.x', 'xxx', '..x', 'xx.'],
   ' ': ['...', '...', '...', '...', '...'], '&': ['.x.', 'x.x', '.x.', 'x.x', '.xx'], '-': ['...', '...', 'xxx', '...', '...'],
   '.': ['...', '...', '...', '...', '.x.'], "'": ['.x.', '.x.', '...', '...', '...'], '?': ['xx.', '..x', '.x.', '...', '.x.'],
-  '@': ['.xxx.', 'x...x', 'x.xxx', 'x....', '.xxx.'],
+  '+': ['...', '.x.', 'xxx', '.x.', '...'],
 }
 
 const GAP = 1
@@ -43,31 +43,34 @@ const PAD_X = 3
 const LINE_H = 7
 const MAX_LINE = 20
 
-// "Topic @ Lab" puts the lab on its own line; any line over 20 characters wraps at a space.
-export function plaqueLines(text) {
+// "Topic @ Lab" becomes a topic line and a lab line (shown in maroon, no @);
+// any line over 20 characters wraps at a space. Each line is tagged with whether it's the lab.
+export function plaqueLayout(text) {
   const at = text.indexOf(' @ ')
-  const parts = at < 0 ? [text] : [text.slice(0, at), text.slice(at + 1)]
+  const parts = at < 0 ? [[text, false]] : [[text.slice(0, at), false], [text.slice(at + 3), true]]
   const lines = []
-  for (const part of parts) {
+  for (const [part, lab] of parts) {
     let line = ''
     for (const word of part.split(' ')) {
       if (line && (line + ' ' + word).length > MAX_LINE) {
-        lines.push(line)
+        lines.push({ text: line, lab })
         line = word
       } else {
         line = line ? `${line} ${word}` : word
       }
     }
-    lines.push(line)
+    lines.push({ text: line, lab })
   }
   return lines
 }
+
+export const plaqueLines = (text) => plaqueLayout(text).map((l) => l.text)
 
 export const plaqueWidth = (text) => Math.max(...plaqueLines(text).map(textWidth)) + PAD_X * 2 + 2
 
 // Brass museum plaque centred on cx, one row per line.
 export function drawPlaque(ctx, cx, y, text) {
-  const lines = plaqueLines(text)
+  const lines = plaqueLayout(text)
   const w = plaqueWidth(text)
   const h = lines.length * LINE_H + 4
   const x = Math.round(cx - w / 2)
@@ -77,5 +80,7 @@ export function drawPlaque(ctx, cx, y, text) {
   ctx.fillRect(x + 1, y + 1, w - 2, h - 2)
   ctx.fillStyle = '#f2d27a'
   ctx.fillRect(x + 1, y + 1, w - 2, 1)
-  lines.forEach((line, i) => drawTinyText(ctx, line, Math.round(cx - textWidth(line) / 2), y + 3 + i * LINE_H, '#3a2a10'))
+  lines.forEach((line, i) =>
+    drawTinyText(ctx, line.text, Math.round(cx - textWidth(line.text) / 2), y + 3 + i * LINE_H, line.lab ? '#8a1f2b' : '#3a2a10'),
+  )
 }
