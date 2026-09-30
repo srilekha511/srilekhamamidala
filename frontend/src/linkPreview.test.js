@@ -1,10 +1,12 @@
+// @vitest-environment node
 import { describe, it, expect } from 'vitest'
 import { readFileSync, existsSync } from 'node:fs'
 import { resolve } from 'node:path'
+import viteConfig from '../vite.config.js'
 
 const root = resolve(__dirname, '..')
 const html = readFileSync(resolve(root, 'index.html'), 'utf8')
-const SITE = 'https://srilekha511.github.io/srilekhamamidala/'
+const SITE = 'https://srilekha.dev/'
 const meta = (attr, name) => {
   const m = html.match(new RegExp(`<meta\\s+${attr}="${name}"\\s+content="([^"]*)"`))
   return m ? m[1] : null
@@ -33,5 +35,8 @@ describe('link previews', () => {
     expect(png.readUInt32BE(16)).toBe(1200)
     expect(png.readUInt32BE(20)).toBe(630)
     expect(png.length).toBeLessThan(1024 * 1024) // stays small for crawlers
+  })
+  it('builds for the root of srilekha.dev', () => {
+    expect(viteConfig.base).toBe('/')
   })
 })

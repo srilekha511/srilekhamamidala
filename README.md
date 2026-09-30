@@ -2,14 +2,14 @@
 
 A pixel-art museum portfolio: walk the gallery, step into paintings, and read about projects and experience.
 
-- Live: https://srilekha511.github.io/srilekhamamidala/
-- Text version: https://srilekha511.github.io/srilekhamamidala/#/quick
+- Live: https://srilekha.dev/
+- Text version: https://srilekha.dev/#/quick
 
 ## Develop
 
     cd frontend
     npm install
-    npm run dev      # http://localhost:3000/srilekhamamidala/
+    npm run dev      # http://localhost:5173/
     npm test
 
 ## Edit content

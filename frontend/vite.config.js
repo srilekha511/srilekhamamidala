@@ -3,14 +3,9 @@ import react from '@vitejs/plugin-react'
 import { copyFileSync } from 'fs'
 import { join } from 'path'
 
-// Get the repository name from environment variable or use default
-// For GitHub Pages, the base path should be '/repository-name/'
-// If deploying to root domain (username.github.io), use '/'
-// 
-// IMPORTANT: Make sure this matches your actual GitHub repository name!
-// Repository name: srilekhamamidala
-const repositoryName = process.env.VITE_REPO_NAME || 'srilekhamamidala'
-const base = repositoryName ? `/${repositoryName}/` : '/'
+// The site is served from the root of https://srilekha.dev (GitHub Pages custom domain).
+// Set VITE_BASE to build for a sub-path instead, e.g. VITE_BASE=/srilekhamamidala/.
+const base = process.env.VITE_BASE ?? '/'
 
 export default defineConfig({
   plugins: [
