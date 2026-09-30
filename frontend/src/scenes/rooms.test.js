@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import * as data from '../data.js'
 import { buildRooms, SECTIONS, THEMES } from './rooms.js'
-import { plaqueWidth, textWidth } from '../engine/sprites/tinyFont.js'
+import { plaqueWidth, plaqueLines, textWidth } from '../engine/sprites/tinyFont.js'
 
 const rooms = buildRooms(data)
 const sectionIds = SECTIONS.map((s) => s.id)
@@ -129,13 +129,21 @@ describe('rooms', () => {
     })
   })
   it('splits work into Research (roles then papers), Experience (jobs) and Projects (builds)', () => {
-    expect(researchRoles.map((e) => e.plaque)).toEqual(['MIT Media Lab', 'MIT Economics', 'MIT CSAIL'])
-    expect(researchProjects.map((p) => p.plaque)).toEqual(['LLM Formality Study', 'Election Law Graphs', 'WhartonMunicode', 'Dementia Risk ML', 'NeuroCADR'])
+    expect(researchRoles.map((e) => e.plaque)).toEqual([
+      'LLM Memory Inference @ MIT Media Lab', 'Behavioral Econ RCT @ MIT Economics', 'LLM Evaluation @ MIT CSAIL',
+    ])
+    expect(researchProjects.map((p) => p.plaque)).toEqual([
+      'Knowledge Graph QA @ MIT CSAIL', 'Election Law Graphs @ MIT Election Lab', 'LLMs for Legal Code @ University of Pennsylvania',
+      'Dementia Risk via ML', 'ML + Drug Repurposing @ Drexel University',
+    ])
     expect(rooms.research.frames.map((f) => f.plaque)).toEqual([...researchRoles, ...researchProjects].map((x) => x.plaque))
     expect(rooms.experience.frames.map((f) => f.plaque)).toEqual(jobs.map((e) => e.plaque))
     expect(rooms.projects.frames.map((f) => f.plaque)).toEqual(builds.map((p) => p.plaque))
-    const csail = rooms.research.frames.findIndex((f) => f.plaque === 'MIT CSAIL')
-    expect(rooms.research.frames[csail + 1].plaque).toBe('LLM Formality Study') // role next to its paper
+    const csail = rooms.research.frames.find((f) => f.id === 'exp-csail')
+    expect(csail.thumb.art).toBe('formality') // role and its formality paper are one frame
+    expect(csail.card.body.join(' ')).toContain('An Empirical Evaluation of LLMs for the Assessment of Subjective Qualities')
+    expect(csail.card.tags).toEqual(['NLP', 'ML', 'Human-Computer Interaction (HCI)'])
+    expect(csail.card.image).toBe('/project3img1.png')
   })
   it('every section frame has a short plaque title, and neighbouring plaques never touch', () => {
     const expected = {
@@ -149,7 +157,7 @@ describe('rooms', () => {
       const frames = rooms[id].frames
       expect(frames.map((f) => f.plaque)).toEqual(expected[id])
       frames.forEach((f, i) => {
-        expect(f.plaque.length, f.plaque).toBeLessThanOrEqual(20)
+        for (const line of plaqueLines(f.plaque)) expect(line.length, line).toBeLessThanOrEqual(20)
         if (i === 0) return
         const prev = frames[i - 1]
         const gap = (f.x + f.w / 2) - (prev.x + prev.w / 2)
@@ -169,5 +177,36 @@ describe('rooms', () => {
       `mailto:${data.profile.email}`, data.profile.social.github, data.profile.social.linkedin,
     ])
     for (const id of ['about', 'research', 'projects', 'experience']) for (const f of rooms[id].frames) expect(f.href).toBeUndefined()
+  })
+  it('the Skills card keeps each group name separate so it can be bold', () => {
+    const skills = rooms.about.frames.find((f) => f.id === 'about-skills').card
+    expect(skills.bullets).toEqual(data.skills.map((g) => ({ label: g.group, text: g.items.join(', ') })))
+  })
+  it('the Interests card splits academic and non-academic interests under bold headings', () => {
+    const interests = rooms.about.frames.find((f) => f.id === 'about-interests').card
+    expect(interests.bullets).toEqual([
+      { label: 'Academic & Research', text: data.interests.academic.join(', ') },
+      { label: 'For Fun', text: data.interests.personal.join(', ') },
+    ])
+  })
+  it('the Economics plaque topic fits on one line', () => {
+    const econ = rooms.research.frames.find((f) => f.id === 'exp-mitecon')
+    expect(plaqueLines(econ.plaque)).toEqual(['Behavioral Econ RCT', 'MIT Economics'])
+  })
+  it('TRACE hangs right after the LLM Evaluation frame and links to its page', () => {
+    const frames = rooms.research.frames
+    const i = frames.findIndex((f) => f.id === 'exp-csail')
+    const trace = frames[i + 1]
+    expect(trace.card.title).toBe('TRACE: An Interactive Visual Paradigm for Knowledge Graph Question-Answering')
+    expect(trace.thumb.art).toBe('trace')
+    expect(trace.card.links).toEqual([{ href: 'https://purl.org/trace', label: 'View TRACE' }])
+    expect(trace.card.body).toEqual([]) // two bullets, like the research roles
+    expect(trace.card.bullets).toHaveLength(2)
+    for (const b of trace.card.bullets) expect(b).not.toMatch(/\d/) // a general summary, no numbers
+    expect(trace.card.bullets[1]).toMatch(/user study/)
+  })
+  it('TRACE credits MIT CSAIL on its plaque', () => {
+    const trace = rooms.research.frames.find((f) => f.thumb.art === 'trace')
+    expect(plaqueLines(trace.plaque)).toEqual(['Knowledge Graph QA', 'MIT CSAIL'])
   })
 })

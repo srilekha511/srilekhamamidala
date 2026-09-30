@@ -25,6 +25,16 @@ const LINKEDIN = [
   '.xxxxxxxxxxxx.', 'xxxxxxxxxxxxxx', 'xxooxxxxxxxxxx', 'xxooxxxxxxxxxx', 'xxxxxxxxxxxxxx', 'xxooxoooooxxxx', 'xxooxooxxooxxx',
   'xxooxooxxooxxx', 'xxooxooxxooxxx', 'xxooxooxxooxxx', 'xxooxooxxooxxx', 'xxxxxxxxxxxxxx', 'xxxxxxxxxxxxxx', '.xxxxxxxxxxxx.',
 ]
+// 8×8 icons for the For Fun interests, in the order they appear in data.js.
+export const HOBBY_ICONS = {
+  dance: { rows: ['...xx...', 'x..xx..x', '.xxxxxx.', '...xx...', '..xxxx..', '.xxxxxx.', 'xxxxxxxx', '..x..x..'], palette: { x: '#8a1f2b' } },
+  travel: { rows: ['..xxxx..', '..x..x..', '.xxxxxx.', 'xxxxxxxx', 'xppppppx', 'xpxxxxpx', 'xppppppx', '.xxxxxx.'], palette: { x: '#2d6a4f', p: '#6fb38a' } },
+  cooking: { rows: ['.s..s...', '..s..s..', '.s..s...', 'xxxxxxxx', '.xxxxxx.', '.xxxxxx.', '.xxxxxx.', '..xxxx..'], palette: { x: '#34466b', s: '#9aa7b8' } },
+  eagles: { rows: ['........', '..xxxx..', '.xxwxwx.', 'xxwwwwxx', '.xxwxwx.', '..xxxx..', '........', '........'], palette: { x: '#004c54', w: '#ffffff' } },
+  painting: { rows: ['..xxxx..', '.xrxxbx.', 'xxxxxxyx', 'xgxx..xx', 'xxxx..x.', 'xxxxxx..', '.xxxxx..', '..xxx...'], palette: { x: '#c9a36a', r: '#e05a3a', b: '#1f6fb3', y: '#f2c94c', g: '#2e7d32' } },
+  singing: { rows: ['...xxxxx', '...x...x', '...x...x', '...x...x', '.xxx.xxx', 'xxxx.xxx', '.xx...x.', '........'], palette: { x: '#6a3f8a' } },
+}
+
 const BOLT = ['....xxxx', '...xxxx.', '..xxxx..', '.xxxx...', 'xxxxxxxx', '...xxxx.', '..xxxx..', '.xxxx...', 'xxx.....', 'xx......']
 
 const SCENES = {
@@ -115,6 +125,50 @@ const SCENES = {
     r(22, 20, 4, 9, '#2d6a4f'); r(27, 16, 4, 13, '#2d6a4f'); r(32, 11, 4, 18, '#2d6a4f'); r(37, 6, 4, 23, '#2d6a4f')
     r(21, 29, 21, 1, '#1e3a2e')
   },
+  // HackMIT Hardware Hub: a microcontroller board, a 3D printer, and a badge QR code
+  hardwareHub(r, px, t) {
+    r(0, 0, 42, 32, '#e8eef8')
+    r(1, 13, 3, 4, '#9aa7b8'); r(3, 10, 18, 14, '#1f7a8c'); r(8, 14, 6, 5, '#2b2b2b')
+    for (let i = 0; i < 7; i++) r(5 + i * 2, 11, 1, 1, '#f2c94c')
+    r(17, 20, 2, 2, Math.floor(t * 3) % 2 ? '#e05a3a' : '#f4a28c')
+    r(3, 26, 5, 5, '#2b2b2b'); r(4, 27, 1, 1, '#ffffff'); r(6, 28, 1, 1, '#ffffff'); r(4, 29, 2, 1, '#ffffff')
+    r(24, 4, 16, 2, '#34466b'); r(24, 4, 2, 22, '#34466b'); r(38, 4, 2, 22, '#34466b'); r(24, 24, 16, 2, '#34466b')
+    r(27 + (Math.floor(t * 4) % 6), 8, 4, 3, '#e05a3a')
+    r(28, 19, 8, 4, '#f2a93b'); r(26, 23, 12, 1, '#9aa7b8')
+  },
+  // PRISM: a sharp stock move split into lean / hold / fade by a prism
+  prism(r) {
+    r(0, 0, 42, 32, '#1f2a4a')
+    r(2, 22, 4, 1, '#9ee6c1'); r(6, 21, 3, 1, '#9ee6c1'); r(9, 20, 3, 1, '#9ee6c1'); r(12, 12, 1, 9, '#9ee6c1'); r(13, 12, 4, 1, '#9ee6c1')
+    for (let i = 0; i < 14; i++) {
+      const half = Math.floor(i / 2)
+      r(23 - half, 8 + i, 1 + half * 2, 1, i < 2 ? '#ffffff' : '#cfe8f7')
+    }
+    r(31, 11, 9, 1, '#9ee6c1'); r(31, 15, 9, 1, '#f2c94c'); r(31, 19, 9, 1, '#e05a7a')
+    r(38, 9, 1, 1, '#9ee6c1'); r(39, 10, 1, 1, '#9ee6c1'); r(38, 20, 1, 1, '#e05a7a'); r(39, 19, 1, 1, '#e05a7a')
+  },
+  // 525 Investment Memo Generator: call audio + pitch deck flowing into a memo with a SWOT grid
+  dealMemo(r) {
+    r(0, 0, 42, 32, '#f7e2cf')
+    ;[2, 5, 8, 4, 9, 3, 6].forEach((hgt, i) => r(3 + i * 2, 10 - Math.floor(hgt / 2), 1, hgt, '#34466b'))
+    r(3, 18, 12, 9, '#8a3a12'); r(4, 19, 10, 7, '#fbf3e0'); r(6, 23, 1, 2, '#2d6a4f'); r(8, 21, 1, 4, '#2d6a4f'); r(10, 22, 1, 3, '#2d6a4f')
+    r(17, 15, 5, 2, '#8a3a12'); r(22, 13, 1, 6, '#8a3a12'); r(23, 14, 1, 4, '#8a3a12'); r(24, 15, 1, 2, '#8a3a12')
+    r(26, 3, 14, 27, '#5a3a2f'); r(27, 4, 12, 25, '#fbf3e0'); r(29, 6, 8, 2, '#8a1f2b')
+    for (const ly of [10, 12, 14, 16]) r(29, ly, 8, 1, '#b8a888')
+    r(29, 19, 4, 4, '#2d6a4f'); r(34, 19, 4, 4, '#e05a3a'); r(29, 24, 4, 4, '#1f4e6e'); r(34, 24, 4, 4, '#f2c94c')
+  },
+
+  // TRACE: a knowledge graph with a highlighted reasoning path (and one broken link)
+  trace(r, px, t) {
+    r(0, 0, 42, 32, '#eef2fb')
+    r(7, 9, 1, 14, '#b8c2d8'); r(8, 22, 12, 1, '#b8c2d8'); r(21, 7, 1, 15, '#b8c2d8'); r(34, 21, 1, 7, '#b8c2d8')
+    r(7, 6, 14, 1, '#f2a93b'); r(21, 6, 1, 1, '#f2a93b'); r(22, 6, 12, 1, '#f2a93b'); r(34, 7, 1, 7, '#f2a93b')
+    r(34, 16, 1, 1, '#e05a7a'); r(34, 18, 1, 1, '#e05a7a') // broken hop
+    for (const [nx, ny, c] of [[5, 4, '#1f4e6e'], [19, 4, '#6a3f8a'], [32, 4, '#6a3f8a'], [32, 12, '#2d6a4f'], [5, 20, '#9aa7b8'], [19, 20, '#9aa7b8'], [32, 25, '#9aa7b8']]) r(nx, ny, 5, 5, c)
+    if (Math.floor(t * 2) % 2) r(33, 13, 3, 3, '#9ee6c1')
+    r(4, 27, 14, 3, '#1f4e6e'); r(5, 28, 2, 1, '#ffffff'); r(8, 28, 6, 1, '#ffffff')
+  },
+
   // ---- Experience ----
   // Disney Streaming: a fairytale castle and a play button
   castleStream(r, px, t) {
@@ -162,15 +216,6 @@ const SCENES = {
     px(ICONS.heart, { x: '#e05a7a' }, 24, 2)
     r(22, 22, 3, 7, '#2d6a4f'); r(26, 24, 3, 5, '#2d6a4f'); r(30, 19, 3, 10, '#2d6a4f'); r(34, 25, 3, 4, '#2d6a4f'); r(21, 29, 18, 1, '#1e3a2e')
   },
-  // MIT CSAIL DIG: rating stars for LLM quality, with a robot
-  ratingRobot(r, px) {
-    r(0, 0, 42, 32, '#e0f0ea')
-    drawPixelArtScaled(px, ROBOT, { x: '#5b6475' }, 2, 8, 2)
-    r(6, 12, 2, 2, '#6fb3d9'); r(12, 12, 2, 2, '#6fb3d9')
-    px(ICONS.star, { x: '#f2a93b' }, 21, 3); px(ICONS.star, { x: '#f2a93b' }, 31, 3)
-    px(ICONS.star, { x: '#f2a93b' }, 21, 13); px(ICONS.star, { x: '#f2a93b' }, 31, 13)
-    px(ICONS.star, { x: '#c9c9d6' }, 26, 23)
-  },
   // 525 VC: voice-agent deal memos with a SWOT grid
   voiceMemo(r) {
     r(0, 0, 42, 32, '#f7e2cf')
@@ -217,12 +262,13 @@ const SCENES = {
       if (i === glint) r(sx + 9, sy + 2, 1, 1, '#ffffff')
     })
   },
+  // For Fun: a heart ringed by the non-academic interests
   interests(r, px, t) {
-    r(0, 0, 42, 32, '#1f2a4a')
-    for (const [sx, sy] of [[12, 2], [30, 30], [2, 16], [40, 17], [20, 30], [21, 1]]) if (Math.floor(t * 3 + sx) % 2) r(sx, sy, 1, 1, '#ffffff')
+    r(0, 0, 42, 32, '#fde7d6')
     drawPixelArtScaled(px, ICONS.heart, { x: '#e05a7a' }, 13, 8, 2)
-    px(ROBOT, { x: '#9aa7b8' }, 3, 3); px(BUBBLE, { x: '#fbf3e0' }, 31, 3)
-    px(ROCKET, { x: '#f2a93b' }, 3, 22); px(CHART, { x: '#9ee6c1' }, 31, 22)
+    if (Math.floor(t * 2) % 2) { r(12, 6, 1, 1, '#ffffff'); r(29, 24, 1, 1, '#ffffff') } else { r(29, 7, 1, 1, '#ffffff'); r(12, 24, 1, 1, '#ffffff') }
+    const slots = [[2, 2], [32, 2], [2, 12], [32, 12], [2, 22], [32, 22]]
+    Object.values(HOBBY_ICONS).forEach(({ rows, palette }, i) => px(rows, palette, ...slots[i]))
   },
 
   // ---- Contact ----

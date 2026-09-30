@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { asset } from '../asset.js'
+import RichText from './RichText.jsx'
 
 const inResearch = (x) => x.room === 'research'
 
@@ -7,7 +8,8 @@ const role = (e) => (
   <article key={e.id} className="quick-view__entry">
     <h3>{e.company}</h3>
     <p className="quick-view__meta">{[e.role, e.location, e.dates].filter(Boolean).join(' · ')}</p>
-    <ul>{e.bullets.map((b) => <li key={b}>{b}</li>)}</ul>
+    <ul>{e.bullets.map((b) => <li key={b}><RichText text={b} /></li>)}</ul>
+    {e.paper && <p><strong>Paper:</strong> {e.paper}</p>}
   </article>
 )
 
@@ -15,7 +17,8 @@ const project = (p) => (
   <article key={p.id} className="quick-view__entry">
     <h3>{p.title}</h3>
     <p className="quick-view__meta">{p.category}</p>
-    <p>{p.description}</p>
+    {p.description && <p><RichText text={p.description} /></p>}
+    {p.bullets && <ul>{p.bullets.map((b) => <li key={b}><RichText text={b} /></li>)}</ul>}
     {p.technologies?.length > 0 && <p className="quick-view__meta">{p.technologies.join(' · ')}</p>}
     {p.link && <a href={p.link} target="_blank" rel="noopener noreferrer">{p.linkText ?? 'View project'}</a>}
   </article>
@@ -47,7 +50,8 @@ export default function QuickView({ data, onClose }) {
         <section>
           <h2>About</h2>
           <p>{profile.bio}</p>
-          <p><strong>Interests:</strong> {interests.join(' · ')}</p>
+          <p><strong>Academic & Research interests:</strong> {interests.academic.join(' · ')}</p>
+          <p><strong>For Fun:</strong> {interests.personal.join(' · ')}</p>
           <ul>{skills.map((g) => <li key={g.group}><strong>{g.group}:</strong> {g.items.join(', ')}</li>)}</ul>
         </section>
 

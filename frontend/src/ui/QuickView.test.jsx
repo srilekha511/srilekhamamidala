@@ -35,4 +35,16 @@ describe('QuickView', () => {
     expect(section('Projects')).toContain('dermalab')
     expect(section('Projects')).not.toContain('NeuroCADR')
   })
+  it('lists both kinds of interests', () => {
+    render(<QuickView data={data} onClose={() => {}} />)
+    const about = screen.getByRole('heading', { name: 'About' }).closest('section').textContent
+    expect(about).toContain('Academic & Research')
+    expect(about).toContain('For Fun')
+    expect(about).toContain('Philadelphia Eagles')
+  })
+  it('shows bullet-style projects as bullets', () => {
+    render(<QuickView data={data} onClose={() => {}} />)
+    const trace = screen.getByText(/^TRACE:/).closest('article')
+    expect(trace.querySelectorAll('li')).toHaveLength(2)
+  })
 })

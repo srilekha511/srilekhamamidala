@@ -33,12 +33,15 @@ export const skills = [
   { group: "Tools & Platforms", items: ["Bloomberg Terminal", "PowerPoint", "Word", "Excel", "Tableau", "Power BI", "Databricks", "AWS"] },
 ];
 
-export const interests = [
-  "AI & machine learning",
-  "NLP & LLM evaluation research",
-  "Venture capital & startups",
-  "Quantitative finance & economics",
-];
+export const interests = {
+  academic: [
+    "AI & machine learning",
+    "NLP & LLM evaluation research",
+    "Venture capital & startups",
+    "Quantitative finance & economics",
+  ],
+  personal: ["Classical Dance", "Traveling/Backpacking", "Cooking", "Philadelphia Eagles", "Painting", "Singing"],
+};
 
 // room: 'research' puts a role in the Research room; 'experience' keeps it with jobs.
 export const experience = [
@@ -68,27 +71,30 @@ export const experience = [
     ],
   },
   {
-    id: "medialab", room: "research", plaque: "MIT Media Lab", art: "memoryLoop", company: "MIT Media Lab", role: "Research Intern",
+    id: "medialab", room: "research", plaque: "LLM Memory Inference @ MIT Media Lab", art: "memoryLoop", company: "MIT Media Lab", role: "Research Intern",
     location: "", dates: "September 2026 – Present",
     bullets: [
-      "Investigating self-confirming inference in persistent LLM memory by instrumenting an open-source memory system to trace preference updates to interaction evidence and distinguish user beliefs from preferences reinforced by agent interactions",
-      "Measuring inference provenance with multi-turn interactions and validating automated classifications vs. hand-labeled traces",
+      "Investigating **self-confirming inference** in **persistent LLM memory**: tracing how an open-source memory system turns interactions into preference updates, to separate what users believe from what agents reinforce",
+      "Measuring **inference provenance** across multi-turn chats and validating automated labels against **hand-labeled traces**",
     ],
   },
   {
-    id: "mitecon", room: "research", plaque: "MIT Economics", art: "phoneWellbeing", company: "MIT Department of Economics", role: "Research Intern",
+    id: "mitecon", room: "research", plaque: "Behavioral Econ RCT @ MIT Economics", art: "phoneWellbeing", company: "MIT Department of Economics", role: "Research Intern",
     location: "Cambridge, MA", dates: "June 2026 – Present",
     bullets: [
-      "Developed and evaluated technical infrastructure for a large-scale RCT studying smartphone use and adolescent well-being",
-      "Analyzed Android application and Django backend logs to diagnose missing/incomplete smartphone usage records",
+      "Built and evaluated infrastructure for a **large-scale RCT** on **smartphone use and adolescent well-being**",
+      "Diagnosed missing usage records from **Android app** and **Django backend** logs",
     ],
   },
   {
-    id: "csail", room: "research", plaque: "MIT CSAIL", art: "ratingRobot", company: "MIT CSAIL, Decentralized Information Group", role: "Research Intern",
+    id: "csail", room: "research", plaque: "LLM Evaluation @ MIT CSAIL", art: "formality", company: "MIT CSAIL, Decentralized Information Group", role: "Research Intern",
     location: "Cambridge, MA", dates: "August 2024 – Present",
+    paper: "An Empirical Evaluation of LLMs for the Assessment of Subjective Qualities",
+    tags: ["NLP", "ML", "Human-Computer Interaction (HCI)"],
+    image: "/project3img1.png",
     bullets: [
-      "Accelerated insurance communication services by >60% by researching development of mathematical metrics for subjective quality evaluation across 10+ large language models (LLMs) in coordination with industry partner Liberty Mutual",
-      "Designed parallel human/LLM judge studies via 300+ human ratings to create auto-evaluation metrics for Agentic AI models",
+      "Developed **metrics for subjective quality** (e.g. **formality**) across **10+ LLMs** with industry partner **Liberty Mutual**, speeding up insurance communications by **>60%**",
+      "Ran **parallel human/LLM judge studies** (**300+ human ratings**) to build **auto-evaluation metrics** for agentic AI",
     ],
   },
   {
@@ -111,9 +117,44 @@ export const experience = [
 // room: 'research' puts a project in the Research room; 'projects' keeps it with the builds.
 export const projects = [
   {
+    id: 10,
+    room: "projects",
+    plaque: "HackMIT Hardware Hub",
+    art: "hardwareHub",
+    title: "HackMIT Hardware Hub",
+    category: "Full Stack · HackMIT Organizing Team",
+    description: "Built with the **HackMIT organizing team**: the hardware desk's web app, used by **700+ hackers** to browse and check out **200+ types of hardware**, with **badge QR-code checkout**, a **3D-print queue** with print-time estimates, and **\"order ready\" push notifications**.",
+    whatILearned: "Shipping a **production app for a live event** as a team: a **React + TypeScript** frontend, **Flask + PostgreSQL** backend, and **Docker** deploys.",
+    technologies: ["React", "TypeScript", "Flask", "PostgreSQL", "Docker"],
+    link: "https://hardware.hackmit.org/",
+    linkText: "Visit Hardware Hub",
+  },
+  {
+    id: 11,
+    room: "projects",
+    plaque: "AI Stock-Move Analyst",
+    art: "prism",
+    title: "PRISM",
+    category: "AI, Quant Finance · Bridgewater AI Hackathon",
+    description: "Built at the **Bridgewater Associates AI Immersion Hackathon** (one of **~20 students** selected) with a team of four. When a stock makes a **sharp move**, PRISM uses **Claude** to explain why from cited **news, SEC filings, and earnings calls**, then judges whether the move is **structural (lean in)** or **transient (fade it)**.",
+    whatILearned: "Building an **evidence-grounded LLM pipeline** over financial data, checked with **ablations and backtests**.",
+    technologies: ["Python", "FastAPI", "Claude API", "SEC EDGAR", "pandas"],
+  },
+  {
+    id: 12,
+    room: "projects",
+    plaque: "AI Deal Memo Generator",
+    art: "dealMemo",
+    title: "Investment Memo Generator",
+    category: "AI, Venture Capital · 525 VC",
+    description: "Built at **525 Venture Capital**: a web app that turns a **founder call**, **pitch deck**, and **financials** into a **first-draft investment memo**, with company research, a **SWOT analysis**, and a \"what do you have to believe\" section.",
+    whatILearned: "Wiring **LLM research, transcription, and document parsing** into one workflow, deployed on **Google Cloud Run**.",
+    technologies: ["Python", "Flask", "Gemini API", "Google Cloud Run", "Docker"],
+  },
+  {
     id: 2,
     room: "projects",
-    plaque: "Insurance Chatbot",
+    plaque: "AI Insurance Chatbot",
     art: "chatbot",
     title: "AI-Powered Insurance Chatbot",
     category: "NLP, Full Stack",
@@ -126,31 +167,30 @@ export const projects = [
     ]
   },
   {
-    id: 3,
+    id: 13,
     room: "research",
-    plaque: "LLM Formality Study",
-    art: "formality",
-    title: "An Empirical Evaluation of LLMs for the Assessment of Subjective Qualities",
-    category: "ML/NLP Research",
-    description: "Research done at the Decentralized Information Group, part of MIT's Computer Science and Artificial Intelligence Lab. Designed a framework involving human and LLM evaluation to assess subjective qualities, with this paper's specific focus being formality in professional communication.",
-    whatILearned: "This project taught me how to design effective user studies to evaluate both humans and LLMs in the context of formality and perform statistical analyses comparing human and LLM alignment on ground truth metrics.",
-    technologies: ["NLP", "ML", "Human-Computer Interaction (HCI)"],
-    image: "/project3img1.png",
-    images: [
-      "/project3img1.png"
-    ]
+    plaque: "Knowledge Graph QA @ MIT CSAIL",
+    art: "trace",
+    title: "TRACE: An Interactive Visual Paradigm for Knowledge Graph Question-Answering",
+    category: "NLP + HCI Research",
+    bullets: [
+      "Built **TRACE**, which turns a **knowledge-graph QA** answer's evidence into one **interactive reasoning path**: **connected** when the answer is supported, **visibly broken** when it isn't",
+      "Ran a **mixed-methods user study** showing the reasoning path helps people **judge when to trust an answer**, especially when it's **backed by the graph**",
+    ],
+    technologies: ["Knowledge Graphs", "NLP", "Graph Search", "HCI", "User Studies"],
+    link: "https://purl.org/trace",
+    linkText: "View TRACE",
   },
   {
     id: 4,
     room: "research",
-    plaque: "Election Law Graphs",
+    plaque: "Election Law Graphs @ MIT Election Lab",
     art: "election",
     title: "Web Scraping of Legislative Election Data for Knowledge Graph Analysis",
     category: "ML/NLP Research",
-    description: "Research done at the MIT Election Data Science Lab. Built a data pipeline to transform unstructured election legislation into knowledge graphs and classified bills to study how lawmakers and interest groups influence election policy outcomes.",
-    whatILearned: "This project helped me gain hands-on experience turning messy political text data into structured, analyzable formats using Python and R, and applying data analysis to answer real-world policy questions.",
+    description: "At the **MIT Election Data Science Lab**, built a pipeline turning **unstructured election legislation** into **knowledge graphs**, and classified bills to study how **lawmakers and interest groups** shape election policy.",
+    whatILearned: "Turning messy political text into **structured, analyzable data** with **Python and R** to answer real policy questions.",
     technologies: ["Data Processing", "Web Scraping", "Python", "R"],
-    link: "https://github.com/jloffredo2/state-elect-leg-scrapers",
     image: "/project4img1.png",
     images: [
       "/project4img1.png"
@@ -159,7 +199,7 @@ export const projects = [
   {
     id: 5,
     room: "projects",
-    plaque: "dermalab",
+    plaque: "ML for Skin Diagnosis",
     art: "dermalab",
     title: "dermalab: AI and LLM-Powered Skin Disease Diagnosis",
     category: "ML/CV/NLP Hackathon Project",
@@ -178,15 +218,13 @@ export const projects = [
   {
     id: 9,
     room: "research",
-    plaque: "WhartonMunicode",
+    plaque: "LLMs for Legal Code @ University of Pennsylvania",
     art: "legal",
-    title: "WhartonMunicode: LLMs for Legal Code Analysis",
+    title: "LLMs for Legal Code",
     category: "ML, NLP Research",
-    description: "Built a nanoGPT-based language model trained on thousands of municipal codes to explore how LLMs can support legal research and analysis in the public law domain.",
-    whatILearned: "I learned the computational foundations of large language models and how to adapt and train them on domain-specific legal text for real-world applications.",
+    description: "WhartonMunicode: trained a **nanoGPT-based language model** on **thousands of municipal codes** to explore how LLMs can support **legal research** in public law.",
+    whatILearned: "The **foundations of LLMs**, and how to adapt and train them on **domain-specific legal text**.",
     technologies: ["Hugging Face Transformers", "PyTorch", "Web Scraping", "NLP"],
-    link: "https://github.com/srilekha511/WhartonMunicode",
-    linkText: "View on GitHub",
     image: "/project9img1.png",
     images: [
       "/project9img1.png",
@@ -195,12 +233,12 @@ export const projects = [
   {
     id: 6,
     room: "research",
-    plaque: "Dementia Risk ML",
+    plaque: "Dementia Risk via ML",
     art: "brainNetwork",
     title: "A Holistic, Personalized Dementia Risk Prediction Framework",
     category: "ML Research",
-    description: "Developed a personalized dementia risk prediction model by integrating ML awith network theory to capture complex lifestyle, environmental, and genetic interactions. Awarded a $2500 prize from the Association for Computing Machinery.",
-    whatILearned: "I gained research experience combining ML methods to model how different types of environmental, genetic, and lifestyle mechanisms and translate biological networks into predictive insights.",
+    description: "Built a **personalized dementia risk model** combining **ML with network theory** to capture lifestyle, environmental, and genetic interactions. **$2,500 award** from the **Association for Computing Machinery**.",
+    whatILearned: "Combining ML methods to turn **biological networks** into **predictive insights**.",
     technologies: ["ML Algorithms", "RF", "SVM", "Pandas", "ML", "Graph Theory"],
     link: "https://arxiv.org/pdf/2311.09229",
     linkText: "View on Arxiv",
@@ -213,12 +251,12 @@ export const projects = [
   {
     id: 7,
     room: "research",
-    plaque: "NeuroCADR",
+    plaque: "ML + Drug Repurposing @ Drexel University",
     art: "drugRepurposing",
-    title: "NeuroCADR: Computational Drug Repurposing for Epilepsy",
+    title: "ML + Drug Repurposing for Epilepsy",
     category: "Computational Biology Research",
-    description: "Built an integrated computational pipeline to identify and prioritize novel anti-epileptic drug candidates through data-driven drug repurposing. Awarded 1st Place in the Mathematics and Computer Science Category at the National Junior Science and Humanities Symposium in Albuquerque, New Mexico.",
-    whatILearned: "I learned how to combine biological data and preprocess it to use ML algorithms effectively.",
+    description: "NeuroCADR: built a **computational drug-repurposing pipeline** to find and rank **anti-epileptic drug candidates**. **1st place, Math & CS** at the **National Junior Science and Humanities Symposium**.",
+    whatILearned: "Combining and preprocessing **biological data** so **ML algorithms** can use it well.",
     technologies: ["ML Algorithms", "KNN", "RF", "Drug Repurposing", "Pandas"],
     link: "https://arxiv.org/pdf/2309.13047",
     linkText: "View on Arxiv",
@@ -231,7 +269,7 @@ export const projects = [
   {
     id: 8,
     room: "projects",
-    plaque: "Food Shelf Life",
+    plaque: "ML-Based Food Expiry Predictor",
     art: "foodShelfLife",
     title: "ML-Based Food Shelf Life Tracking",
     category: "ML, CV Research",
@@ -250,7 +288,7 @@ export const projects = [
   {
     id: 1,
     room: "projects",
-    plaque: "Campaign AI",
+    plaque: "AI Ad Campaign Manager",
     art: "campaign",
     title: "AI-Powered Performance Campaign Manager",
     category: "AI, Web Dev",

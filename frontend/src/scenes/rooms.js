@@ -28,7 +28,7 @@ const HALL_FRAME = { w: 56, h: 44, y: 44 }
 const STARRY_FRAME = { w: 38, h: 26, y: 54 }
 const ITEM_FRAME = { w: 48, h: 38, y: 50 }
 const HALL_GAP = 50
-const ITEM_GAP = 48
+const ITEM_GAP = 56
 const TILE_W = 24
 const TILE_GAP = 32
 const START_TILE_X = 16 // Home portal just inside the entrance
@@ -65,7 +65,9 @@ export function projectItems(projects) {
     card: card({
       title: p.title,
       subtitle: p.category,
+      // Projects can use a description paragraph or, like the research roles, short bullets.
       body: [p.description, p.whatILearned && `What I learned: ${p.whatILearned}`].filter(Boolean),
+      bullets: p.bullets ?? [],
       tags: p.technologies ?? [],
       links: p.link ? [{ href: p.link, label: p.linkText ?? 'View project' }] : [],
       image: p.image,
@@ -82,7 +84,10 @@ export function experienceItems(experience) {
       title: e.company,
       subtitle: e.role,
       meta: [e.location, e.dates].filter(Boolean).join(' · '),
+      body: e.paper ? [`**Paper:** ${e.paper}`] : [],
       bullets: e.bullets,
+      tags: e.tags ?? [],
+      image: e.image ?? null,
     }),
   }))
 }
@@ -111,13 +116,19 @@ export function aboutItems({ profile, education, skills, interests }) {
       id: 'about-skills',
       plaque: 'Skills',
       thumb: { type: 'art', art: 'inventory' },
-      card: card({ title: 'Skills', bullets: skills.map((g) => `${g.group}: ${g.items.join(', ')}`) }),
+      card: card({ title: 'Skills', bullets: skills.map((g) => ({ label: g.group, text: g.items.join(', ') })) }),
     },
     {
       id: 'about-interests',
       plaque: 'Interests',
       thumb: { type: 'art', art: 'interests' },
-      card: card({ title: 'Interests', bullets: interests }),
+      card: card({
+        title: 'Interests',
+        bullets: [
+          { label: 'Academic & Research', text: interests.academic.join(', ') },
+          { label: 'For Fun', text: interests.personal.join(', ') },
+        ],
+      }),
     },
   ]
 }
