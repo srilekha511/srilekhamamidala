@@ -202,7 +202,8 @@ describe('rooms', () => {
     expect(trace.card.links).toEqual([{ href: 'https://purl.org/trace', label: 'View TRACE' }])
     expect(trace.card.body).toEqual([]) // two bullets, like the research roles
     expect(trace.card.bullets).toHaveLength(2)
-    expect(trace.card.bullets[1]).toMatch(/34\.5% → 71\.4%/)
+    for (const b of trace.card.bullets) expect(b).not.toMatch(/\d/) // a general summary, no numbers
+    expect(trace.card.bullets[1]).toMatch(/user study/)
   })
   it('TRACE credits MIT CSAIL on its plaque', () => {
     const trace = rooms.research.frames.find((f) => f.thumb.art === 'trace')

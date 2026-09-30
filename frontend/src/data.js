@@ -175,7 +175,7 @@ export const projects = [
     category: "NLP + HCI Research",
     bullets: [
       "Built **TRACE**, which turns a **knowledge-graph QA** answer's evidence into one **interactive reasoning path**: **connected** when the answer is supported, **visibly broken** when it isn't",
-      "In a **mixed-methods user study** (24 questions, 3–6 hops), **calibration accuracy more than doubled** on supported answers (**34.5% → 71.4%**, p = 2.0 × 10⁻⁴)",
+      "Ran a **mixed-methods user study** showing the reasoning path helps people **judge when to trust an answer**, especially when it's **backed by the graph**",
     ],
     technologies: ["Knowledge Graphs", "NLP", "Graph Search", "HCI", "User Studies"],
     link: "https://purl.org/trace",
