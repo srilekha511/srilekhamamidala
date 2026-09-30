@@ -124,4 +124,26 @@ describe('hallScene', () => {
     s.update(0.016, fakeInput())
     expect(s.update(0.016, fakeInput({ presses: ['interact'] }))).toContainEqual({ type: 'open', href: 'https://github.com/x' })
   })
+  it('collects a stamp only by jumping into it, and only once', () => {
+    const stampRoom = { ...room, stamp: { id: 'hall', x: 50, height: 22 } }
+    const s = createHallScene(stampRoom)
+    for (let i = 0; i < 30; i++) expect(s.update(1 / 60, fakeInput()).some((e) => e.type === 'stamp')).toBe(false) // standing under it
+    let got = []
+    s.update(1 / 60, fakeInput({ presses: ['jump'] }))
+    for (let i = 0; i < 60; i++) got = got.concat(s.update(1 / 60, fakeInput()).filter((e) => e.type === 'stamp'))
+    expect(got).toEqual([{ type: 'stamp', id: 'hall' }])
+    s.update(1 / 60, fakeInput({ presses: ['jump'] }))
+    for (let i = 0; i < 60; i++) expect(s.update(1 / 60, fakeInput()).some((e) => e.type === 'stamp')).toBe(false)
+  })
+  it('does not offer a stamp that was already collected', () => {
+    const s = createHallScene({ ...room, stamp: { id: 'hall', x: 50, height: 22 } }, { stampCollected: true })
+    expect(s.stampVisible).toBe(false)
+    s.update(1 / 60, fakeInput({ presses: ['jump'] }))
+    for (let i = 0; i < 60; i++) expect(s.update(1 / 60, fakeInput()).some((e) => e.type === 'stamp')).toBe(false)
+  })
+  it('misses the stamp when jumping too far away', () => {
+    const s = createHallScene({ ...room, stamp: { id: 'hall', x: 90, height: 22 } })
+    s.update(1 / 60, fakeInput({ presses: ['jump'] }))
+    for (let i = 0; i < 60; i++) expect(s.update(1 / 60, fakeInput()).some((e) => e.type === 'stamp')).toBe(false)
+  })
 })

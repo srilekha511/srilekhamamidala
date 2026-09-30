@@ -12,9 +12,12 @@ import TouchControls from './ui/TouchControls.jsx'
 import DirectoryMenu from './ui/DirectoryMenu.jsx'
 import useMediaQuery from './ui/useMediaQuery.js'
 import { openLink } from './ui/openLink.js'
+import PassportPanel from './ui/PassportPanel.jsx'
+import { createPassport } from './passport.js'
 
 export default function App() {
   const storage = useMemo(() => createStorage(), [])
+  const passport = useMemo(() => createPassport(storage), [storage])
   const initial = useMemo(() => parseHash(window.location.hash), [])
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
   const isTouch = useMediaQuery('(pointer: coarse)')
@@ -27,6 +30,8 @@ export default function App() {
   const [card, setCard] = useState(null)
   const [avatarPos, setAvatarPos] = useState(null)
   const [room, setRoom] = useState(initial.room)
+  const [stamps, setStamps] = useState(() => passport.list())
+  const [passportOpen, setPassportOpen] = useState(false)
 
   const gameRef = useRef(null)
   const roomRef = useRef(initial.room)
@@ -34,7 +39,7 @@ export default function App() {
   const quickPushedRef = useRef(false) // brochure opened by us, so closing can step back
 
   const options = useMemo(
-    () => ({ data, initialRoom: initial.room, playIntro: introPlaying, reducedMotion, isTouch, soundOn }),
+    () => ({ data, initialRoom: initial.room, playIntro: introPlaying, reducedMotion, isTouch, soundOn, collectedStamps: stamps }),
     // read once at mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
@@ -65,6 +70,10 @@ export default function App() {
     },
     back: () => setCard(null),
     open: (href) => openLink(href),
+    stamp: (id) => {
+      passport.collect(id)
+      setStamps(passport.list())
+    },
   }
 
   const onReady = useCallback((game) => {
@@ -96,8 +105,8 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    gameRef.current?.setPaused(quickOpen)
-  }, [quickOpen])
+    gameRef.current?.setPaused(quickOpen || passportOpen)
+  }, [quickOpen, passportOpen])
 
   const openQuick = () => {
     setQuickOpen(true)
@@ -113,6 +122,7 @@ export default function App() {
       window.history.replaceState(null, '', urlWithHash(hashFor(roomRef.current)))
     }
   }, [])
+  const closePassport = useCallback(() => setPassportOpen(false), [])
   const toggleSound = () => {
     const next = !soundOn
     setSoundOn(next)
@@ -132,7 +142,14 @@ export default function App() {
       <a className="skip-link" href="#/quick">Skip to text version</a>
       <header className="top-bar">
         <h1 className="site-title">Srilekha's Gallery</h1>
-        <CornerMenu soundOn={soundOn} onToggleSound={toggleSound} onReplayIntro={replayIntro} onQuickView={openQuick} />
+        <CornerMenu
+          soundOn={soundOn}
+          onToggleSound={toggleSound}
+          onReplayIntro={replayIntro}
+          onQuickView={openQuick}
+          stampCount={stamps.length}
+          onPassport={() => setPassportOpen(true)}
+        />
       </header>
 
       {!introPlaying && <DirectoryMenu room={room} onGo={travel} />}
@@ -155,6 +172,7 @@ export default function App() {
       </div>
 
       {quickOpen && <QuickView data={data} onClose={closeQuick} />}
+      {passportOpen && <PassportPanel stamps={stamps} onClose={closePassport} />}
     </div>
   )
 }

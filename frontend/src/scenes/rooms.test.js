@@ -224,4 +224,22 @@ describe('rooms', () => {
     expect(hub.card.image).toBe('/hardware.png')
     expect(trace.card.image).toBe('/trace.png')
   })
+  it('every room hides one stamp that needs a jump to reach', () => {
+    for (const room of Object.values(rooms)) {
+      expect(room.stamp.id, room.id).toBe(room.id)
+      expect(room.stamp.height, room.id).toBeGreaterThanOrEqual(18) // above a standing avatar's reach
+      expect(room.stamp.height, room.id).toBeLessThanOrEqual(30) // below the jump's peak
+      expect(room.stamp.x).toBeGreaterThan(0)
+      expect(room.stamp.x).toBeLessThan(room.width)
+    }
+  })
+  it('section stamps sit between the last painting and the end portals', () => {
+    for (const id of sectionIds) {
+      const room = rooms[id]
+      const last = room.frames.at(-1)
+      const firstEnd = room.tiles[1]
+      expect(room.stamp.x).toBeGreaterThan(last.x + last.w + 10)
+      expect(room.stamp.x).toBeLessThan(firstEnd.x - 10)
+    }
+  })
 })

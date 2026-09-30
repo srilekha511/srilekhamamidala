@@ -26,7 +26,7 @@ export default function GameCanvas({ options, handlers, onReady, children }) {
 
   useEffect(() => {
     const emitter = createEmitter()
-    const names = ['bubble', 'card', 'avatar', 'room', 'introDone', 'back', 'settled', 'open']
+    const names = ['bubble', 'card', 'avatar', 'room', 'introDone', 'back', 'settled', 'open', 'stamp']
     const offs = names.map((n) => emitter.on(n, (p) => handlersRef.current[n]?.(p)))
     const game = createGame({ canvas: canvasRef.current, emitter, ...options })
     gameRef.current = game

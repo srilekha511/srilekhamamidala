@@ -107,3 +107,16 @@ body { min-height: 100vh; }
   .directory__sign { display: none; margin-top: 8px; }
   .directory--open .directory__sign { display: block; }
 }
+
+/* Museum passport: a small booklet of room stamps. */
+.passport { position: fixed; inset: 0; z-index: 11; display: flex; align-items: center; justify-content: center; background: rgba(18, 14, 24, 0.7); padding: 16px; }
+.passport__book { position: relative; width: min(420px, 100%); background: #1f3b5c; color: #fbf3e0; border: 4px solid #0f2238; box-shadow: 0 0 0 4px var(--gold), 6px 6px 0 4px rgba(0, 0, 0, 0.5); padding: 20px; }
+.passport__close { position: absolute; top: 10px; right: 10px; }
+.passport__title { font-family: var(--pixel); font-size: 13px; color: var(--gold); margin: 0 0 6px; }
+.passport__count { font-family: var(--pixel); font-size: 9px; margin: 0 0 14px; opacity: 0.85; }
+.passport__grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.passport__slot { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 4px; border: 2px dashed rgba(251, 243, 224, 0.35); color: rgba(251, 243, 224, 0.35); font-family: var(--pixel); font-size: 7px; text-align: center; }
+.passport__slot .pixel-icon { width: 24px; height: 24px; }
+.passport__slot--stamped { border: 2px solid var(--maroon); background: #fbf3e0; color: var(--maroon); transform: rotate(-3deg); }
+.passport__slot--stamped:nth-child(even) { transform: rotate(2deg); }
+.passport__hint { font-size: 15px; line-height: 1.4; margin: 14px 0 0; }

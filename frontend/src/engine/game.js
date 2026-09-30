@@ -3,7 +3,7 @@ import { createLoop } from './loop.js'
 import { setupCanvas, setViewSize, VIEW_W, VIEW_H } from './renderer.js'
 import { clampCamera, followCamera } from './camera.js'
 import { createDirector, introPhase } from './director.js'
-import { welcomeText, enterFrameText, tileText, openLinkText, STARRY_TEXT } from './copy.js'
+import { welcomeText, enterFrameText, tileText, openLinkText, STARRY_TEXT, PASSPORT_COMPLETE_TEXT } from './copy.js'
 import { mulberry32 } from './rng.js'
 import { revealOrder, revealCount } from './effects/reveal.js'
 import { easeInOut, lerpRect } from './effects/tween.js'
@@ -15,6 +15,9 @@ import { createAudio } from './audio.js'
 import { drawFrame } from './sprites/frame.js'
 import { drawRoom, frameInnerScreenRect } from './draw/room.js'
 import { drawAvatar, drawDust, drawSparkle } from './draw/avatar.js'
+import { drawStamp } from './draw/stamp.js'
+import { fireworkPixels } from './effects/fireworks.js'
+import { STAMP_IDS } from '../passport.js'
 import { createIntroReveal, drawWelcome, paintFull } from './draw/intro.js'
 import { buildRooms, AVATAR_FEET_Y, TILE_Y } from '../scenes/rooms.js'
 import { createHallScene } from '../scenes/hallScene.js'
@@ -34,7 +37,7 @@ function makeCanvas(w, h) {
   return { canvas: c, ctx }
 }
 
-export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIntro = false, reducedMotion = false, isTouch = false, soundOn = false }) {
+export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIntro = false, reducedMotion = false, isTouch = false, soundOn = false, collectedStamps = [] }) {
   const ctx = setupCanvas(canvas)
   const input = createInput()
   const detachInput = input.attach(window)
@@ -53,7 +56,12 @@ export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIn
 
   document.fonts?.load('8px "Press Start 2P"').catch(() => {})
 
-  let scene = createHallScene(rooms[initialRoom])
+  const stamps = new Set(collectedStamps)
+  const passportComplete = () => STAMP_IDS.every((id) => stamps.has(id))
+  let celebrateUntil = 0
+  const newScene = (room, opts = {}) => createHallScene(room, { ...opts, stampCollected: stamps.has(room.stamp?.id) })
+
+  let scene = newScene(rooms[initialRoom])
   let camX = clampCamera(scene.avatar.x - VIEW_W / 2, scene.room.width)
   let t = 0
   let paused = false
@@ -71,7 +79,7 @@ export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIn
 
   function enterScene(roomId, fromId) {
     const spawn = spawnFor(fromId, rooms[roomId])
-    scene = createHallScene(rooms[roomId], { spawnX: spawn.x, facing: spawn.facing })
+    scene = newScene(rooms[roomId], { spawnX: spawn.x, facing: spawn.facing })
     camX = clampCamera(scene.avatar.x - VIEW_W / 2, scene.room.width)
     emitter.emit('card', null)
     emitter.emit('bubble', null)
@@ -100,6 +108,16 @@ export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIn
         }
       }
       if (ev.type === 'open') emitter.emit('open', ev.href)
+      if (ev.type === 'stamp') {
+        stamps.add(ev.id)
+        emitter.emit('stamp', ev.id)
+        audio.sfx('stamp')
+        sparkleUntil = t + 0.8
+        if (passportComplete()) {
+          celebrateUntil = t + 6
+          emitter.emit('bubble', { text: PASSPORT_COMPLETE_TEXT })
+        }
+      }
       if (ev.type === 'jump') audio.sfx('jump')
       if (ev.type === 'land') landedAt = t
       if (ev.type === 'tile') emitter.emit('bubble', ev.tile ? { text: tileText(ev.tile.label, isTouch) } : null)
@@ -161,6 +179,16 @@ export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIn
 
   function drawWorld(target, { hideAvatar = false } = {}) {
     drawRoom(target, scene.room, camX, t, assets, scene.activeTile?.id ?? null)
+    if (scene.stampVisible) drawStamp(target, scene.room.stamp, camX, t)
+    if (scene.room.id === 'hall' && passportComplete() && (t < celebrateUntil || scene.activeFrame?.kind === 'starry')) {
+      const starry = scene.room.frames.find((f) => f.kind === 'starry')
+      for (const p of fireworkPixels(t, starry.x + starry.w / 2 - camX, starry.y - 8)) {
+        target.globalAlpha = p.alpha
+        target.fillStyle = p.color
+        target.fillRect(p.x, p.y, p.size, p.size)
+      }
+      target.globalAlpha = 1
+    }
     if (!hideAvatar) drawAvatar(target, scene.avatar, camX)
     if (t < sparkleUntil) drawSparkle(target, scene.avatar.x - camX, AVATAR_FEET_Y - 12, t)
     if (landedAt >= 0 && t - landedAt < 0.25) drawDust(target, scene.avatar.x - camX, AVATAR_FEET_Y - 1, (t - landedAt) / 0.25)

@@ -6,13 +6,16 @@ export const JUMP_VELOCITY = 200 // px/s; peak ≈ 36px, about 1.5 avatar height
 export const GRAVITY = 560 // px/s²
 const LANDING_SQUASH = 0.12 // seconds
 
-export function createHallScene(room, { spawnX = room.spawnX, facing = 1 } = {}) {
+const STAMP_REACH = 8 // horizontal distance to touch the stamp
+
+export function createHallScene(room, { spawnX = room.spawnX, facing = 1, stampCollected = false } = {}) {
   const frameTracker = createProximityTracker()
   const tileTracker = createProximityTracker({ enter: 10, exit: 14 })
   const clampX = (x) => Math.max(AVATAR_MARGIN, Math.min(room.width - AVATAR_MARGIN, x))
   const avatar = { x: clampX(spawnX), facing, walking: false, animT: 0, y: 0, vy: 0, airborne: false, landing: 0 }
   let walkTarget = null
   let hasMoved = false
+  let stampVisible = !!room.stamp && !stampCollected
 
   function update(dt, input) {
     const events = []
@@ -63,6 +66,12 @@ export function createHallScene(room, { spawnX = room.spawnX, facing = 1 } = {})
     const t = tileTracker.update(avatar.x, room.tiles)
     if (t.changed) events.push({ type: 'tile', tile: t.active })
 
+    // Stamps float above the floor: only a jump reaches them.
+    if (stampVisible && Math.abs(avatar.x - room.stamp.x) <= STAMP_REACH && avatar.y >= room.stamp.height - 6) {
+      stampVisible = false
+      events.push({ type: 'stamp', id: room.stamp.id })
+    }
+
     // Portals and paintings only open with both feet on the floor.
     if (input.consume('interact') && !avatar.airborne) {
       if (tileTracker.active) {
@@ -88,6 +97,9 @@ export function createHallScene(room, { spawnX = room.spawnX, facing = 1 } = {})
     },
     get activeTile() {
       return tileTracker.active
+    },
+    get stampVisible() {
+      return stampVisible
     },
   }
 }

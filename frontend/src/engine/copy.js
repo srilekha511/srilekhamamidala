@@ -8,4 +8,5 @@ export const enterFrameText = (label, touch) => `${action(touch)} to step into t
 export const tileText = (label, touch) =>
   label === 'Home' ? `${action(touch)} to go to Home!` : `${action(touch)} to go to the ${label} page!`
 export const openLinkText = (label, touch) => `${action(touch)} to open ${label}!`
+export const PASSPORT_COMPLETE_TEXT = "You found all 6 stamps! Thanks for exploring my gallery ✨"
 export const STARRY_TEXT = "The Starry Night by Van Gogh, pixel edition!"

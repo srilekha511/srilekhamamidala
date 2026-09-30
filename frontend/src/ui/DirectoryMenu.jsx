@@ -1,18 +1,8 @@
 import { useState } from 'react'
-import { ICONS } from '../engine/sprites/icons.js'
+import PixelIcon from './PixelIcon.jsx'
 import { SECTIONS } from '../scenes/rooms.js'
 
 const DESTINATIONS = [{ id: 'hall', label: 'Home', icon: 'house' }, ...SECTIONS]
-
-// The same 8×8 pixel icons the portal tiles use, as crisp SVG.
-function PixelIcon({ name }) {
-  const rows = ICONS[name] ?? []
-  return (
-    <svg className="pixel-icon" viewBox="0 0 8 8" aria-hidden="true" shapeRendering="crispEdges">
-      {rows.flatMap((row, y) => [...row].map((ch, x) => (ch === 'x' ? <rect key={`${x}-${y}`} x={x} y={y} width="1" height="1" /> : null)))}
-    </svg>
-  )
-}
 
 // Wooden "Gallery Directory" sign for jumping straight to a room.
 export default function DirectoryMenu({ room, onGo }) {

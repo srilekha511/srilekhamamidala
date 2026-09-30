@@ -34,6 +34,7 @@ const TILE_GAP = 32
 const START_TILE_X = 16 // Home portal just inside the entrance
 const SECTION_SPAWN_X = 64 // arrive clear of that portal
 const FIRST_ITEM_X = 100
+const STAMP_HEIGHT = 22 // above a standing avatar, below the jump's peak
 
 export function buildHall(now) {
   const frames = []
@@ -61,6 +62,7 @@ export function buildHall(now) {
     tiles: [],
     width: Math.max(VIEW_W, x),
     spawnX: frames[0].x + frames[0].w + 16,
+    stamp: { id: 'hall', x: 24, height: STAMP_HEIGHT }, // tucked left of the Starry Night
   }
 }
 
@@ -199,6 +201,7 @@ function sectionRoom(section, items) {
     tiles: [startTile, ...endTiles],
     width: Math.max(VIEW_W, endTiles.at(-1).x + TILE_W + 12),
     spawnX: SECTION_SPAWN_X,
+    stamp: { id: section.id, x: lastEnd + 35, height: STAMP_HEIGHT }, // between the art and the portals
   }
 }
 

@@ -1,4 +1,4 @@
-export const KEYS = { introSeen: 'rg.introSeen', soundOn: 'rg.soundOn' }
+export const KEYS = { introSeen: 'rg.introSeen', soundOn: 'rg.soundOn', stamps: 'rg.stamps', theme: 'rg.theme' }
 
 function defaultBackend() {
   try {
