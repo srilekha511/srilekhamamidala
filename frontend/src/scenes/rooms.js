@@ -35,11 +35,20 @@ const START_TILE_X = 16 // Home portal just inside the entrance
 const SECTION_SPAWN_X = 64 // arrive clear of that portal
 const FIRST_ITEM_X = 100
 
-export function buildHall() {
+export function buildHall(now) {
   const frames = []
   let x = 60
   frames.push({ id: 'starry', kind: 'starry', label: 'The Starry Night', x, ...STARRY_FRAME })
   x += STARRY_FRAME.w + HALL_GAP
+  if (now) {
+    // "Now" board: a corkboard with this month's card, not a portal.
+    frames.push({
+      id: 'now', kind: 'now', label: 'Now', plaque: 'Now', x, ...ITEM_FRAME,
+      thumb: { type: 'art', art: 'now' },
+      card: card({ title: `Now · ${now.month}`, bullets: now.items }),
+    })
+    x += ITEM_FRAME.w + HALL_GAP
+  }
   for (const s of SECTIONS) {
     frames.push({ id: s.id, kind: 'section', label: s.label, target: s.id, cover: s.id, x, ...HALL_FRAME })
     x += HALL_FRAME.w + HALL_GAP
@@ -197,7 +206,7 @@ export function buildRooms(data) {
   const section = (id) => SECTIONS.find((s) => s.id === id)
   const inResearch = (x) => x.room === 'research'
   return {
-    hall: buildHall(),
+    hall: buildHall(data.now),
     about: sectionRoom(section('about'), aboutItems(data)),
     // Research: roles first, then papers, so the CSAIL role sits next to its paper.
     research: sectionRoom(section('research'), [

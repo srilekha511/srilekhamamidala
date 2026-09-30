@@ -12,12 +12,12 @@ const builds = data.projects.filter((p) => p.room !== 'research')
 
 describe('rooms', () => {
   it('main hall has its six frames in order and no tiles', () => {
-    expect(rooms.hall.frames.map((f) => f.id)).toEqual(['starry', 'about', 'research', 'projects', 'experience', 'contact'])
+    expect(rooms.hall.frames.map((f) => f.id)).toEqual(['starry', 'now', 'about', 'research', 'projects', 'experience', 'contact'])
     expect(rooms.hall.tiles).toEqual([])
     const [starry, about] = rooms.hall.frames
     expect(starry.w).toBeLessThan(about.w)
     expect(starry.h).toBeLessThan(about.h)
-    for (const f of rooms.hall.frames.slice(1)) expect(f.target).toBe(f.id)
+    for (const f of rooms.hall.frames.slice(2)) expect(f.target).toBe(f.id)
   })
   it('shows every project and role exactly once across the three work rooms', () => {
     const work = ['research', 'projects', 'experience'].flatMap((id) => rooms[id].frames)
@@ -208,5 +208,14 @@ describe('rooms', () => {
   it('TRACE credits MIT CSAIL on its plaque', () => {
     const trace = rooms.research.frames.find((f) => f.thumb.art === 'trace')
     expect(plaqueLines(trace.plaque)).toEqual(['Knowledge Graph QA', 'MIT CSAIL'])
+  })
+  it('the main hall has a Now board with this month\'s card and no portal', () => {
+    const now = rooms.hall.frames.find((f) => f.id === 'now')
+    expect(now.kind).toBe('now')
+    expect(now.target).toBeUndefined()
+    expect(now.plaque).toBe('Now')
+    expect(now.thumb).toEqual({ type: 'art', art: 'now' })
+    expect(now.card.title).toBe(`Now · ${data.now.month}`)
+    expect(now.card.bullets).toEqual(data.now.items)
   })
 })

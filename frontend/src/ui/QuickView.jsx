@@ -26,7 +26,7 @@ const project = (p) => (
 
 export default function QuickView({ data, onClose }) {
   const closeRef = useRef(null)
-  const { profile, education, skills, interests, experience, projects } = data
+  const { profile, education, skills, interests, experience, projects, now } = data
 
   useEffect(() => {
     closeRef.current?.focus()
@@ -46,6 +46,11 @@ export default function QuickView({ data, onClose }) {
             <p>{profile.fullRole}</p>
           </div>
         </header>
+
+        <section>
+          <h2>Now · {now.month}</h2>
+          <ul>{now.items.map((item) => <li key={item}><RichText text={item} /></li>)}</ul>
+        </section>
 
         <section>
           <h2>About</h2>

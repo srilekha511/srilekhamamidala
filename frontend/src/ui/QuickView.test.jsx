@@ -10,7 +10,7 @@ describe('QuickView', () => {
       expect(screen.getByRole('heading', { name: h })).toBeTruthy()
     }
     for (const p of data.projects) expect(screen.getByText(p.title)).toBeTruthy()
-    for (const e of data.experience) expect(screen.getByText(e.company)).toBeTruthy()
+    for (const e of data.experience) expect(screen.getByRole('heading', { name: e.company })).toBeTruthy()
   })
   it('never shows a GPA', () => {
     const { container } = render(<QuickView data={data} onClose={() => {}} />)
@@ -46,5 +46,10 @@ describe('QuickView', () => {
     render(<QuickView data={data} onClose={() => {}} />)
     const trace = screen.getByText(/^TRACE:/).closest('article')
     expect(trace.querySelectorAll('li')).toHaveLength(2)
+  })
+  it('opens with what Srilekha is doing now', () => {
+    render(<QuickView data={data} onClose={() => {}} />)
+    const now = screen.getByRole('heading', { name: `Now · ${data.now.month}` }).closest('section')
+    expect(now.querySelectorAll('li')).toHaveLength(data.now.items.length)
   })
 })

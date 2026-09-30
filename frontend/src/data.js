@@ -33,6 +33,17 @@ export const skills = [
   { group: "Tools & Platforms", items: ["Bloomberg Terminal", "PowerPoint", "Word", "Excel", "Tableau", "Power BI", "Databricks", "AWS"] },
 ];
 
+// What I'm up to right now, shown on the "Now" board in the main hall. Update monthly.
+export const now = {
+  month: "September 2026",
+  items: [
+    "Researching **LLM memory** at the **MIT Media Lab**",
+    "Building **LLM evaluation pipelines** as an ML intern at **Acronym**",
+    "Sourcing **AI and frontier-tech startups** at **HOF Capital**",
+    "Running a **behavioral economics RCT** with **MIT Economics**",
+  ],
+};
+
 export const interests = {
   academic: [
     "AI & machine learning",

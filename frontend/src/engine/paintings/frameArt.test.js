@@ -6,7 +6,7 @@ import { FRAME_ART, drawFrameArt, HOBBY_ICONS } from './frameArt.js'
 const X = 100, Y = 53, W = 42, H = 32 // item frame inner area
 
 it('has scenes for the About and Contact rooms', () => {
-  for (const k of ['avatar', 'mit', 'inventory', 'interests', 'email', 'github', 'linkedin']) expect(FRAME_ART).toHaveProperty(k)
+  for (const k of ['avatar', 'mit', 'inventory', 'interests', 'email', 'github', 'linkedin', 'now']) expect(FRAME_ART).toHaveProperty(k)
 })
 
 describe('frame art', () => {

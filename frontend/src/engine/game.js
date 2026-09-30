@@ -90,7 +90,9 @@ export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIn
       if (ev.type === 'frame') {
         if (inHall) {
           const f = ev.frame
-          emitter.emit('bubble', f ? { text: f.kind === 'starry' ? STARRY_TEXT : enterFrameText(f.label, isTouch) } : null)
+          emitter.emit('card', f?.card ?? null) // the Now board has a card; the paintings don't
+          if (f?.card) audio.sfx('card')
+          emitter.emit('bubble', f && !f.card ? { text: f.kind === 'starry' ? STARRY_TEXT : enterFrameText(f.label, isTouch) } : null)
         } else {
           emitter.emit('card', ev.frame?.card ?? null)
           if (ev.frame) audio.sfx('card')

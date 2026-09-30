@@ -236,6 +236,22 @@ const SCENES = {
     r(0, 30, 42, 2, '#9ccf8a')
   },
 
+  // ---- Main hall ----
+  // Now board: pinned notes and this month's calendar page on a corkboard
+  now(r, px, t) {
+    r(0, 0, 42, 32, '#c8955a')
+    for (const [sx, sy] of [[2, 30], [16, 1], [40, 15], [23, 28], [1, 14], [38, 30]]) r(sx, sy, 1, 1, '#a8763f')
+    const note = (x, y, w, h, color) => {
+      r(x + 1, y + 1, w, h, 'rgba(0,0,0,0.2)'); r(x, y, w, h, color)
+      for (let ly = y + 4; ly < y + h - 1; ly += 2) r(x + 2, ly, w - 4, 1, '#8a6420')
+      r(x + Math.floor(w / 2) - 1, y - 1, 2, 2, '#e05a3a')
+    }
+    note(3, 4, 12, 10, '#f6e27a'); note(17, 6, 10, 9, '#f4a6c8'); note(29, 3, 10, 11, '#9fd3f2'); note(6, 18, 13, 10, '#b8e0a8')
+    r(24, 17, 14, 12, '#fbf3e0'); r(24, 17, 14, 3, '#e05a3a')
+    for (let gy = 22; gy < 28; gy += 2) for (let gx = 26; gx < 37; gx += 2) r(gx, gy, 1, 1, '#9aa7b8')
+    if (Math.floor(t * 2) % 2) r(32, 24, 3, 3, '#e05a3a') // today, circled
+  },
+
   // ---- About ----
   avatar(r, px, t) {
     r(0, 0, 42, 32, '#f2d0a9'); r(0, 24, 42, 8, '#e8b98a')

@@ -75,4 +75,9 @@ describe('content', () => {
       'AI Insurance Chatbot', 'ML for Skin Diagnosis', 'ML-Based Food Expiry Predictor', 'AI Ad Campaign Manager',
     ])
   })
+  it('has a short Now list for the main hall', () => {
+    expect(data.now.month).toMatch(/^[A-Z][a-z]+ \d{4}$/)
+    expect(data.now.items.length).toBeGreaterThanOrEqual(1)
+    expect(data.now.items.length).toBeLessThanOrEqual(5)
+  })
 })
