@@ -335,6 +335,10 @@ export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIn
       }
       scene.walkTo(camX + fx * VIEW_W)
     },
+    // Wheel/trackpad scroll by `fraction` of the canvas width walks the avatar that far.
+    scrollBy(fraction) {
+      if (director.state.mode === 'play') scene.nudge(fraction * VIEW_W)
+    },
     isClickableAt(fx, fy) {
       return director.state.mode === 'play' && !!frameAt(scene.room, camX + fx * VIEW_W, fy * VIEW_H)?.target
     },

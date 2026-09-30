@@ -39,6 +39,20 @@ export default function GameCanvas({ options, handlers, onReady, children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Scrolling over the gallery walks the avatar (native listener so it can stop the page from scrolling).
+  useEffect(() => {
+    const box = boxRef.current
+    const onWheel = (e) => {
+      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY
+      if (!delta) return
+      e.preventDefault()
+      const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? box.clientWidth : 1
+      gameRef.current?.scrollBy((delta * unit) / box.clientWidth)
+    }
+    box.addEventListener('wheel', onWheel, { passive: false })
+    return () => box.removeEventListener('wheel', onWheel)
+  }, [])
+
   const at = (e) => {
     const rect = e.currentTarget.getBoundingClientRect()
     return [(e.clientX - rect.left) / rect.width, (e.clientY - rect.top) / rect.height]

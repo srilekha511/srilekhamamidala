@@ -14,19 +14,23 @@ export function createHallScene(room, { spawnX = room.spawnX, facing = 1, stampC
   const clampX = (x) => Math.max(AVATAR_MARGIN, Math.min(room.width - AVATAR_MARGIN, x))
   const avatar = { x: clampX(spawnX), facing, walking: false, animT: 0, y: 0, vy: 0, airborne: false, landing: 0 }
   let walkTarget = null
+  let jogging = false // scroll-driven walks speed up to catch up
   let hasMoved = false
   let stampVisible = !!room.stamp && !stampCollected
 
   function update(dt, input) {
     const events = []
     let dir = input.direction()
+    let speed = WALK_SPEED
     if (dir !== 0) {
       walkTarget = null
     } else if (walkTarget !== null) {
       const d = walkTarget - avatar.x
-      if (Math.abs(d) <= WALK_SPEED * dt) {
+      if (jogging) speed = Math.min(WALK_SPEED * 3, Math.max(WALK_SPEED, Math.abs(d) * 4))
+      if (Math.abs(d) <= speed * dt) {
         avatar.x = walkTarget
         walkTarget = null
+        jogging = false
       } else {
         dir = Math.sign(d)
       }
@@ -35,7 +39,7 @@ export function createHallScene(room, { spawnX = room.spawnX, facing = 1, stampC
     avatar.walking = dir !== 0
     if (dir !== 0) {
       avatar.facing = dir
-      avatar.x = clampX(avatar.x + dir * WALK_SPEED * dt)
+      avatar.x = clampX(avatar.x + dir * speed * dt)
       if (!hasMoved) {
         hasMoved = true
         events.push({ type: 'firstMove' })
@@ -91,6 +95,12 @@ export function createHallScene(room, { spawnX = room.spawnX, facing = 1, stampC
     update,
     walkTo(x) {
       walkTarget = clampX(x)
+      jogging = false
+    },
+    // Scroll wheel / trackpad: shift the walk target; successive scrolls accumulate.
+    nudge(dx) {
+      walkTarget = clampX((walkTarget ?? avatar.x) + dx)
+      jogging = true
     },
     get activeFrame() {
       return frameTracker.active
