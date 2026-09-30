@@ -218,4 +218,10 @@ describe('rooms', () => {
     expect(now.card.title).toBe(`Now · ${data.now.month}`)
     expect(now.card.bullets).toEqual(data.now.items)
   })
+  it('Hardware Hub and TRACE cards show their screenshots', () => {
+    const hub = rooms.projects.frames.find((f) => f.card.title === 'HackMIT Hardware Hub')
+    const trace = rooms.research.frames.find((f) => f.thumb.art === 'trace')
+    expect(hub.card.image).toBe('/hardware.png')
+    expect(trace.card.image).toBe('/trace.png')
+  })
 })

@@ -139,6 +139,7 @@ export const projects = [
     technologies: ["React", "TypeScript", "Flask", "PostgreSQL", "Docker"],
     link: "https://hardware.hackmit.org/",
     linkText: "Visit Hardware Hub",
+    image: "/hardware.png",
   },
   {
     id: 11,
@@ -191,6 +192,7 @@ export const projects = [
     technologies: ["Knowledge Graphs", "NLP", "Graph Search", "HCI", "User Studies"],
     link: "https://purl.org/trace",
     linkText: "View TRACE",
+    image: "/trace.png",
   },
   {
     id: 4,
