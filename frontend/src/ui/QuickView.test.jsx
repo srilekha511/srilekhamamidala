@@ -42,4 +42,9 @@ describe('QuickView', () => {
     expect(about).toContain('For Fun')
     expect(about).toContain('Philadelphia Eagles')
   })
+  it('shows bullet-style projects as bullets', () => {
+    render(<QuickView data={data} onClose={() => {}} />)
+    const trace = screen.getByText(/^TRACE:/).closest('article')
+    expect(trace.querySelectorAll('li')).toHaveLength(2)
+  })
 })

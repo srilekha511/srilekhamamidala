@@ -200,7 +200,9 @@ describe('rooms', () => {
     expect(trace.card.title).toBe('TRACE: An Interactive Visual Paradigm for Knowledge Graph Question-Answering')
     expect(trace.thumb.art).toBe('trace')
     expect(trace.card.links).toEqual([{ href: 'https://purl.org/trace', label: 'View TRACE' }])
-    expect(trace.card.body.join(' ')).toMatch(/34\.5% → 71\.4%/)
+    expect(trace.card.body).toEqual([]) // two bullets, like the research roles
+    expect(trace.card.bullets).toHaveLength(2)
+    expect(trace.card.bullets[1]).toMatch(/34\.5% → 71\.4%/)
   })
   it('TRACE credits MIT CSAIL on its plaque', () => {
     const trace = rooms.research.frames.find((f) => f.thumb.art === 'trace')

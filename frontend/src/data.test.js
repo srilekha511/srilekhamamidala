@@ -11,7 +11,8 @@ describe('content', () => {
     expect(data.projects.length).toBeGreaterThan(0)
     for (const p of data.projects) {
       expect(p.id).toBeDefined()
-      for (const f of ['title', 'category', 'description']) expect(typeof p[f]).toBe('string')
+      for (const f of ['title', 'category']) expect(typeof p[f]).toBe('string')
+      expect(typeof p.description === 'string' || Array.isArray(p.bullets), p.title).toBe(true)
       expect(Array.isArray(p.technologies)).toBe(true)
       if (p.image) expect(exists(p.image), p.image).toBe(true)
     }
@@ -46,7 +47,7 @@ describe('content', () => {
   })
   it('research cards are trimmed and bold their key words', () => {
     for (const e of data.experience.filter((x) => x.room === 'research')) for (const b of e.bullets) expect(b, e.company).toContain('**')
-    for (const p of data.projects.filter((x) => x.room === 'research')) expect(p.description, p.title).toContain('**')
+    for (const p of data.projects.filter((x) => x.room === 'research')) expect(p.description ?? p.bullets.join(' '), p.title).toContain('**')
   })
   it('the formality paper lives on the CSAIL role, and projects are titled by topic', () => {
     expect(data.projects.some((p) => /Subjective Qualities/.test(p.title))).toBe(false)

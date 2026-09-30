@@ -17,7 +17,8 @@ const project = (p) => (
   <article key={p.id} className="quick-view__entry">
     <h3>{p.title}</h3>
     <p className="quick-view__meta">{p.category}</p>
-    <p><RichText text={p.description} /></p>
+    {p.description && <p><RichText text={p.description} /></p>}
+    {p.bullets && <ul>{p.bullets.map((b) => <li key={b}><RichText text={b} /></li>)}</ul>}
     {p.technologies?.length > 0 && <p className="quick-view__meta">{p.technologies.join(' · ')}</p>}
     {p.link && <a href={p.link} target="_blank" rel="noopener noreferrer">{p.linkText ?? 'View project'}</a>}
   </article>

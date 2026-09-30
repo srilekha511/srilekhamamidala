@@ -65,7 +65,9 @@ export function projectItems(projects) {
     card: card({
       title: p.title,
       subtitle: p.category,
+      // Projects can use a description paragraph or, like the research roles, short bullets.
       body: [p.description, p.whatILearned && `What I learned: ${p.whatILearned}`].filter(Boolean),
+      bullets: p.bullets ?? [],
       tags: p.technologies ?? [],
       links: p.link ? [{ href: p.link, label: p.linkText ?? 'View project' }] : [],
       image: p.image,
