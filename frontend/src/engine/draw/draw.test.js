@@ -50,4 +50,14 @@ describe('intro layout follows the view width', () => {
     expect(x + String(text).length * 8 / 2).toBeCloseTo(200, 0)
     setViewSize(320)
   })
+describe('night mode', () => {
+  it('paints the walls with the room\'s night palette', () => {
+    const day = stubCtx(), night = stubCtx()
+    drawRoom(day, rooms.about, 0, 1, assets, null, false)
+    drawRoom(night, rooms.about, 0, 1, assets, null, true)
+    const firstFill = (ctx) => ctx.calls.find((c) => c[0] === 'fillStyle')[1]
+    expect(firstFill(day)).toBe(rooms.about.theme.wall)
+    expect(firstFill(night)).toBe(rooms.about.nightTheme.wall)
+  })
+})
 })

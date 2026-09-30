@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 
-const fakeGame = { skipIntro: vi.fn(), replayIntro: vi.fn(() => true), setPaused: vi.fn(), setSoundOn: vi.fn(), goTo: vi.fn(), press: vi.fn(), release: vi.fn(), clickAt: vi.fn(), isClickableAt: vi.fn(() => false) }
+const fakeGame = { setNight: vi.fn(), skipIntro: vi.fn(), replayIntro: vi.fn(() => true), setPaused: vi.fn(), setSoundOn: vi.fn(), goTo: vi.fn(), press: vi.fn(), release: vi.fn(), clickAt: vi.fn(), isClickableAt: vi.fn(() => false) }
 let handlers
 vi.mock('./ui/GameCanvas.jsx', () => ({
   default: (props) => {
@@ -151,5 +151,21 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: /passport/i }))
     expect(screen.getByRole('dialog', { name: /museum passport/i })).toBeTruthy()
     expect(fakeGame.setPaused).toHaveBeenLastCalledWith(true)
+  })
+  it('follows the system theme until the visitor picks one, then remembers it', () => {
+    window.localStorage.setItem('rg.introSeen', 'true')
+    render(<App />)
+    expect(document.documentElement.dataset.theme).toBe('light')
+    fireEvent.click(screen.getByRole('button', { name: 'Switch to dark mode' }))
+    expect(document.documentElement.dataset.theme).toBe('dark')
+    expect(fakeGame.setNight).toHaveBeenLastCalledWith(true)
+    expect(JSON.parse(window.localStorage.getItem('rg.theme'))).toBe('dark')
+    expect(screen.getByRole('button', { name: 'Switch to light mode' })).toBeTruthy()
+  })
+  it('starts dark when the visitor chose dark before', () => {
+    window.localStorage.setItem('rg.introSeen', 'true')
+    window.localStorage.setItem('rg.theme', '"dark"')
+    render(<App />)
+    expect(document.documentElement.dataset.theme).toBe('dark')
   })
 })

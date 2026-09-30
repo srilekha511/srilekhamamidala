@@ -37,7 +37,7 @@ function makeCanvas(w, h) {
   return { canvas: c, ctx }
 }
 
-export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIntro = false, reducedMotion = false, isTouch = false, soundOn = false, collectedStamps = [] }) {
+export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIntro = false, reducedMotion = false, isTouch = false, soundOn = false, collectedStamps = [], night = false }) {
   const ctx = setupCanvas(canvas)
   const input = createInput()
   const detachInput = input.attach(window)
@@ -178,7 +178,7 @@ export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIn
   }
 
   function drawWorld(target, { hideAvatar = false } = {}) {
-    drawRoom(target, scene.room, camX, t, assets, scene.activeTile?.id ?? null)
+    drawRoom(target, scene.room, camX, t, assets, scene.activeTile?.id ?? null, night)
     if (scene.stampVisible) drawStamp(target, scene.room.stamp, camX, t)
     if (scene.room.id === 'hall' && passportComplete() && (t < celebrateUntil || scene.activeFrame?.kind === 'starry')) {
       const starry = scene.room.frames.find((f) => f.kind === 'starry')
@@ -360,6 +360,9 @@ export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIn
       snap = makeCanvas(VIEW_W, VIEW_H)
       camX = clampCamera(scene.avatar.x - VIEW_W / 2, scene.room.width)
       lastAvatar = null
+    },
+    setNight(v) {
+      night = !!v
     },
     setSoundOn(v) {
       audio.setEnabled(v)

@@ -9,7 +9,7 @@ import { WAINSCOT_Y, FLOOR_Y, TILE_Y, TILE_H } from '../../scenes/rooms.js'
 
 export const frameInnerScreenRect = (f, camX) => ({ x: f.x - camX + 3, y: f.y + 3, w: f.w - 6, h: f.h - 6 })
 
-function drawBackground(ctx, theme, camX, t) {
+function drawBackground(ctx, theme, camX, t, night) {
   ctx.fillStyle = theme.wall
   ctx.fillRect(0, 0, VIEW_W, WAINSCOT_Y)
   ctx.fillStyle = theme.wallDark
@@ -34,12 +34,24 @@ function drawBackground(ctx, theme, camX, t) {
     ctx.fillRect(sx, 22, 4, 6)
     ctx.fillStyle = Math.sin(t * 9 + wx) > 0 ? '#f6d743' : '#f2a93b'
     ctx.fillRect(sx + 1, 18, 2, 4)
+    if (night) {
+      // warm pools of light around each sconce
+      ctx.fillStyle = '#f6d743'
+      const flicker = 0.01 * Math.sin(t * 9 + wx)
+      for (const [r, a] of [[16, 0.03], [12, 0.035], [8, 0.045], [5, 0.06]]) { // stepped pixel glow
+        ctx.globalAlpha = a + flicker
+        ctx.fillRect(sx + 2 - r, 20 - r, r * 2, r * 2)
+        ctx.fillRect(sx + 2 - r - 2, 20 - r + 3, r * 2 + 4, r * 2 - 6) // clip the corners
+      }
+      ctx.globalAlpha = 1
+    }
   }
 }
 
-export function drawRoom(ctx, room, camX, t, assets, activeTileId) {
+export function drawRoom(ctx, room, camX, t, assets, activeTileId, night = false) {
   const cam = Math.round(camX)
-  drawBackground(ctx, room.theme, cam, t)
+  const theme = night ? room.nightTheme : room.theme
+  drawBackground(ctx, theme, cam, t, night)
   for (const f of room.frames) {
     const sx = f.x - cam
     if (sx + f.w < 0 || sx > VIEW_W) continue
@@ -55,10 +67,10 @@ export function drawRoom(ctx, room, camX, t, assets, activeTileId) {
     const sx = tile.x - cam
     if (sx + tile.w < 0 || sx > VIEW_W) continue
     const active = tile.id === activeTileId
-    drawTile(ctx, sx, TILE_Y, tile.w, TILE_H, t, active, room.theme.accent)
+    drawTile(ctx, sx, TILE_Y, tile.w, TILE_H, t, active, theme.accent)
     drawIcon(ctx, tile.icon, sx + (tile.w - 8) / 2, WAINSCOT_Y + 8, '#fbf3e0')
     const lw = textWidth(tile.label)
     const lx = Math.round(sx + tile.w / 2 - lw / 2)
-    if (lx >= 0 && lx + lw <= VIEW_W) drawTinyText(ctx, tile.label, lx, WAINSCOT_Y - 10, room.theme.accent)
+    if (lx >= 0 && lx + lw <= VIEW_W) drawTinyText(ctx, tile.label, lx, WAINSCOT_Y - 10, theme.accent)
   }
 }

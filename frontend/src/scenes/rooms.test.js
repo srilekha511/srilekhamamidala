@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import * as data from '../data.js'
-import { buildRooms, SECTIONS, THEMES } from './rooms.js'
+import { buildRooms, SECTIONS, THEMES, NIGHT_THEMES } from './rooms.js'
 import { plaqueWidth, plaqueLines, textWidth } from '../engine/sprites/tinyFont.js'
 
 const rooms = buildRooms(data)
@@ -241,5 +241,20 @@ describe('rooms', () => {
       expect(room.stamp.x).toBeGreaterThan(last.x + last.w + 10)
       expect(room.stamp.x).toBeLessThan(firstEnd.x - 10)
     }
+  })
+  it('has a dim after-hours palette for every room, with readable labels', () => {
+    const lum = (hex) => {
+      const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+        .map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b
+    }
+    const contrast = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05) }
+    expect(Object.keys(NIGHT_THEMES).sort()).toEqual(Object.keys(THEMES).sort())
+    for (const [id, t] of Object.entries(NIGHT_THEMES)) {
+      expect(lum(t.wall), `${id} wall`).toBeLessThan(0.06)
+      expect(contrast(t.accent, t.wall), `${id} tile label`).toBeGreaterThanOrEqual(4.5)
+      expect(contrast('#fbf3e0', t.trim), `${id} tile icon`).toBeGreaterThanOrEqual(4.5)
+    }
+    for (const room of Object.values(rooms)) expect(room.nightTheme, room.id).toBe(NIGHT_THEMES[room.id])
   })
 })

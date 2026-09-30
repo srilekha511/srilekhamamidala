@@ -24,6 +24,16 @@ export const THEMES = {
   contact: { wall: '#eee0f2', wallDark: '#e1cfe7', trim: '#9278a8', floor: '#c9a3b1', floorLine: '#b28a99', accent: '#7a2560', ink: '#5a2a6a' },
 }
 
+// Dark mode: the museum after hours. Dim walls, glowing sconces, paintings keep their colour.
+export const NIGHT_THEMES = {
+  hall: { wall: '#1d1826', wallDark: '#181420', trim: '#3a2a1e', floor: '#2a1f18', floorLine: '#221a13', accent: '#e0b44c', ink: '#4a3a2a' },
+  about: { wall: '#16222b', wallDark: '#121c24', trim: '#2c3e4c', floor: '#2e2218', floorLine: '#251b13', accent: '#9fd3f2', ink: '#1f4e6e' },
+  research: { wall: '#26210f', wallDark: '#1f1b0c', trim: '#4a3e20', floor: '#2e2218', floorLine: '#251b13', accent: '#f2d27a', ink: '#5a3e0e' },
+  projects: { wall: '#142219', wallDark: '#101c14', trim: '#26402e', floor: '#2e2218', floorLine: '#251b13', accent: '#9ee6c1', ink: '#1e5a3e' },
+  experience: { wall: '#2a1a14', wallDark: '#231510', trim: '#3e2a22', floor: '#221e2c', floorLine: '#1b1824', accent: '#f2a93b', ink: '#6a3a22' },
+  contact: { wall: '#221628', wallDark: '#1c1222', trim: '#3a2a48', floor: '#2a1c22', floorLine: '#22161b', accent: '#f4a6c8', ink: '#5a2a6a' },
+}
+
 const HALL_FRAME = { w: 56, h: 44, y: 44 }
 const STARRY_FRAME = { w: 38, h: 26, y: 54 }
 const ITEM_FRAME = { w: 48, h: 38, y: 50 }
@@ -58,6 +68,7 @@ export function buildHall(now) {
     id: 'hall',
     label: 'Main Hall',
     theme: THEMES.hall,
+    nightTheme: NIGHT_THEMES.hall,
     frames,
     tiles: [],
     width: Math.max(VIEW_W, x),
@@ -197,6 +208,7 @@ function sectionRoom(section, items) {
     id: section.id,
     label: section.label,
     theme: THEMES[section.id],
+    nightTheme: NIGHT_THEMES[section.id],
     frames,
     tiles: [startTile, ...endTiles],
     width: Math.max(VIEW_W, endTiles.at(-1).x + TILE_W + 12),

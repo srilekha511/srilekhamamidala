@@ -21,6 +21,9 @@ export default function App() {
   const initial = useMemo(() => parseHash(window.location.hash), [])
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
   const isTouch = useMediaQuery('(pointer: coarse)')
+  const systemDark = useMediaQuery('(prefers-color-scheme: dark)')
+  const [themeChoice, setThemeChoice] = useState(() => storage.get(KEYS.theme, null)) // null = follow the system
+  const theme = themeChoice === 'dark' || themeChoice === 'light' ? themeChoice : systemDark ? 'dark' : 'light'
 
   const isDeepLink = initial.room !== 'hall' || initial.quick
   const [introPlaying, setIntroPlaying] = useState(() => !isDeepLink && !storage.get(KEYS.introSeen, false))
@@ -39,7 +42,7 @@ export default function App() {
   const quickPushedRef = useRef(false) // brochure opened by us, so closing can step back
 
   const options = useMemo(
-    () => ({ data, initialRoom: initial.room, playIntro: introPlaying, reducedMotion, isTouch, soundOn, collectedStamps: stamps }),
+    () => ({ data, initialRoom: initial.room, playIntro: introPlaying, reducedMotion, isTouch, soundOn, collectedStamps: stamps, night: theme === 'dark' }),
     // read once at mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
@@ -105,6 +108,11 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    gameRef.current?.setNight(theme === 'dark')
+  }, [theme])
+
+  useEffect(() => {
     gameRef.current?.setPaused(quickOpen || passportOpen)
   }, [quickOpen, passportOpen])
 
@@ -123,6 +131,11 @@ export default function App() {
     }
   }, [])
   const closePassport = useCallback(() => setPassportOpen(false), [])
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark'
+    setThemeChoice(next)
+    storage.set(KEYS.theme, next)
+  }
   const toggleSound = () => {
     const next = !soundOn
     setSoundOn(next)
@@ -149,6 +162,8 @@ export default function App() {
           onQuickView={openQuick}
           stampCount={stamps.length}
           onPassport={() => setPassportOpen(true)}
+          dark={theme === 'dark'}
+          onToggleTheme={toggleTheme}
         />
       </header>
 
