@@ -1,0 +1,62 @@
+/* Landing page: readable text in Inter, the museum's palette, pixel font only for small accents. */
+.landing {
+  --read: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column;
+  background: var(--bg); color: var(--ink); font-family: var(--read); font-size: 17px; line-height: 1.6;
+}
+.landing a { color: inherit; text-decoration: underline; text-decoration-color: var(--gold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.landing a:hover { color: var(--heading); }
+.landing a:focus-visible, .landing button:focus-visible { outline: 3px dashed var(--accent); outline-offset: 3px; }
+
+.landing__top, .landing__footer, .landing__main { width: 100%; max-width: 1120px; margin: 0 auto; padding-left: 24px; padding-right: 24px; }
+.landing__top { display: flex; justify-content: space-between; align-items: center; padding-top: 20px; padding-bottom: 16px; border-bottom: 1px solid color-mix(in srgb, var(--ink) 15%, transparent); }
+.landing__name { font-weight: 600; font-size: 18px; }
+.landing__theme { background: none; border: 2px solid var(--ink); width: 40px; height: 40px; cursor: pointer; font-size: 16px; }
+
+/* Desktop: text on the left, portal on the right. Phones: intro, portal, then work. */
+.landing__main {
+  flex: 1; display: grid; gap: 8px 64px; align-content: center; padding-top: 48px; padding-bottom: 48px;
+  grid-template-columns: minmax(0, 36rem) minmax(0, 1fr);
+  grid-template-areas: 'intro portal' 'work portal';
+}
+.landing__intro { grid-area: intro; }
+.landing__work { grid-area: work; }
+.landing__portal { grid-area: portal; display: flex; align-items: center; justify-content: center; }
+
+.landing__hi { font-size: clamp(40px, 7vw, 68px); line-height: 1.05; letter-spacing: -0.03em; font-weight: 700; margin: 0 0 20px; }
+.landing__first { color: var(--heading); }
+.landing__lede { font-size: 19px; margin: 0 0 8px; opacity: 0.85; }
+.landing__list { margin: 0; padding-left: 20px; }
+.landing__list li { margin: 4px 0; }
+.landing__list strong { font-weight: 600; }
+.landing__label { font-family: var(--pixel); font-size: 11px; font-weight: 400; text-transform: lowercase; color: var(--heading); margin: 32px 0 12px; letter-spacing: 0.5px; }
+.landing__note { opacity: 0.7; }
+
+.landing__footer { display: flex; flex-wrap: wrap; gap: 8px 24px; padding-top: 18px; padding-bottom: calc(24px + env(safe-area-inset-bottom)); border-top: 1px solid color-mix(in srgb, var(--ink) 15%, transparent); font-weight: 600; }
+
+/* The portal: Starry Night in a gold frame with a slow shimmer. */
+.portal { background: none; border: 0; padding: 0; cursor: pointer; color: var(--ink); display: flex; flex-direction: column; align-items: center; gap: 18px; width: min(100%, 440px); }
+.portal__frame {
+  display: block; width: 100%; padding: 14px; background: var(--gold); border: 4px solid var(--gold-dark);
+  box-shadow: inset 0 0 0 4px #f2d27a, 8px 8px 0 rgba(0, 0, 0, 0.25); animation: portal-shimmer 3.2s ease-in-out infinite;
+  transition: transform 0.2s steps(3);
+}
+.portal__canvas { display: block; width: 100%; aspect-ratio: 144 / 90; image-rendering: pixelated; image-rendering: crisp-edges; background: #0b1e4a; border: 3px solid var(--gold-dark); }
+.portal__caption { font-family: var(--pixel); font-size: 10px; letter-spacing: 0.5px; }
+.portal:hover .portal__frame, .portal:focus-visible .portal__frame { transform: translateY(-4px) scale(1.02); }
+.portal:hover .portal__caption { color: var(--heading); }
+@keyframes portal-shimmer {
+  0%, 100% { box-shadow: inset 0 0 0 4px #f2d27a, 8px 8px 0 rgba(0, 0, 0, 0.25), 0 0 0 0 rgba(242, 210, 122, 0); }
+  50% { box-shadow: inset 0 0 0 4px #fff1b8, 8px 8px 0 rgba(0, 0, 0, 0.25), 0 0 28px 6px rgba(242, 210, 122, 0.45); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .portal__frame { animation: none; transition: none; }
+}
+
+@media (max-width: 899px) {
+  .landing { font-size: 16px; }
+  .landing__top, .landing__footer, .landing__main { padding-left: 16px; padding-right: 16px; }
+  .landing__main { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'intro' 'portal' 'work'; padding-top: 32px; padding-bottom: 32px; align-content: start; }
+  .landing__portal { margin-top: 28px; }
+  .portal { width: min(100%, 360px); }
+}
