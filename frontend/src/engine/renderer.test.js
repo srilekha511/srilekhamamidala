@@ -30,11 +30,24 @@ describe('fitView (game fills the window)', () => {
     expect(wide.viewW * wide.scale).toBeCloseTo(1920, 0)
     expect(VIEW_H * wide.scale).toBeCloseTo(1080, 0)
   })
-  it('fills the width on portrait phones with a minimum world width', () => {
+  it('fills the width on portrait phones, zooming in within a world-width range', () => {
     const { viewW, scale } = fitView(390, 844)
-    expect(viewW).toBe(240)
+    expect(viewW).toBe(200)
     expect(viewW * scale).toBeCloseTo(390, 0)
     expect(VIEW_H * scale).toBeLessThan(844)
+  })
+  it('keeps the game to about half the height on short portrait phones', () => {
+    for (const [w, h] of [[320, 568], [375, 667], [360, 640]]) {
+      const { viewW, scale } = fitView(w, h)
+      expect(viewW).toBeGreaterThanOrEqual(200)
+      expect(viewW).toBeLessThanOrEqual(240)
+      expect(viewW * scale).toBeCloseTo(w, 0)
+      expect(VIEW_H * scale).toBeLessThanOrEqual(h * 0.5 + 2)
+    }
+  })
+  it('never zooms a portrait phone out past the minimum world width', () => {
+    const { viewW } = fitView(400, 500) // nearly square: half the height would need a wider world
+    expect(viewW).toBe(240)
   })
   it('caps very wide screens so rooms still fill the view', () => {
     const { viewW, scale } = fitView(3440, 800)

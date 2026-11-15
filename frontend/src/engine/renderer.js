@@ -20,6 +20,10 @@ export function setupCanvas(canvas) {
 
 export const MIN_VIEW_W = 240
 export const MAX_VIEW_W = 560
+// Portrait phones may zoom in down to this world width, while the game stays within
+// PORTRAIT_MAX_H of the window height so cards and controls still fit underneath.
+export const PORTRAIT_MIN_VIEW_W = 200
+const PORTRAIT_MAX_H = 0.5
 
 export function setViewSize(w) {
   VIEW_W = w
@@ -31,8 +35,11 @@ export function fitView(windowW, windowH) {
   let scale = windowH / VIEW_H
   let viewW = Math.floor(windowW / scale)
   if (viewW < MIN_VIEW_W) {
-    viewW = MIN_VIEW_W
-    scale = windowW / MIN_VIEW_W
+    const minScale = windowW / MIN_VIEW_W
+    const maxScale = windowW / PORTRAIT_MIN_VIEW_W
+    const wanted = Math.min(Math.max((windowH * PORTRAIT_MAX_H) / VIEW_H, minScale), maxScale)
+    viewW = Math.min(Math.max(Math.floor(windowW / wanted), PORTRAIT_MIN_VIEW_W), MIN_VIEW_W)
+    scale = windowW / viewW
   } else if (viewW > MAX_VIEW_W) {
     viewW = MAX_VIEW_W
   }

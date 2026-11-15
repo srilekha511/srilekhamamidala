@@ -16,7 +16,7 @@
 - Internal resolution exactly **320×180**; `ctx.imageSmoothingEnabled = false`; canvas CSS `image-rendering: pixelated`.
 - Main hall frames in order: Starry Night (small, decorative) → About → Projects → Experience → Contact. **No Awards room. No Résumé frame. GPA never appears anywhere.**
 - Portal tiles only at the **end** of section rooms: Home + the other three sections. The main hall has no tiles.
-- Speech copy (verbatim): welcome `Hi, I'm Srilekha! Welcome to my gallery ✨ Use ← → to walk, and step up to a painting to go inside.` (touch: `◀ ▶`); frame `Press Enter to step into {Section}!`; tile `Press Enter to go to {Destination}!`; touch variants replace `Press Enter` with `Tap A`.
+- Speech copy (verbatim): welcome `Hi, I'm Srilekha! Welcome to my gallery ✨ Use ← → to walk, and step up to a painting to go inside.` (touch: `◀ ▶`); frame `Press Enter to step into the {Section} page!`; tile `Press Enter to go to the{Destination} page!`; touch variants replace `Press Enter` with `Tap A`.
 - Sound **off by default**; storage keys `rg.introSeen`, `rg.soundOn`; all storage access via `src/storage.js` (never throws).
 - Intro plays on first visit only, and never when the page loads with a deep-link hash.
 - Engine code never touches DOM other than its own canvas, offscreen canvases, and window key/blur listeners. React never draws on the canvas.

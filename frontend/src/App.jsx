@@ -165,9 +165,9 @@ export default function App() {
           dark={theme === 'dark'}
           onToggleTheme={toggleTheme}
         />
+        {/* Floats on the left on big screens; collapses into a Map dropdown in the header on phones. */}
+        {!introPlaying && <DirectoryMenu room={room} onGo={travel} />}
       </header>
-
-      {!introPlaying && <DirectoryMenu room={room} onGo={travel} />}
 
       <main className="stage">
         <GameCanvas options={options} handlers={handlers} onReady={onReady}>
@@ -176,6 +176,10 @@ export default function App() {
         </GameCanvas>
         <div className="card-slot">
           <InfoCard card={card} onClose={() => setCard(null)} />
+          {/* Shown only on portrait touch screens, where the card area sits empty under the game. */}
+          {!card && !introPlaying && isTouch && (
+            <p className="card-hint">Walk up to a painting and its story appears here. In a hurry? Tap 📜 up top for the text version.</p>
+          )}
         </div>
       </main>
 
