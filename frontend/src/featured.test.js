@@ -18,6 +18,14 @@ describe('featuredItems', () => {
       { key: '7', title: 'Epilepsy ML', note: 'ML Research', href: '#/research', external: false },
     ])
   })
+  it('prefers the short plaque name when an entry has one', () => {
+    const items = featuredItems({
+      featured: ['csail', 13],
+      experience: [{ id: 'csail', room: 'research', plaque: 'LLM Evaluation @ MIT CSAIL', company: 'MIT CSAIL, Decentralized Information Group', role: 'Research Intern' }],
+      projects: [{ id: 13, room: 'research', plaque: 'Knowledge Graph QA @ MIT CSAIL', title: 'TRACE: An Interactive Visual Paradigm', category: 'NLP + HCI Research', link: 'https://purl.org/trace' }],
+    })
+    expect(items.map((i) => i.title)).toEqual(['LLM Evaluation @ MIT CSAIL', 'Knowledge Graph QA @ MIT CSAIL'])
+  })
   it('every id in the real data resolves', async () => {
     const real = await import('./data.js')
     expect(real.featured.length).toBeGreaterThan(0)
