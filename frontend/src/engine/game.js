@@ -37,14 +37,14 @@ function makeCanvas(w, h) {
   return { canvas: c, ctx }
 }
 
-export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIntro = false, reducedMotion = false, isTouch = false, soundOn = false, collectedStamps = [], night = false }) {
+export function createGame({ canvas, emitter, data, initialRoom = 'hall', playIntro = false, reducedMotion = false, isTouch = false, soundOn = false, collectedStamps = [], night = false, introFrom = 'start' }) {
   const ctx = setupCanvas(canvas)
   const input = createInput()
   const detachInput = input.attach(window)
   const audio = createAudio()
   audio.setEnabled(soundOn)
   const rooms = buildRooms(data)
-  const director = createDirector({ room: initialRoom, playIntro, reducedMotion })
+  const director = createDirector({ room: initialRoom, playIntro, reducedMotion, introFrom })
 
   const painting = generateStarryNight()
   const paintingCanvas = makeCanvas(painting.width, painting.height)

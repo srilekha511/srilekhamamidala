@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createDirector, introPhase, pickTransition, INTRO, DURATIONS } from './director.js'
+import { createDirector, introPhase, pickTransition, INTRO, DURATIONS, INTRO_ZOOM_START } from './director.js'
 
 const run = (d, seconds, dt = 1 / 60) => {
   const events = []
@@ -81,5 +81,18 @@ describe('director', () => {
     expect(d.replayIntro()).toBe(true)
     expect(d.state).toMatchObject({ mode: 'intro', room: 'hall', t: 0 })
     expect(d.replayIntro()).toBe(false)
+  })
+})
+
+describe('starting the intro at the zoom', () => {
+  it('can start the intro at the zoom', () => {
+    const d = createDirector({ playIntro: true, introFrom: 'zoom' })
+    expect(introPhase(d.state.t).phase).toBe('zoom')
+    expect(d.state.t).toBe(INTRO_ZOOM_START)
+    expect(d.tick(INTRO.zoom + 0.01)).toEqual([{ type: 'introDone' }])
+  })
+  it('ignores introFrom under reduced motion', () => {
+    const d = createDirector({ playIntro: true, introFrom: 'zoom', reducedMotion: true })
+    expect(d.state.t).toBe(0)
   })
 })

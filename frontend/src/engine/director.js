@@ -6,6 +6,8 @@ export const DURATIONS = {
   crossfade: { out: 0.25, in: 0.25 },
 }
 const INTRO_ORDER = ['reveal', 'welcome', 'hold', 'zoom']
+// Where a zoom-only intro starts: the painting fully revealed, about to shrink into the hall.
+export const INTRO_ZOOM_START = INTRO.reveal + INTRO.welcome + INTRO.hold
 
 export function introPhase(t, reduced = false) {
   if (reduced) return t >= REDUCED_INTRO ? { phase: 'done', p: 1 } : { phase: 'fade', p: t / REDUCED_INTRO }
@@ -24,8 +26,9 @@ export function pickTransition(from, to, { reducedMotion = false, kind } = {}) {
   return to === 'hall' && from !== 'hall' ? 'fold' : 'ripple'
 }
 
-export function createDirector({ room = 'hall', playIntro = false, reducedMotion = false } = {}) {
-  const state = { mode: playIntro ? 'intro' : 'play', room, t: 0, transition: null }
+export function createDirector({ room = 'hall', playIntro = false, reducedMotion = false, introFrom = 'start' } = {}) {
+  const startT = playIntro && introFrom === 'zoom' && !reducedMotion ? INTRO_ZOOM_START : 0
+  const state = { mode: playIntro ? 'intro' : 'play', room, t: startT, transition: null }
 
   function request(to, { kind, origin = null } = {}) {
     if (state.mode !== 'play' || to === state.room) return false
