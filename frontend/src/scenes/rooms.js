@@ -120,7 +120,7 @@ export function aboutItems({ profile, education, skills, interests }) {
       id: 'about-me',
       plaque: profile.firstName,
       thumb: { type: 'art', art: 'avatar' },
-      card: card({ title: profile.fullName, subtitle: profile.fullRole, body: [profile.bio], image: profile.headshot }),
+      card: card({ title: profile.fullName, subtitle: profile.fullRole, body: [profile.bio], image: profile.headshot, imageStyle: 'portrait' }), // show the whole photo, not a face crop
     },
     {
       id: 'about-education',

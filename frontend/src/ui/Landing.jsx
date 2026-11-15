@@ -1,5 +1,7 @@
+import { useEffect, useRef, useState } from 'react'
 import RichText from './RichText.jsx'
-import PortalPainting from './PortalPainting.jsx'
+import PortalWormhole, { ENTER_MS } from './PortalWormhole.jsx'
+import useMediaQuery from './useMediaQuery.js'
 import { featuredItems } from '../featured.js'
 import '../styles/landing.css'
 
@@ -9,9 +11,26 @@ const externalProps = { target: '_blank', rel: 'noopener noreferrer' }
 export default function Landing({ data, dark = false, onToggleTheme, onEnter }) {
   const { profile, now } = data
   const work = featuredItems(data)
+  const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
+  const [entering, setEntering] = useState(false)
+  const enteringRef = useRef(false)
+  const timerRef = useRef(0)
+  useEffect(() => () => clearTimeout(timerRef.current), [])
+
+  // The wormhole pulls you in and the screen goes dark, then the museum's intro takes over.
+  const enter = () => {
+    if (enteringRef.current) return
+    enteringRef.current = true
+    if (reducedMotion) {
+      onEnter()
+      return
+    }
+    setEntering(true)
+    timerRef.current = setTimeout(onEnter, ENTER_MS)
+  }
 
   return (
-    <div className="landing">
+    <div className={`landing ${entering ? 'landing--entering' : ''}`}>
       <header className="landing__top">
         <span className="landing__name">{profile.fullName.toLowerCase()}</span>
         <button className="landing__theme" onClick={onToggleTheme} aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}>
@@ -24,7 +43,7 @@ export default function Landing({ data, dark = false, onToggleTheme, onEnter }) 
           <h1 className="landing__hi">
             hi, i'm <span className="landing__first">{profile.firstName.toLowerCase()}</span>
           </h1>
-          <p className="landing__lede">cs, data science &amp; econ at mit. currently, i'm:</p>
+          <p className="landing__lede">i study cs, data science &amp; econ at mit. currently, i'm:</p>
           <ul className="landing__list">
             {now.items.map((item) => (
               <li key={item}>
@@ -35,7 +54,7 @@ export default function Landing({ data, dark = false, onToggleTheme, onEnter }) 
         </section>
 
         <div className="landing__portal">
-          <PortalPainting onEnter={onEnter} />
+          <PortalWormhole onEnter={enter} entering={entering} still={reducedMotion} />
         </div>
 
         <section className="landing__work" aria-labelledby="landing-work">
@@ -58,6 +77,7 @@ export default function Landing({ data, dark = false, onToggleTheme, onEnter }) 
         {profile.resume && <a href={profile.resume} {...externalProps}>resume</a>}
         <a href="#/quick">full text version</a>
       </footer>
+      {entering && <div className="landing__veil" aria-hidden="true" />}
     </div>
   )
 }

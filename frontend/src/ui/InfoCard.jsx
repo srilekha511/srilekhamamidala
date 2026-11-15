@@ -20,7 +20,9 @@ export default function InfoCard({ card, onClose }) {
   return (
     <article className="info-card pixel-border" aria-labelledby="info-card-title">
       <button className="info-card__close" onClick={onClose} aria-label="Close card">✕</button>
-      {card.image && <img className="info-card__image" src={asset(card.image)} alt="" />}
+      {card.image && (
+        <img className={`info-card__image${card.imageStyle === 'portrait' ? ' info-card__image--portrait' : ''}`} src={asset(card.image)} alt="" />
+      )}
       <h2 id="info-card-title" className="info-card__title">{card.title}</h2>
       {card.subtitle && <p className="info-card__subtitle">{card.subtitle}</p>}
       {card.meta && <p className="info-card__meta">{card.meta}</p>}

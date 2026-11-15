@@ -131,6 +131,9 @@ export default function Museum({ initialRoom = 'hall', intro = 'none', theme, on
     <div className="app">
       <a className="skip-link" href="#/quick">Skip to text version</a>
       <header className="top-bar">
+        <button className="pixel-button front-page-button" onClick={onHome} aria-label="Back to the front page">
+          ← <span className="label-front">Front page</span>
+        </button>
         <h1 className="site-title">
           <a className="site-title__link" href={urlWithHash(LANDING_HASH)} onClick={goHome}>Srilekha's Gallery</a>
         </h1>

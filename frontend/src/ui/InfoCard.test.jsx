@@ -34,4 +34,10 @@ describe('InfoCard', () => {
     const { container } = render(<InfoCard card={{ ...card, body: ['Won **PennApps**.'], bullets: ['Built **RCT** infra'] }} onClose={() => {}} />)
     expect([...container.querySelectorAll('strong')].map((s) => s.textContent)).toEqual(['PennApps', 'RCT'])
   })
+  it('shows a portrait photo whole instead of cropping it to a wide strip', () => {
+    const { container, rerender } = render(<InfoCard card={{ ...card, image: '/headshot.jpg', imageStyle: 'portrait' }} onClose={() => {}} />)
+    expect(container.querySelector('img').className).toBe('info-card__image info-card__image--portrait')
+    rerender(<InfoCard card={{ ...card, image: '/hardware.png' }} onClose={() => {}} />)
+    expect(container.querySelector('img').className).toBe('info-card__image')
+  })
 })

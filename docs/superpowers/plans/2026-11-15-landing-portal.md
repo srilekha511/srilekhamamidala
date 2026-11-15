@@ -20,7 +20,7 @@ All paths below are relative to `frontend/`. Run tests with `npx vitest run <fil
 - Palette: cream / maroon / gold via the existing CSS tokens (`--bg`, `--panel`, `--ink`, `--heading`, `--gold`, `--gold-dark`, `--maroon`), dark mode via `:root[data-theme='dark']`.
 - Running text in Inter (`'Inter', system-ui, sans-serif`); Press Start 2P only for the portal caption and small section labels.
 - Intro on portal click: full (reveal + welcome + hold + zoom) if `rg.introSeen` is not set, otherwise zoom only. Deep links and Back/Forward into the museum: no intro. Reduced motion: the existing short fade, regardless.
-- Portal caption copy: `step inside the gallery →`. Heading copy: `hi, i'm srilekha`. Subheading: `cs, data science & econ at mit. currently, i'm:`.
+- Portal caption copy: `step inside the gallery →`. Heading copy: `hi, i'm srilekha`. Subheading: `i study cs, data science & econ at mit. currently, i'm:`.
 
 ## Review Focus
 

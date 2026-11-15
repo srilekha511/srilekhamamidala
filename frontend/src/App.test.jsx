@@ -12,9 +12,14 @@ vi.mock('./ui/GameCanvas.jsx', () => ({
 }))
 
 import App from './App.jsx'
+import { ENTER_MS } from './ui/PortalWormhole.jsx'
 
 const HI = { level: 1, name: "hi, i'm srilekha" }
-const enter = () => fireEvent.click(screen.getByRole('button', { name: 'Step inside the gallery' }))
+// Click the portal and wait out the wormhole's pull-in animation.
+const enter = async () => {
+  fireEvent.click(screen.getByRole('button', { name: 'Step inside the gallery' }))
+  await act(() => new Promise((r) => setTimeout(r, ENTER_MS)))
+}
 const navigate = (url, Event = PopStateEvent) =>
   act(() => {
     window.history.replaceState(null, '', url)
@@ -40,18 +45,18 @@ describe('App', () => {
   })
   it('the portal enters the museum at #/hall with the full intro on a first visit', async () => {
     render(<App />)
-    enter()
+    await enter()
     expect(await screen.findByTestId('game')).toBeTruthy()
     expect(window.location.hash).toBe('#/hall')
     expect(lastGameOptions).toMatchObject({ initialRoom: 'hall', playIntro: true, introFrom: 'start' })
     expect(screen.queryByRole('heading', HI)).toBe(null)
   })
-  it('later portal visits play only the zoom', async () => {
+  it('every portal visit plays the full painting reveal, even after the intro was seen', async () => {
     window.localStorage.setItem('rg.introSeen', 'true')
     render(<App />)
-    enter()
+    await enter()
     await screen.findByTestId('game')
-    expect(lastGameOptions).toMatchObject({ playIntro: true, introFrom: 'zoom' })
+    expect(lastGameOptions).toMatchObject({ playIntro: true, introFrom: 'start' })
   })
   it('deep links open the museum room with no intro', async () => {
     window.history.replaceState(null, '', '/#/projects')
@@ -61,7 +66,7 @@ describe('App', () => {
   })
   it('Back from the museum returns to the landing, and Forward re-enters with no intro', async () => {
     render(<App />)
-    enter()
+    await enter()
     await screen.findByTestId('game')
     navigate('/')
     expect(screen.getByRole('heading', HI)).toBeTruthy()
@@ -72,9 +77,17 @@ describe('App', () => {
   })
   it('the museum title goes back to the landing page', async () => {
     render(<App />)
-    enter()
+    await enter()
     await screen.findByTestId('game')
     fireEvent.click(screen.getByRole('link', { name: "Srilekha's Gallery" }))
+    expect(screen.getByRole('heading', HI)).toBeTruthy()
+    expect(window.location.hash).toBe('')
+  })
+  it('the front-page button in the museum returns to the landing', async () => {
+    render(<App />)
+    await enter()
+    await screen.findByTestId('game')
+    fireEvent.click(screen.getByRole('button', { name: 'Back to the front page' }))
     expect(screen.getByRole('heading', HI)).toBeTruthy()
     expect(window.location.hash).toBe('')
   })
@@ -117,7 +130,7 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Switch to dark mode' }))
     expect(document.documentElement.dataset.theme).toBe('dark')
     expect(JSON.parse(window.localStorage.getItem('rg.theme'))).toBe('dark')
-    enter()
+    await enter()
     await screen.findByTestId('game')
     expect(lastGameOptions.night).toBe(true)
     expect(screen.getByRole('button', { name: 'Switch to light mode' })).toBeTruthy()

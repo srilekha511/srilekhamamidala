@@ -36,12 +36,11 @@ export const skills = [
 
 // What I'm up to right now, shown on the "Now" board in the main hall. Update monthly.
 export const now = {
-  month: "September 2026",
+  month: "November 2026",
   items: [
-    "Researching **LLM memory** at the **MIT Media Lab**",
-    "Building **LLM evaluation pipelines** as an ML intern at **Acronym**",
-    "Sourcing **AI and frontier-tech startups** at **HOF Capital**",
-    "Running a **behavioral economics RCT** with **MIT Economics**",
+    "Researching **fairness in shared AI agents** at the [MIT Media Lab](https://www.media.mit.edu/groups/camera-culture/overview/)",
+    "Building **LLM evaluation infrastructure** at [Acronym](https://goacronym.com/)",
+    "Exploring **frontier-tech startups** at [HOF Capital](https://hofcapital.com/)",
   ],
 };
 
@@ -86,16 +85,16 @@ export const experience = [
     ],
   },
   {
-    id: "medialab", room: "research", plaque: "LLM Memory Inference @ MIT Media Lab", art: "memoryLoop", company: "MIT Media Lab", role: "Research Intern",
+    id: "medialab", room: "research", plaque: "Shared AI Agents @ MIT Media Lab", art: "memoryLoop", company: "MIT Media Lab", role: "Research Intern",
     location: "", dates: "September 2026 – Present",
     bullets: [
-      "Investigating **self-confirming inference** in **persistent LLM memory**: tracing how an open-source memory system turns interactions into preference updates, to separate what users believe from what agents reinforce",
-      "Measuring **inference provenance** across multi-turn chats and validating automated labels against **hand-labeled traces**",
+      "Studying **whose preferences a shared AI agent serves** when people use it unequally, and formalizing **volume invariance**: new information can shift a user's influence, repetition can't",
+      "Running **controlled experiments** that vary how often users repeat themselves, and designing a **fairer memory mechanism**",
     ],
   },
   {
     id: "mitecon", room: "research", plaque: "Behavioral Econ RCT @ MIT Economics", art: "phoneWellbeing", company: "MIT Department of Economics", role: "Research Intern",
-    location: "Cambridge, MA", dates: "June 2026 – Present",
+    location: "Cambridge, MA", dates: "June 2026 – October 2026",
     bullets: [
       "Built and evaluated infrastructure for a **large-scale RCT** on **smartphone use and adolescent well-being**",
       "Diagnosed missing usage records from **Android app** and **Django backend** logs",
@@ -113,7 +112,7 @@ export const experience = [
     ],
   },
   {
-    id: "525vc", room: "experience", plaque: "525 VC", art: "voiceMemo", company: "525 Venture Capital Firm", role: "Venture Associate Intern",
+    id: "fivetwofive", room: "experience", plaque: "FiveTwoFive VC", art: "voiceMemo", company: "FiveTwoFive Venture Capital Firm", role: "Venture Associate Intern",
     location: "New York, NY", dates: "December 2025 – February 2026",
     bullets: [
       "Built AI-driven investment portfolio management system using voice and text agentic AI models to ingest founder calls, inbound applications, pitch decks, and market research for deal sourcing, generating first-pass deal memos and SWOT analyses",
@@ -162,8 +161,8 @@ export const projects = [
     plaque: "AI Deal Memo Generator",
     art: "dealMemo",
     title: "Investment Memo Generator",
-    category: "AI, Venture Capital · 525 VC",
-    description: "Built at **525 Venture Capital**: a web app that turns a **founder call**, **pitch deck**, and **financials** into a **first-draft investment memo**, with company research, a **SWOT analysis**, and a \"what do you have to believe\" section.",
+    category: "AI, Venture Capital · FiveTwoFive VC",
+    description: "Built at **FiveTwoFive Venture Capital**: a web app that turns a **founder call**, **pitch deck**, and **financials** into a **first-draft investment memo**, with company research, a **SWOT analysis**, and a \"what do you have to believe\" section.",
     whatILearned: "Wiring **LLM research, transcription, and document parsing** into one workflow, deployed on **Google Cloud Run**.",
     technologies: ["Python", "Flask", "Gemini API", "Google Cloud Run", "Docker"],
   },

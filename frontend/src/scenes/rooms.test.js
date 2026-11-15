@@ -24,6 +24,7 @@ describe('rooms', () => {
     expect(work).toHaveLength(data.projects.length + data.experience.length)
     expect(new Set(work.map((f) => f.id)).size).toBe(work.length)
     expect(rooms.about.frames.map((f) => f.id)).toEqual(['about-me', 'about-education', 'about-skills', 'about-interests'])
+    expect(rooms.about.frames[0].card).toMatchObject({ image: '/headshot.jpg', imageStyle: 'portrait' })
     expect(rooms.contact.frames.map((f) => f.id)).toEqual(['contact-email', 'contact-github', 'contact-linkedin'])
   })
   it('every section room starts with a Home portal before the first painting', () => {
@@ -130,7 +131,7 @@ describe('rooms', () => {
   })
   it('splits work into Research (roles then papers), Experience (jobs) and Projects (builds)', () => {
     expect(researchRoles.map((e) => e.plaque)).toEqual([
-      'LLM Memory Inference @ MIT Media Lab', 'Behavioral Econ RCT @ MIT Economics', 'LLM Evaluation @ MIT CSAIL',
+      'Shared AI Agents @ MIT Media Lab', 'Behavioral Econ RCT @ MIT Economics', 'LLM Evaluation @ MIT CSAIL',
     ])
     expect(researchProjects.map((p) => p.plaque)).toEqual([
       'Knowledge Graph QA @ MIT CSAIL', 'Election Law Graphs @ MIT Election Lab', 'LLMs for Legal Code @ University of Pennsylvania',

@@ -147,7 +147,7 @@ const SCENES = {
     r(31, 11, 9, 1, '#9ee6c1'); r(31, 15, 9, 1, '#f2c94c'); r(31, 19, 9, 1, '#e05a7a')
     r(38, 9, 1, 1, '#9ee6c1'); r(39, 10, 1, 1, '#9ee6c1'); r(38, 20, 1, 1, '#e05a7a'); r(39, 19, 1, 1, '#e05a7a')
   },
-  // 525 Investment Memo Generator: call audio + pitch deck flowing into a memo with a SWOT grid
+  // FiveTwoFive Investment Memo Generator: call audio + pitch deck flowing into a memo with a SWOT grid
   dealMemo(r) {
     r(0, 0, 42, 32, '#f7e2cf')
     ;[2, 5, 8, 4, 9, 3, 6].forEach((hgt, i) => r(3 + i * 2, 10 - Math.floor(hgt / 2), 1, hgt, '#34466b'))
@@ -216,7 +216,7 @@ const SCENES = {
     px(ICONS.heart, { x: '#e05a7a' }, 24, 2)
     r(22, 22, 3, 7, '#2d6a4f'); r(26, 24, 3, 5, '#2d6a4f'); r(30, 19, 3, 10, '#2d6a4f'); r(34, 25, 3, 4, '#2d6a4f'); r(21, 29, 18, 1, '#1e3a2e')
   },
-  // 525 VC: voice-agent deal memos with a SWOT grid
+  // FiveTwoFive VC: voice-agent deal memos with a SWOT grid
   voiceMemo(r) {
     r(0, 0, 42, 32, '#f7e2cf')
     r(6, 3, 8, 11, '#34466b'); r(7, 5, 6, 1, '#6f7488'); r(7, 8, 6, 1, '#6f7488'); r(7, 11, 6, 1, '#6f7488')

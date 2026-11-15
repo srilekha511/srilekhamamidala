@@ -88,3 +88,32 @@ describe('resume', () => {
     expect(existsSync(resolve(__dirname, '../public', data.profile.resume.slice(1)))).toBe(true)
   })
 })
+
+describe('now (November 2026)', () => {
+  it('drops MIT Economics, which ended in October', () => {
+    expect(data.now.items.join(' ')).not.toMatch(/MIT Economics|RCT/)
+    const econ = data.experience.find((e) => e.id === 'mitecon')
+    expect(econ.dates).toBe('June 2026 – October 2026')
+  })
+  it('links the MIT Media Lab group page', () => {
+    expect(data.now.items).toContain('Researching **fairness in shared AI agents** at the [MIT Media Lab](https://www.media.mit.edu/groups/camera-culture/overview/)')
+  })
+  it('links Acronym and HOF Capital', () => {
+    expect(data.now.items).toContain('Building **LLM evaluation infrastructure** at [Acronym](https://goacronym.com/)')
+    expect(data.now.items).toContain('Exploring **frontier-tech startups** at [HOF Capital](https://hofcapital.com/)')
+  })
+  it('describes the Media Lab research as shared-agent fairness, not LLM memory', () => {
+    const lab = data.experience.find((e) => e.id === 'medialab')
+    expect(data.now.items.join(' ')).not.toMatch(/LLM memory/)
+    expect(lab.plaque).toBe('Shared AI Agents @ MIT Media Lab')
+    expect(lab.bullets.join(' ')).toMatch(/volume invariance/)
+  })
+})
+
+describe('FiveTwoFive', () => {
+  it('is always written FiveTwoFive, never 525', () => {
+    const all = JSON.stringify(data)
+    expect(all).not.toMatch(/525/)
+    expect(data.experience.find((e) => e.id === 'fivetwofive')).toMatchObject({ plaque: 'FiveTwoFive VC', company: 'FiveTwoFive Venture Capital Firm' })
+  })
+})

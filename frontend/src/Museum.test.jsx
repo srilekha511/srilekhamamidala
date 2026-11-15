@@ -73,6 +73,12 @@ describe('Museum', () => {
     fireEvent.click(screen.getByRole('link', { name: "Srilekha's Gallery" }))
     expect(onHome).toHaveBeenCalledTimes(1)
   })
+  it('a top-bar button goes back to the front page', () => {
+    const onHome = vi.fn()
+    renderMuseum({ onHome })
+    fireEvent.click(screen.getByRole('button', { name: 'Back to the front page' }))
+    expect(onHome).toHaveBeenCalledTimes(1)
+  })
   it('sound starts off and toggles on', () => {
     renderMuseum()
     fireEvent.click(screen.getByRole('button', { name: /sound off/i }))

@@ -70,10 +70,10 @@ export default function App() {
   }
 
   const enterMuseum = () => {
-    const intro = storage.get(KEYS.introSeen, false) ? 'zoom' : 'full'
+    // Every trip through the wormhole plays the full painting reveal (Skip is always there).
     window.history.pushState(null, '', urlWithHash(hashFor('hall')))
     roomRef.current = 'hall'
-    show('museum', { room: 'hall', intro })
+    show('museum', { room: 'hall', intro: 'full' })
   }
   const goHome = () => {
     window.history.pushState(null, '', urlWithHash(LANDING_HASH))
