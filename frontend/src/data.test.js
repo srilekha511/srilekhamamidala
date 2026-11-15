@@ -81,3 +81,10 @@ describe('content', () => {
     expect(data.now.items.length).toBeLessThanOrEqual(5)
   })
 })
+
+describe('resume', () => {
+  it('links to a PDF that ships with the site', () => {
+    expect(data.profile.resume).toBe('/resume.pdf')
+    expect(existsSync(resolve(__dirname, '../public', data.profile.resume.slice(1)))).toBe(true)
+  })
+})

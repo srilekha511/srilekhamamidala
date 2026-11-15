@@ -5,6 +5,7 @@ export const profile = {
   bio: "I'm a student at MIT studying Computer Science, Data Science, and Economics. Check out my projects and experience, and feel free to reach out!",
   email: "mamidala@mit.edu",
   headshot: "/headshot.jpg",
+  resume: "/resume.pdf", // shown as a "resume" link on the landing page
   social: {
     github: "https://github.com/srilekha511",
     linkedin: "https://www.linkedin.com/in/srilekha-mamidala/",

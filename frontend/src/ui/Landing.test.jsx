@@ -34,7 +34,8 @@ describe('Landing', () => {
     expect(onEnter).toHaveBeenCalledTimes(1)
   })
   it('shows a resume link only when one is configured', () => {
-    const { rerender } = render(<Landing data={data} onEnter={noop} onToggleTheme={noop} />)
+    const noResume = { ...data, profile: { ...data.profile, resume: undefined } }
+    const { rerender } = render(<Landing data={noResume} onEnter={noop} onToggleTheme={noop} />)
     expect(screen.queryByRole('link', { name: 'resume' })).toBe(null)
     rerender(<Landing data={{ ...data, profile: { ...data.profile, resume: '/resume.pdf' } }} onEnter={noop} onToggleTheme={noop} />)
     expect(screen.getByRole('link', { name: 'resume' }).getAttribute('href')).toBe('/resume.pdf')
