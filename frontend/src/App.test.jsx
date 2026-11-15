@@ -1,11 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 
 const fakeGame = { setNight: vi.fn(), skipIntro: vi.fn(), replayIntro: vi.fn(() => true), setPaused: vi.fn(), setSoundOn: vi.fn(), goTo: vi.fn(), press: vi.fn(), release: vi.fn(), clickAt: vi.fn(), isClickableAt: vi.fn(() => false) }
-let handlers
+let lastGameOptions
 vi.mock('./ui/GameCanvas.jsx', () => ({
   default: (props) => {
-    handlers = props.handlers
+    lastGameOptions = props.options
     props.onReady(fakeGame)
     return <div data-testid="game">{props.children}</div>
   },
@@ -13,157 +13,116 @@ vi.mock('./ui/GameCanvas.jsx', () => ({
 
 import App from './App.jsx'
 
+const HI = { level: 1, name: "hi, i'm srilekha" }
+const enter = () => fireEvent.click(screen.getByRole('button', { name: 'Step inside the gallery' }))
+const navigate = (url, Event = PopStateEvent) =>
+  act(() => {
+    window.history.replaceState(null, '', url)
+    window.dispatchEvent(new Event(Event === PopStateEvent ? 'popstate' : 'hashchange'))
+  })
+
+beforeAll(() => {
+  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null) // jsdom has no 2D canvas
+})
+
 beforeEach(() => {
   window.localStorage.clear()
-  window.location.hash = ''
+  window.history.replaceState(null, '', '/')
+  lastGameOptions = undefined
   Object.values(fakeGame).forEach((f) => f.mockClear())
 })
 
 describe('App', () => {
-  it('shows Skip on a first visit and skips the intro', () => {
+  it('the bare URL shows the landing, not the game', () => {
     render(<App />)
-    fireEvent.click(screen.getByRole('button', { name: /skip/i }))
-    expect(fakeGame.skipIntro).toHaveBeenCalled()
+    expect(screen.getByRole('heading', HI)).toBeTruthy()
+    expect(screen.queryByTestId('game')).toBe(null)
   })
-  it('does not offer Skip once the intro has been seen', () => {
+  it('the portal enters the museum at #/hall with the full intro on a first visit', async () => {
+    render(<App />)
+    enter()
+    expect(await screen.findByTestId('game')).toBeTruthy()
+    expect(window.location.hash).toBe('#/hall')
+    expect(lastGameOptions).toMatchObject({ initialRoom: 'hall', playIntro: true, introFrom: 'start' })
+    expect(screen.queryByRole('heading', HI)).toBe(null)
+  })
+  it('later portal visits play only the zoom', async () => {
     window.localStorage.setItem('rg.introSeen', 'true')
     render(<App />)
-    expect(screen.queryByRole('button', { name: /skip/i })).toBe(null)
+    enter()
+    await screen.findByTestId('game')
+    expect(lastGameOptions).toMatchObject({ playIntro: true, introFrom: 'zoom' })
   })
-  it('does not play the intro for deep links', () => {
-    window.location.hash = '#/projects'
+  it('deep links open the museum room with no intro', async () => {
+    window.history.replaceState(null, '', '/#/projects')
     render(<App />)
-    expect(screen.queryByRole('button', { name: /skip/i })).toBe(null)
+    await screen.findByTestId('game')
+    expect(lastGameOptions).toMatchObject({ initialRoom: 'projects', playIntro: false })
   })
-  it('opens the Quick view from the menu and pauses the game', () => {
-    window.localStorage.setItem('rg.introSeen', 'true')
+  it('Back from the museum returns to the landing, and Forward re-enters with no intro', async () => {
     render(<App />)
-    fireEvent.click(screen.getByRole('button', { name: /quick view/i }))
-    expect(screen.getByRole('dialog')).toBeTruthy()
-    expect(fakeGame.setPaused).toHaveBeenLastCalledWith(true)
+    enter()
+    await screen.findByTestId('game')
+    navigate('/')
+    expect(screen.getByRole('heading', HI)).toBeTruthy()
+    expect(screen.queryByTestId('game')).toBe(null)
+    navigate('/#/hall')
+    await screen.findByTestId('game')
+    expect(lastGameOptions.playIntro).toBe(false)
   })
-  it('opens the Quick view directly from #/quick', () => {
-    window.location.hash = '#/quick'
+  it('the museum title goes back to the landing page', async () => {
     render(<App />)
-    expect(screen.getByRole('dialog')).toBeTruthy()
+    enter()
+    await screen.findByTestId('game')
+    fireEvent.click(screen.getByRole('link', { name: "Srilekha's Gallery" }))
+    expect(screen.getByRole('heading', HI)).toBeTruthy()
+    expect(window.location.hash).toBe('')
   })
-  it('sound starts off and toggles on', () => {
-    window.localStorage.setItem('rg.introSeen', 'true')
-    render(<App />)
-    const btn = screen.getByRole('button', { name: /sound off/i })
-    fireEvent.click(btn)
-    expect(fakeGame.setSoundOn).toHaveBeenLastCalledWith(true)
-    expect(screen.getByRole('button', { name: /sound on/i })).toBeTruthy()
-  })
-  it('announces bubbles and cards in a live region', () => {
-    window.localStorage.setItem('rg.introSeen', 'true')
-    render(<App />)
-    act(() => handlers.bubble({ text: 'Press Enter to step into the Projects page!' }))
-    expect(screen.getByRole('status').textContent).toContain('Press Enter to step into the Projects page!')
-  })
-  it('records that the intro was seen', () => {
-    render(<App />)
-    act(() => handlers.introDone())
-    expect(window.localStorage.getItem('rg.introSeen')).toBe('true')
-  })
-  it('applies a Back/Forward that arrived mid-transition once the game settles', () => {
-    window.localStorage.setItem('rg.introSeen', 'true')
-    render(<App />)
-    fakeGame.goTo.mockReturnValueOnce(false)
-    act(() => {
-      window.history.replaceState(null, '', '#/about')
-      window.dispatchEvent(new HashChangeEvent('hashchange'))
-    })
-    expect(fakeGame.goTo).toHaveBeenLastCalledWith('about', { kind: 'crossfade' })
-    fakeGame.goTo.mockClear()
-    act(() => handlers.settled())
-    expect(fakeGame.goTo).toHaveBeenCalledWith('about', { kind: 'crossfade' })
-  })
-  it('normalising the startup hash does not add a history entry', () => {
-    window.localStorage.setItem('rg.introSeen', 'true')
-    window.history.replaceState(null, '', '#/Projects')
-    render(<App />)
-    const before = window.history.length
-    act(() => handlers.room('projects'))
-    expect(window.location.hash).toBe('#/projects')
-    expect(window.history.length).toBe(before)
-  })
-  it('walking into a new room adds a history entry so Back works', () => {
-    window.localStorage.setItem('rg.introSeen', 'true')
-    render(<App />)
-    act(() => handlers.room('hall'))
-    const before = window.history.length
-    act(() => handlers.room('about'))
-    expect(window.location.hash).toBe('#/about')
-    expect(window.history.length).toBe(before + 1)
-  })
-  it('closing a brochure opened from the menu steps back instead of stacking history', () => {
-    window.localStorage.setItem('rg.introSeen', 'true')
+  it('#/quick from the landing opens the brochure without loading the museum, and closing returns to the landing', () => {
     render(<App />)
     const back = vi.spyOn(window.history, 'back').mockImplementation(() => {})
-    fireEvent.click(screen.getByRole('button', { name: /quick view/i }))
+    navigate('/#/quick', HashChangeEvent)
+    expect(screen.getByRole('dialog')).toBeTruthy()
+    expect(screen.queryByTestId('game')).toBe(null)
     fireEvent.click(screen.getByRole('button', { name: /close brochure/i }))
-    expect(back).toHaveBeenCalledTimes(1)
     expect(screen.queryByRole('dialog')).toBe(null)
+    expect(screen.getByRole('heading', HI)).toBeTruthy()
+    expect(back).toHaveBeenCalledTimes(1)
     back.mockRestore()
   })
-  it('the main hall has a clean URL with no #', () => {
-    window.localStorage.setItem('rg.introSeen', 'true')
-    window.history.replaceState(null, '', '#/')
+  it('opening #/quick directly shows the brochure over the landing; closing tidies the URL', () => {
+    window.history.replaceState(null, '', '/#/quick')
     render(<App />)
-    act(() => handlers.room('hall'))
-    expect(window.location.href).not.toContain('#')
+    expect(screen.getByRole('dialog')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: /close brochure/i }))
+    expect(screen.getByRole('heading', HI)).toBeTruthy()
+    expect(window.location.hash).toBe('')
   })
-  it('walking back into the hall adds a clean history entry', () => {
-    window.localStorage.setItem('rg.introSeen', 'true')
-    window.history.replaceState(null, '', '#/about')
+  it('the brochure opened from the museum pauses the game and closing steps back', async () => {
+    window.history.replaceState(null, '', '/#/hall')
     render(<App />)
-    act(() => handlers.room('about'))
-    const before = window.history.length
-    act(() => handlers.room('hall'))
-    expect(window.location.href).not.toContain('#')
-    expect(window.history.length).toBe(before + 1)
-  })
-  it('the directory travels to a room and is hidden during the intro', () => {
-    render(<App />)
-    expect(screen.queryByRole('navigation', { name: /gallery directory/i })).toBe(null)
-    act(() => handlers.introDone())
-    fireEvent.click(screen.getByRole('button', { name: 'Projects' }))
-    expect(fakeGame.goTo).toHaveBeenLastCalledWith('projects')
-  })
-  it('the directory highlights the room the game reports', () => {
-    window.localStorage.setItem('rg.introSeen', 'true')
-    render(<App />)
-    act(() => handlers.room('about'))
-    expect(screen.getByRole('button', { name: 'About' }).getAttribute('aria-current')).toBe('page')
-  })
-  it('collecting a stamp updates the passport count and is remembered', () => {
-    window.localStorage.setItem('rg.introSeen', 'true')
-    render(<App />)
-    expect(screen.getByRole('button', { name: 'Passport: 0 of 6 stamps' })).toBeTruthy()
-    act(() => handlers.stamp('about'))
-    expect(screen.getByRole('button', { name: 'Passport: 1 of 6 stamps' })).toBeTruthy()
-    expect(JSON.parse(window.localStorage.getItem('rg.stamps'))).toEqual(['about'])
-  })
-  it('opening the passport pauses the game', () => {
-    window.localStorage.setItem('rg.introSeen', 'true')
-    render(<App />)
-    fireEvent.click(screen.getByRole('button', { name: /passport/i }))
-    expect(screen.getByRole('dialog', { name: /museum passport/i })).toBeTruthy()
+    await screen.findByTestId('game')
+    fireEvent.click(screen.getByRole('button', { name: /quick view/i }))
+    expect(screen.getByRole('dialog')).toBeTruthy()
     expect(fakeGame.setPaused).toHaveBeenLastCalledWith(true)
+    const back = vi.spyOn(window.history, 'back').mockImplementation(() => {})
+    fireEvent.click(screen.getByRole('button', { name: /close brochure/i }))
+    expect(back).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId('game')).toBeTruthy()
+    back.mockRestore()
   })
-  it('follows the system theme until the visitor picks one, then remembers it', () => {
-    window.localStorage.setItem('rg.introSeen', 'true')
+  it('a theme chosen on the landing carries into the museum and is remembered', async () => {
     render(<App />)
     expect(document.documentElement.dataset.theme).toBe('light')
     fireEvent.click(screen.getByRole('button', { name: 'Switch to dark mode' }))
     expect(document.documentElement.dataset.theme).toBe('dark')
-    expect(fakeGame.setNight).toHaveBeenLastCalledWith(true)
     expect(JSON.parse(window.localStorage.getItem('rg.theme'))).toBe('dark')
+    enter()
+    await screen.findByTestId('game')
+    expect(lastGameOptions.night).toBe(true)
     expect(screen.getByRole('button', { name: 'Switch to light mode' })).toBeTruthy()
   })
   it('starts dark when the visitor chose dark before', () => {
-    window.localStorage.setItem('rg.introSeen', 'true')
     window.localStorage.setItem('rg.theme', '"dark"')
     render(<App />)
     expect(document.documentElement.dataset.theme).toBe('dark')
