@@ -44,6 +44,9 @@ export const now = {
   ],
 };
 
+// The landing page's "selected work" list, in this order. Experience ids are strings; project ids are numbers.
+export const featured = ['disney', 'acronym', 10, 13, 'csail', 'medialab'];
+
 export const interests = {
   academic: [
     "AI & machine learning",
