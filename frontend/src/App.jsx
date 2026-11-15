@@ -4,6 +4,7 @@ import { createStorage, KEYS } from './storage.js'
 import { parseHash, hashFor, urlWithHash, LANDING_HASH } from './routing.js'
 import Landing from './ui/Landing.jsx'
 import QuickView from './ui/QuickView.jsx'
+import MuseumErrorBoundary from './ui/MuseumErrorBoundary.jsx'
 import useMediaQuery from './ui/useMediaQuery.js'
 
 // The game engine only downloads when someone enters the museum.
@@ -100,21 +101,23 @@ export default function App() {
       {view === 'landing' ? (
         <Landing data={data} dark={theme === 'dark'} onToggleTheme={toggleTheme} onEnter={enterMuseum} />
       ) : (
-        <Suspense fallback={<div className="museum-loading" />}>
-          <Museum
-            key={museum.key}
-            initialRoom={museum.room}
-            intro={museum.intro}
-            theme={theme}
-            onToggleTheme={toggleTheme}
-            quickOpen={quickOpen}
-            onOpenQuick={openQuick}
-            onHome={goHome}
-            onRoomChange={(room) => {
-              roomRef.current = room
-            }}
-          />
-        </Suspense>
+        <MuseumErrorBoundary onHome={goHome}>
+          <Suspense fallback={<div className="museum-loading" />}>
+            <Museum
+              key={museum.key}
+              initialRoom={museum.room}
+              intro={museum.intro}
+              theme={theme}
+              onToggleTheme={toggleTheme}
+              quickOpen={quickOpen}
+              onOpenQuick={openQuick}
+              onHome={goHome}
+              onRoomChange={(room) => {
+                roomRef.current = room
+              }}
+            />
+          </Suspense>
+        </MuseumErrorBoundary>
       )}
       {quickOpen && <QuickView data={data} onClose={closeQuick} />}
     </>
